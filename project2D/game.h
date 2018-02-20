@@ -6,9 +6,10 @@
 #define TILE_WIDTH 132
 #define TILE_HEIGHT 99
 
-#define WORLD_WIDTH 128
-#define WORLD_HEIGHT 128
+#define WORLD_WIDTH 32
+#define WORLD_HEIGHT 32
 
+class Camera;
 class ImageManager;
 class Tile;
 
@@ -19,6 +20,9 @@ public:
 	Game();
 	virtual ~Game();
 
+	Tile*			m_tiles[WORLD_HEIGHT][WORLD_WIDTH];
+	ImageManager*	m_imageManager;
+
 	static Game* getInstance() { return m_instance; };
 
 	virtual bool startup();
@@ -26,6 +30,8 @@ public:
 
 	virtual void update(float deltaTime);
 	virtual void draw();
+
+	void updateTiles();
 
 	void getMouseXY(float* x, float* y);
 
@@ -37,11 +43,7 @@ protected:
 
 	aie::Renderer2D*	m_2dRenderer;
 	aie::Font*			m_font;
-	ImageManager*		m_imageManager;
+	Camera*				m_camera;
 
-	Tile*				m_tiles[WORLD_HEIGHT][WORLD_WIDTH];
-
-	float m_cameraX, m_cameraY;
-	float m_timer;
-	float m_mapStartX, m_mapStartY;
+	float				m_mapStartX, m_mapStartY;
 };

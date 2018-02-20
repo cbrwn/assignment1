@@ -4,16 +4,30 @@
 
 class Game;
 
+enum TileType
+{
+	GRASS = 0,
+};
+
 class Tile
 {
 public:
 	Tile(Game* game, aie::Texture* tex);
 
 	virtual void draw(aie::Renderer2D* renderer, float dx, float dy);
+	virtual void update();
 
 	aie::Texture* getTexture();
 	void setTexture(aie::Texture* tex);
-private:
+
+	TileType getType();
+
+	void setIndices(int ix, int iy);
+protected:
+	// indices in the 2d tile array
+	int m_ix, m_iy;
+
 	Game*			m_game;
 	aie::Texture*	m_texture;
+	TileType		m_tileType;
 };

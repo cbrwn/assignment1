@@ -4,6 +4,7 @@
 #include <Font.h>
 #include <Input.h>
 
+#include "camera.h"
 #include "game.h"
 #include "imagemanager.h"
 #include "tile.h"
@@ -23,18 +24,17 @@ Game::~Game()
 bool Game::startup()
 {
 	srand((unsigned int)time(NULL));
-	setBackgroundColour(0.12f, 0.63f, 1.0f);
 
-	m_cameraX = 0;
-	m_cameraY = 0;
+	setBackgroundColour(0.12f, 0.63f, 1.0f);
+	this->setShowCursor(false);
 
 	m_2dRenderer = new aie::Renderer2D();
-
 	m_imageManager = new ImageManager();
+	m_camera = new Camera();
+
+	//m_camera->setScale(0.5f);
 
 	m_font = new aie::Font("./font/consolas.ttf", 32);
-
-	m_timer = 0;
 
 	m_mapStartX = 1200;
 	m_mapStartY = 800;
@@ -52,6 +52,7 @@ void Game::shutdown()
 
 	delete m_font;
 	delete m_2dRenderer;
+	delete m_camera;
 
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -61,9 +62,6 @@ void Game::shutdown()
 
 void Game::update(float deltaTime)
 {
-
-	m_timer += deltaTime;
-
 	// input example
 	aie::Input* input = aie::Input::getInstance();
 
@@ -71,24 +69,19 @@ void Game::update(float deltaTime)
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 
-	const float camSpeed = 1000.0f;
-	if (input->isKeyDown(aie::INPUT_KEY_LEFT))
-		m_cameraX -= camSpeed * deltaTime;
-	if (input->isKeyDown(aie::INPUT_KEY_RIGHT))
-		m_cameraX += camSpeed * deltaTime;
-	if (input->isKeyDown(aie::INPUT_KEY_UP))
-		m_cameraY += camSpeed * deltaTime;
-	if (input->isKeyDown(aie::INPUT_KEY_DOWN))
-		m_cameraY -= camSpeed * deltaTime;
-
 	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
 	{
 		float mx, my;
 		this->getMouseXY(&mx, &my);
-		Tile* mouseOver = getTileAtPosition(mx, my);
+		int ix, iy;
+		getTileAtPosition((int)mx, (int)my, &ix, &iy);
+		Tile* mouseOver = m_tiles[iy][ix];
 		if (mouseOver != nullptr)
-			mouseOver->setTexture(m_imageManager->getTexture("tiles/building"));
+		{
+		}
 	}
+
+	m_camera->update(deltaTime);
 }
 
 void Game::draw()
@@ -98,16 +91,18 @@ void Game::draw()
 	clearScreen();
 
 	// set the camera position before we begin rendering
-	m_2dRenderer->setCameraPos(m_cameraX, m_cameraY);
+	float camX, camY;
+	m_camera->getPosition(&camX, &camY);
+	m_2dRenderer->setCameraPos(camX, camY);
+	m_2dRenderer->setCameraScale(m_camera->getScale());
 
 	// begin drawing sprites
 	m_2dRenderer->begin();
 
 	// draw tiles
-	//m_2dRenderer->setRenderColour(1, 1, 1, 0.5f);
 	float mx, my;
 	this->getMouseXY(&mx, &my);
-	Tile* mouseOver = this->getTileAtPosition(mx, my);
+	Tile* mouseOver = this->getTileAtPosition((int)mx, (int)my);
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -129,13 +124,11 @@ void Game::draw()
 			float dify = TILE_HEIGHT - (float)thisTile->getTexture()->getHeight();
 
 			thisTile->draw(m_2dRenderer, xpos, -ypos - dify / 2.0f);
+			thisTile->setIndices(x, y);
 		}
 	}
 
 	m_2dRenderer->drawCircle((float)mx, (float)my, 8);
-	/*char mpos[32];
-	sprintf_s(mpos, 32, "(%d, %d)", (int)mx, (int)my);
-	m_2dRenderer->drawText(m_font, mpos, (float)mx, (float)my);*/
 
 	// done drawing sprites
 	m_2dRenderer->end();
@@ -155,13 +148,33 @@ void Game::draw()
 	m_2dRenderer->end();
 }
 
+void Game::updateTiles()
+{
+	for (int y = 0; y < WORLD_HEIGHT; y++)
+	{
+		for (int x = 0; x < WORLD_WIDTH; x++)
+		{
+			Tile* thisTile = m_tiles[y][x];
+			if (thisTile == nullptr)
+				continue;
+			thisTile->update();
+		}
+	}
+}
+
 void Game::getMouseXY(float* x, float* y)
 {
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
 
-	*x = mx + m_cameraX;
-	*y = my + m_cameraY;
+	// convert to floats for camera translation
+	float ax = (float)mx;
+	float ay = (float)my;
+
+	m_camera->screenToWorld(&ax, &ay);
+
+	*x = ax;
+	*y = ay;
 }
 
 // gets the tile at world position x,y 
