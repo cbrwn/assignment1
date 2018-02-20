@@ -45,4 +45,7 @@ private:
 	// dragging control
 	bool m_dragging;
 	float m_dragStartX, m_dragStartY;
+
+	// zoom control
+	double m_lastScroll;
 };

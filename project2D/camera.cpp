@@ -15,6 +15,7 @@ Camera::Camera()
 	m_arrowSpeed = 1000.0f;
 
 	m_dragging = false;
+	m_lastScroll = 0.0f;
 }
 
 void Camera::update(float delta)
@@ -29,6 +30,15 @@ void Camera::update(float delta)
 		m_targetY += m_arrowSpeed * delta;
 	if (input->isKeyDown(aie::INPUT_KEY_DOWN))
 		m_targetY -= m_arrowSpeed * delta;
+
+	// mousewheel scroll
+	double scrollAmt = input->getMouseScroll();
+	double dif = scrollAmt - m_lastScroll;
+	m_targetScale -= (float)dif * 0.1f;
+	m_lastScroll = scrollAmt;
+
+	if (m_targetScale < 0.2f)
+		m_targetScale = 0.2f;
 
 	// smoothly moves towards target position
 	m_actualX -= (m_actualX - m_targetX) * m_smoothSpeed * delta;

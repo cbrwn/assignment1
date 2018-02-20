@@ -1,4 +1,5 @@
 #include <ctime>
+#include <functional>
 
 #include <Texture.h>
 #include <Font.h>
@@ -128,16 +129,20 @@ void Game::draw()
 		}
 	}
 
-	m_2dRenderer->drawCircle((float)mx, (float)my, 8);
-
 	// done drawing sprites
 	m_2dRenderer->end();
 
 	// set camera back to 0,0 for ui stuff
 	m_2dRenderer->setCameraPos(0, 0);
+	m_2dRenderer->setCameraScale(1.0f);
 
 	// start drawing ui
 	m_2dRenderer->begin();
+
+	// show screen's mouse position (as opposed to the world mouse position)
+	int smx, smy;
+	aie::Input::getInstance()->getMouseXY(&smx, &smy);
+	m_2dRenderer->drawCircle((float)smx, (float)smy, 8);
 
 	// output some text, uses the last used colour
 	char fps[32];
