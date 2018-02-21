@@ -18,6 +18,11 @@ void Tile::update()
 {
 }
 
+char* Tile::getMouseoverText()
+{
+	return "";
+}
+
 aie::Texture* Tile::getTexture()
 {
 	return m_texture;
@@ -37,4 +42,11 @@ void Tile::setIndices(int ix, int iy)
 {
 	m_ix = ix;
 	m_iy = iy;
+}
+
+// stores the tile's place in the array into ix and iy
+void Tile::getIndices(int* ix, int* iy)
+{
+	*ix = m_ix;
+	*iy = m_iy;
 }
