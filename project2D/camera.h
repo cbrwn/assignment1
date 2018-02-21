@@ -44,7 +44,8 @@ private:
 
 	// dragging control
 	bool m_dragging;
-	float m_dragStartX, m_dragStartY;
+	float m_dragStartMX, m_dragStartMY; // starting mouse position
+	float m_dragStartCX, m_dragStartCY; // starting camera pos
 
 	// zoom control
 	double m_lastScroll;

@@ -31,6 +31,34 @@ void Camera::update(float delta)
 	if (input->isKeyDown(aie::INPUT_KEY_DOWN))
 		m_targetY -= m_arrowSpeed * delta;
 
+	// dragging control
+	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_RIGHT))
+	{
+		int mx, my;
+		input->getMouseXY(&mx, &my);
+		float wx = (float)mx; float wy = (float)my;
+		screenToWorld(&wx, &wy);
+
+		if (!m_dragging)
+		{
+			// start dragging if mouse is down
+			m_dragging = true;
+			m_dragStartMX = wx; m_dragStartMY = wy;
+			m_dragStartCX = m_actualX; m_dragStartCY = m_actualY;
+		}
+		else
+		{
+			// move the camera with the mouse
+			setX(m_dragStartCX + (m_dragStartMX - wx));
+			setY(m_dragStartCY + (m_dragStartMY - wy));
+		}
+	}
+	else
+	{
+		// stop dragging when mouse button is released
+		m_dragging = false;
+	}
+
 	// mousewheel scroll
 	double scrollAmt = input->getMouseScroll();
 	double dif = scrollAmt - m_lastScroll;

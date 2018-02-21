@@ -7,7 +7,7 @@ int main()
 	auto app = new Game();
 
 	// initialise and loop
-	app->run("isotest", 1920, 1280, false);
+	app->run("isotest", 1280, 720, false);
 
 	// deallocation
 	delete app;
