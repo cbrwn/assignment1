@@ -29,13 +29,14 @@ Game::~Game()
 bool Game::startup()
 {
 	srand((unsigned int)time(NULL));
+	setBackgroundColour(0.12f, 0.63f, 1.0f);
+	this->setVSync(true);
 
 	// set up tile names
 	m_tileNames[GRASS] = "Grass";
 	m_tileNames[HOUSE] = "House";
 	m_tileNames[SHOP] = "Shop";
 
-	setBackgroundColour(0.12f, 0.63f, 1.0f);
 	//this->setShowCursor(false);
 
 	m_2dRenderer = new aie::Renderer2D();
@@ -183,14 +184,13 @@ void Game::draw()
 
 			float xpos;// = (x - y) * TILE_WIDTH / 2.0f + m_mapStartX;
 			float ypos;// = (x + y) * TILE_HEIGHT / 3.0f - m_mapStartY;
-
 			getTileWorldPosition(x, y, &xpos, &ypos);
 
 			// account for the difference in height in the texture
 			// and keep the bottoms aligned
 			float dify = TILE_HEIGHT - (float)thisTile->getTexture()->getHeight();
 
-			thisTile->draw(m_2dRenderer, xpos, -ypos - dify / 2.0f);
+			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f);
 
 			// make sure the tile knows its place in the array
 			thisTile->setIndices(x, y);
@@ -257,6 +257,8 @@ void Game::draw()
 			m_2dRenderer->setRenderColour(1, 1, 1);
 			m_2dRenderer->drawText(mouseOverFont, info,
 				(float)mx + padding, (float)my - padding - stringHeight);
+
+			delete info;
 		}
 	}
 
@@ -269,19 +271,21 @@ void Game::draw()
 	sprintf_s(pop, 64, "Unemployment: %d / %d", m_peopleManager->getUnemployed(),
 		m_peopleManager->getTotalPopulation());
 	m_2dRenderer->setRenderColour(1, 1, 1);
-	m_2dRenderer->drawText(m_uiFontLarge, pop, 2, 720 - 18);
+	m_2dRenderer->drawText(m_uiFontLarge, pop, 2, (float)getWindowHeight() - 18);
 
 	// temp - show which tile we're placing
 	char plc[32];
 	sprintf_s(plc, 32, "Placing %s tile", m_tileNames[m_placeMode]);
-	m_2dRenderer->drawText(m_uiFontLarge, plc, 2, 720 - (18 * 2));
+	m_2dRenderer->drawText(m_uiFontLarge, plc, 2, 
+		(float)getWindowHeight() - (18 * 2));
 
 	// show money
 	char mny[32];
 	sprintf_s(mny, 32, "$%d", m_money);
 	float moneyWidth = m_uiFontLarge->getStringWidth(mny);
 	m_2dRenderer->setRenderColour(0, 0.4f, 0);
-	m_2dRenderer->drawText(m_uiFontLarge, mny, 1280 - moneyWidth - 2, 720 - 18);
+	m_2dRenderer->drawText(m_uiFontLarge, mny, 
+		getWindowWidth() - moneyWidth - 2, (float)getWindowHeight() - 18);
 
 	// show fps
 	char fps[32];
@@ -371,7 +375,7 @@ void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 	float ypos = (ix + iy) * TILE_HEIGHT / 3.0f - m_mapStartY;
 
 	*ox = xpos;
-	*oy = ypos;
+	*oy = -ypos;
 }
 
 void Game::tileClicked(Tile* tile)
@@ -407,8 +411,6 @@ void Game::tileClicked(Tile* tile)
 
 void Game::addTextPopup(char* text, float startX, float startY)
 {
-	// CONTINUE HERE
-
 	// get the first empty element in popup array
 	int freeIndex = 0;
 	while (freeIndex < MAX_POPUPS && m_popups[freeIndex] != nullptr)

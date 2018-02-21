@@ -32,9 +32,9 @@ void TileShop::update()
 		float wx, wy;
 		m_game->getTileWorldPosition(m_ix, m_iy, &wx, &wy);
 
-		char txt[16];
+		char* txt = new char[16];
 		sprintf_s(txt, 16, "$%d", moneyMade);
-		m_game->addTextPopup(txt, wx, wy);
+		m_game->addTextPopup(txt, wx, wy + TILE_HEIGHT/2.0f);
 	}
 }
 

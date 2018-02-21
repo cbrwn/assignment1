@@ -6,6 +6,7 @@ class TextPopup
 {
 public:
 	TextPopup(char* text, float startX, float startY, float lifeTime, float ySpeed, aie::Font* font);
+	~TextPopup();
 
 	void update(float delta);
 	void draw(aie::Renderer2D* renderer);
