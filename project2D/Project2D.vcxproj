@@ -170,6 +170,7 @@
     <ClCompile Include="textpopup.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="tile_house.cpp" />
+    <ClCompile Include="tile_military.cpp" />
     <ClCompile Include="tile_shop.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +181,7 @@
     <ClInclude Include="textpopup.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="tile_house.h" />
+    <ClInclude Include="tile_military.h" />
     <ClInclude Include="tile_shop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

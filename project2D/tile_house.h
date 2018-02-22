@@ -8,6 +8,7 @@ public:
 	TileHouse(Game* game, bool right);
 
 	virtual void update();
+	virtual void draw(aie::Renderer2D* renderer, float dx, float dy);
 	
 	virtual char* getMouseoverText() override;
 
@@ -19,4 +20,6 @@ public:
 	void addPeople(int newPeople);
 private:
 	int m_capacity, m_people;
+
+	aie::Texture* m_roofTexture;
 };

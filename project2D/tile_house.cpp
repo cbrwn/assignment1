@@ -10,12 +10,25 @@ TileHouse::TileHouse(Game* game, bool right)
 	if (right)
 		setTexture(game->m_imageManager->getTexture("tiles/house_right"));
 
+	// set roof texture
+	if (right)
+		m_roofTexture = game->m_imageManager->getTexture("tiles/house_roof_right");
+	else
+		m_roofTexture = game->m_imageManager->getTexture("tiles/house_roof_left");
+
 	m_people = 0;
 	m_capacity = 5;
 }
 
 void TileHouse::update()
 {
+}
+
+void TileHouse::draw(aie::Renderer2D* renderer, float dx, float dy)
+{
+	Tile::draw(renderer, dx, dy);
+	float roofY = dy + (TILE_HEIGHT - m_roofTexture->getHeight());
+	renderer->drawSprite(m_roofTexture, dx, roofY);
 }
 
 char* TileHouse::getMouseoverText()

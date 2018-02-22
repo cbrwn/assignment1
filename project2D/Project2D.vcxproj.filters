@@ -54,6 +54,9 @@
     <ClCompile Include="tile_shop.cpp">
       <Filter>Source Files\tiles</Filter>
     </ClCompile>
+    <ClCompile Include="tile_military.cpp">
+      <Filter>Source Files\tiles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -78,6 +81,9 @@
       <Filter>Header Files\tiles</Filter>
     </ClInclude>
     <ClInclude Include="tile_house.h">
+      <Filter>Header Files\tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="tile_military.h">
       <Filter>Header Files\tiles</Filter>
     </ClInclude>
   </ItemGroup>
