@@ -29,6 +29,8 @@ private:
 	int						m_totalPopulation;
 	int						m_unemployedPopulation;
 
+	void updateShops();
+
 	int updateTotalPopulation();
 	int updateUnemployedPopulation();
 };

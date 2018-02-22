@@ -19,7 +19,6 @@ class Tile;
 class Game : public aie::Application
 {
 public:
-
 	Game();
 	virtual ~Game();
 

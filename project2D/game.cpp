@@ -152,7 +152,6 @@ void Game::update(float deltaTime)
 
 void Game::draw()
 {
-
 	// wipe the screen to the background colour
 	clearScreen();
 
@@ -182,8 +181,8 @@ void Game::draw()
 
 			m_2dRenderer->setRenderColour(rg, rg, 1.0f);
 
-			float xpos;// = (x - y) * TILE_WIDTH / 2.0f + m_mapStartX;
-			float ypos;// = (x + y) * TILE_HEIGHT / 3.0f - m_mapStartY;
+			float xpos;
+			float ypos;
 			getTileWorldPosition(x, y, &xpos, &ypos);
 
 			// account for the difference in height in the texture
@@ -293,7 +292,7 @@ void Game::draw()
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
 
-	// done drawing sprites
+	// done drawing hud
 	m_2dRenderer->end();
 }
 
@@ -327,7 +326,7 @@ void Game::getMouseXY(float* x, float* y)
 }
 
 // gets the tile at world position x,y 
-Tile * Game::getTileAtPosition(int x, int y)
+Tile* Game::getTileAtPosition(int x, int y)
 {
 	int ix, iy;
 	this->getTileAtPosition(x, y, &ix, &iy);

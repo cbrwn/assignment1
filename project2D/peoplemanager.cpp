@@ -54,31 +54,37 @@ void PeopleManager::update(float delta)
 		updateTotalPopulation();
 		updateUnemployedPopulation();
 
-		// process all shop-related stuff
-		for (auto s : m_allShops)
-		{
-			// give people jobs!
-			if (getUnemployed() > 0 && (rand() % 100) < 10)
-				s->addEmployees(1);
-			s->update();
-		}
+		updateShops();
 
-		// and let's make sure we don't have negative unemployment
-		// which can happen if people disappear but a shop keeps them as an employee
-		while (updateUnemployedPopulation() < 0)
-		{
-			for (auto s : m_allShops)
-			{
-				s->addEmployees(-1);
-				if (updateUnemployedPopulation() >= 0)
-					break;
-			}
-		}
-
-		// update our record after we potentially give/take jobs
+		// update our record after updateShops has changed everything
 		updateUnemployedPopulation();
 
 		m_timeSinceUpdate = 0;
+	}
+}
+
+// process all shop-related stuff
+void PeopleManager::updateShops()
+{
+	for (auto s : m_allShops)
+	{
+		// give people jobs!
+		if (getUnemployed() > 0 && (rand() % 100) < 10)
+			s->addEmployees(1);
+		// and update the shop to make money
+		s->update();
+	}
+
+	// and let's make sure we don't have negative unemployment
+	// which can happen if people disappear but a shop keeps them as an employee
+	while (updateUnemployedPopulation() < 0)
+	{
+		for (auto s : m_allShops)
+		{
+			s->addEmployees(-1);
+			if (updateUnemployedPopulation() >= 0)
+				break;
+		}
 	}
 }
 

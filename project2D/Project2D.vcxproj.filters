@@ -19,6 +19,12 @@
     <Filter Include="Source Files\effects">
       <UniqueIdentifier>{2e3b2add-3aec-4992-9842-a1eacf483019}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\tiles">
+      <UniqueIdentifier>{a66649dc-6237-47b8-a97d-a8146898482f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tiles">
+      <UniqueIdentifier>{839d856c-aa08-437a-ae4b-1725eab51d50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,33 +33,30 @@
     <ClCompile Include="game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imagemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tile_house.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="peoplemanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tile_shop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="textpopup.cpp">
       <Filter>Source Files\effects</Filter>
     </ClCompile>
+    <ClCompile Include="tile.cpp">
+      <Filter>Source Files\tiles</Filter>
+    </ClCompile>
+    <ClCompile Include="tile_house.cpp">
+      <Filter>Source Files\tiles</Filter>
+    </ClCompile>
+    <ClCompile Include="tile_shop.cpp">
+      <Filter>Source Files\tiles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imagemanager.h">
@@ -62,17 +65,20 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tile_house.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="peoplemanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tile_shop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textpopup.h">
       <Filter>Header Files\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="tile_shop.h">
+      <Filter>Header Files\tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="tile.h">
+      <Filter>Header Files\tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="tile_house.h">
+      <Filter>Header Files\tiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
