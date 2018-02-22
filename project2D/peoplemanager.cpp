@@ -12,8 +12,11 @@ PeopleManager::PeopleManager(Game* game)
 	: m_game(game)
 {
 	m_totalPopulation = 0;
-	m_timeSinceUpdate = 0;
+	m_totalWorkers = 0;
+	m_totalSoldiers = 0;
 	m_unemployedPopulation = 0;
+
+	m_timeSinceUpdate = 0;
 }
 
 void PeopleManager::update(float delta)
@@ -60,9 +63,9 @@ void PeopleManager::update(float delta)
 		updateUnemployedPopulation();
 
 		updateShops();
-
 		// update our record after updateShops has probably changed things
 		updateUnemployedPopulation();
+		updateMilitary();
 
 		m_timeSinceUpdate = 0;
 	}
@@ -82,7 +85,7 @@ void PeopleManager::updateShops()
 
 	// and let's make sure we don't have negative unemployment
 	// which can happen if people disappear but a shop keeps them as an employee
-	while (updateUnemployedPopulation() < 0)
+	while (updateUnemployedPopulation() < 0 && m_totalWorkers > 0)
 	{
 		for (auto s : m_allShops)
 		{
@@ -95,7 +98,24 @@ void PeopleManager::updateShops()
 
 void PeopleManager::updateMilitary()
 {
+	for (auto b : m_allMilitaryBases)
+	{
+		// todo - let player choose their priority of military vs economy
+		if (getUnemployed() > 0 && (rand() % 100) < 8)
+			b->addSoldiers(1);
+	}
 
+	// do the same as in updateShops to make sure there aren't more
+	//   soldiers than there are people
+	while (updateUnemployedPopulation() < 0 && m_totalSoldiers > 0)
+	{
+		for (auto b : m_allMilitaryBases)
+		{
+			b->addSoldiers(-1);
+			if (updateUnemployedPopulation() >= 0)
+				break;
+		}
+	}
 }
 
 // updates our record of the total population and also returns it
@@ -113,23 +133,16 @@ int PeopleManager::updateTotalPopulation()
 int PeopleManager::updateUnemployedPopulation()
 {
 	// count the number of employed people to subtract from total population
-	int employed = 0;
+	int workers = 0;
 	for (auto s : m_allShops)
-		employed += s->getEmployees();
+		workers += s->getEmployees();
+	m_totalWorkers = workers;
 
-	m_unemployedPopulation = getTotalPopulation() - employed;
+	int soldiers = 0;
+	for (auto b : m_allMilitaryBases)
+		soldiers += b->getSoldiers();
+	m_totalSoldiers = soldiers;
+
+	m_unemployedPopulation = getTotalPopulation() - (workers + soldiers);
 	return m_unemployedPopulation;
 }
-
-// updates our record of the total number of soldiers and returns it
-int PeopleManager::updateTotalSoldiers()
-{
-	int total = 0;
-	for (auto b : m_allMilitaryBases)
-		total += b->getSoldiers();
-
-	m_totalSoldiers = total;
-	return total;
-}
-
-

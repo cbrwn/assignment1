@@ -32,6 +32,7 @@ private:
 
 	int							m_totalPopulation;
 	int							m_unemployedPopulation;
+	int							m_totalWorkers;
 	int							m_totalSoldiers;
 
 	void updateShops();
@@ -39,5 +40,4 @@ private:
 
 	int updateTotalPopulation();
 	int updateUnemployedPopulation();
-	int updateTotalSoldiers();
 };

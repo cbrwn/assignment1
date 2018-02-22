@@ -46,9 +46,9 @@ void TileMilitary::addSoldiers(int amt)
 {
 	m_soldiers += amt;
 	// limit soldier amount
-	if (amt > m_maxSoldiers)
-		amt = m_maxSoldiers;
+	if (m_soldiers > m_maxSoldiers)
+		m_soldiers = m_maxSoldiers;
 	// and make sure we don't have negative soldiers!
-	if (amt < 0)
-		amt = 0;
+	if (m_soldiers < 0)
+		m_soldiers = 0;
 }
