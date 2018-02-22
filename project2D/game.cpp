@@ -8,18 +8,15 @@
 #include "camera.h"
 #include "game.h"
 #include "peoplemanager.h"
-#include "textpopup.h"
+#include "uimanager.h"
 
 #include "tile.h"
 #include "tile_house.h"
 #include "tile_shop.h"
 #include "tile_military.h"
 
-Game* Game::m_instance = nullptr;
-
 Game::Game()
 {
-	m_instance = this;
 }
 
 Game::~Game()
@@ -30,8 +27,10 @@ Game::~Game()
 bool Game::startup()
 {
 	srand((unsigned int)time(NULL));
-	setBackgroundColour(0.12f, 0.63f, 1.0f);
 	this->setVSync(true);
+
+	// sky blue background
+	setBackgroundColour(0.12f, 0.63f, 1.0f);
 
 	// set up tile names
 	m_tileNames[GRASS] = "Grass";
@@ -39,11 +38,12 @@ bool Game::startup()
 	m_tileNames[SHOP] = "Shop";
 	m_tileNames[MILITARY] = "Military Base";
 
-	//this->setShowCursor(false);
-
 	m_2dRenderer = new aie::Renderer2D();
+	m_camera = new Camera(this);
 	m_imageManager = new ImageManager();
-	m_camera = new Camera();
+	m_uiManager = new UiManager(this);
+
+	m_peopleManager = new PeopleManager(this);
 
 	m_camera->setScale(1.3f);
 
@@ -51,14 +51,7 @@ bool Game::startup()
 	m_uiFont = new aie::Font("./font/roboto.ttf", 16);
 	m_uiFontLarge = new aie::Font("./font/roboto.ttf", 24);
 
-	m_peopleManager = new PeopleManager(this);
-
-	// initialize all popups to nullptr
-	for (int i = 0; i < MAX_POPUPS; i++)
-	{
-		m_popups[i] = nullptr;
-	}
-
+	// initialize tiles to grass tiles
 	m_placeMode = 0;
 	m_mapStartX = 1200;
 	m_mapStartY = 800;
@@ -81,18 +74,12 @@ void Game::shutdown()
 
 	delete m_imageManager;
 	delete m_peopleManager;
+	delete m_uiManager;
 
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 		for (int x = 0; x < WORLD_WIDTH; x++)
 			if (m_tiles[y][x] != nullptr)
 				delete m_tiles[y][x];
-
-	// delete all the popups
-	for (int i = 0; i < MAX_POPUPS; i++)
-	{
-		if (m_popups[i] != nullptr)
-			delete m_popups[i];
-	}
 }
 
 void Game::update(float deltaTime)
@@ -104,7 +91,8 @@ void Game::update(float deltaTime)
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 
-	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
+	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) &&
+		isMouseInGame())
 	{
 		float mx, my;
 		this->getMouseXY(&mx, &my);
@@ -130,24 +118,8 @@ void Game::update(float deltaTime)
 	}
 
 	m_peopleManager->update(deltaTime);
-
 	m_camera->update(deltaTime);
-
-	// update money popups
-	// todo: make this a general 'effect' thing
-	for (int i = 0; i < MAX_POPUPS; i++)
-	{
-		TextPopup* thisPopup = m_popups[i];
-		if (thisPopup != nullptr)
-		{
-			thisPopup->update(deltaTime);
-			if (thisPopup->shouldDie())
-			{
-				delete thisPopup;
-				m_popups[i] = nullptr;
-			}
-		}
-	}
+	m_uiManager->update(deltaTime);
 }
 
 void Game::draw()
@@ -168,6 +140,9 @@ void Game::draw()
 	float mx, my;
 	this->getMouseXY(&mx, &my);
 	Tile* mouseOver = this->getTileAtPosition((int)mx, (int)my);
+	// don't show mouseover stuff if the mouse is over the UI
+	if (!isMouseInGame())
+		mouseOver = nullptr;
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -196,14 +171,6 @@ void Game::draw()
 		}
 	}
 
-	// draw money popups
-	for (int i = 0; i < MAX_POPUPS; i++)
-	{
-		TextPopup* thisPopup = m_popups[i];
-		if (thisPopup != nullptr)
-			thisPopup->draw(m_2dRenderer);
-	}
-
 	// done drawing sprites
 	m_2dRenderer->end();
 
@@ -214,10 +181,8 @@ void Game::draw()
 	// start drawing ui
 	m_2dRenderer->begin();
 
-	// show screen's mouse position (as opposed to the world mouse position)
 	int smx, smy;
 	aie::Input::getInstance()->getMouseXY(&smx, &smy);
-	m_2dRenderer->drawCircle((float)smx, (float)smy, 8);
 
 	// draw mouseover information
 	if (mouseOver != nullptr)
@@ -267,16 +232,9 @@ void Game::draw()
 
 	// show population
 	char pop[64];
-	sprintf_s(pop, 64, "Unemployment: %d / %d", m_peopleManager->getUnemployed(),
-		m_peopleManager->getTotalPopulation());
+	sprintf_s(pop, 64, "Population: %d", m_peopleManager->getTotalPopulation());
 	m_2dRenderer->setRenderColour(1, 1, 1);
 	m_2dRenderer->drawText(m_uiFontLarge, pop, 2, (float)getWindowHeight() - 18);
-
-	// temp - show which tile we're placing
-	char plc[32];
-	sprintf_s(plc, 32, "Placing %s tile", m_tileNames[m_placeMode]);
-	m_2dRenderer->drawText(m_uiFontLarge, plc, 2, 
-		(float)getWindowHeight() - (18 * 2));
 
 	// show money
 	char mny[32];
@@ -286,11 +244,17 @@ void Game::draw()
 	m_2dRenderer->drawText(m_uiFontLarge, mny, 
 		getWindowWidth() - moneyWidth - 2, (float)getWindowHeight() - 18);
 
+	m_uiManager->draw(m_2dRenderer);
+
 	// show fps
 	char fps[32];
 	sprintf_s(fps, 32, "FPS: %i", getFPS());
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
+
+	// show screen's mouse position (as opposed to the world mouse position)
+	m_2dRenderer->setRenderColour(1, 1, 1);
+	m_2dRenderer->drawCircle((float)smx, (float)smy, 4);
 
 	// done drawing hud
 	m_2dRenderer->end();
@@ -325,6 +289,11 @@ void Game::getMouseXY(float* x, float* y)
 	*y = ay;
 }
 
+bool Game::isMouseInGame()
+{
+	return !m_uiManager->isMouseOverUi();
+}
+
 // gets the tile at world position x,y 
 Tile* Game::getTileAtPosition(int x, int y)
 {
@@ -356,8 +325,8 @@ void Game::getTileAtPosition(int px, int py, int* ix, int* iy)
 	fpx -= m_mapStartX;
 	fpy += m_mapStartY;
 
-	int resultX = (int)(((fpx) / tw + fpy / th) / 2);
-	int resultY = (int)((fpy / th - (fpx / tw)) / 2);
+	int resultX = (int)((fpx / tw + fpy / th) / 2);
+	int resultY = (int)((fpy / th - fpx / tw) / 2);
 
 	if (resultX < 0 || resultX >= WORLD_WIDTH)
 		resultX = -1;
@@ -375,6 +344,11 @@ void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 
 	*ox = xpos;
 	*oy = -ypos;
+}
+
+char* Game::getTileName(TileType type)
+{
+	return m_tileNames[type];
 }
 
 void Game::tileClicked(Tile* tile)
@@ -409,15 +383,4 @@ void Game::tileClicked(Tile* tile)
 	delete tile; // free up where the old tile was
 	// and replace it
 	m_tiles[iy][ix] = newTile;
-}
-
-void Game::addTextPopup(char* text, float startX, float startY)
-{
-	// get the first empty element in popup array
-	int freeIndex = 0;
-	while (freeIndex < MAX_POPUPS && m_popups[freeIndex] != nullptr)
-	{ freeIndex++; }
-
-	TextPopup* newPopup = new TextPopup(text, startX, startY, 1.0f, 30.0f, m_uiFont);
-	m_popups[freeIndex] = newPopup;
 }

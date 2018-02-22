@@ -2,17 +2,17 @@
 #include "tile_military.h"
 
 TileMilitary::TileMilitary(Game* game, bool right)
-	: Tile(game, game->m_imageManager->getTexture("tiles/military_left"))
+	: Tile(game, game->getImageManager()->getTexture("tiles/military_left"))
 {
 	if (right)
-		setTexture(game->m_imageManager->getTexture("tiles/military_right"));
+		setTexture(game->getImageManager()->getTexture("tiles/military_right"));
 
-	m_middleLayer = game->m_imageManager->getTexture("tiles/military_roof_middle");
+	m_middleLayer = game->getImageManager()->getTexture("tiles/military_roof_middle");
 
 	if (right)
-		m_roofTexture = game->m_imageManager->getTexture("tiles/military_roof_right");
+		m_roofTexture = game->getImageManager()->getTexture("tiles/military_roof_right");
 	else
-		m_roofTexture = game->m_imageManager->getTexture("tiles/military_roof_left");
+		m_roofTexture = game->getImageManager()->getTexture("tiles/military_roof_left");
 
 	m_soldiers = 0;
 	m_maxSoldiers = 5;

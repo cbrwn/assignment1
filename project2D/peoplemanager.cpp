@@ -30,7 +30,7 @@ void PeopleManager::update(float delta)
 		{
 			for (int x = 0; x < WORLD_WIDTH; x++)
 			{
-				Tile* thisTile = m_game->m_tiles[y][x];
+				Tile* thisTile = m_game->getTile(x, y);
 				if (thisTile != nullptr)
 				{
 					switch (thisTile->getType())
@@ -61,7 +61,7 @@ void PeopleManager::update(float delta)
 
 		updateShops();
 
-		// update our record after updateShops has changed everything
+		// update our record after updateShops has probably changed things
 		updateUnemployedPopulation();
 
 		m_timeSinceUpdate = 0;
@@ -93,6 +93,11 @@ void PeopleManager::updateShops()
 	}
 }
 
+void PeopleManager::updateMilitary()
+{
+
+}
+
 // updates our record of the total population and also returns it
 int PeopleManager::updateTotalPopulation()
 {
@@ -111,8 +116,20 @@ int PeopleManager::updateUnemployedPopulation()
 	int employed = 0;
 	for (auto s : m_allShops)
 		employed += s->getEmployees();
+
 	m_unemployedPopulation = getTotalPopulation() - employed;
 	return m_unemployedPopulation;
+}
+
+// updates our record of the total number of soldiers and returns it
+int PeopleManager::updateTotalSoldiers()
+{
+	int total = 0;
+	for (auto b : m_allMilitaryBases)
+		total += b->getSoldiers();
+
+	m_totalSoldiers = total;
+	return total;
 }
 
 

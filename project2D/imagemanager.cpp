@@ -11,7 +11,6 @@ ImageManager::~ImageManager()
 	// destroy all textures
 	for (auto t : m_textures)
 	{
-		printf("Deleting texture named %s", t.first);
 		aie::Texture* tex = t.second;
 		if (tex != nullptr)
 			delete tex;
@@ -38,7 +37,7 @@ aie::Texture* ImageManager::getTexture(char* name)
 		else
 		{
 			// wasn't found!
-			printf("Texture named %s was not found!", name);
+			printf("Texture named %s was not found!\n", name);
 			return nullptr;
 		}
 	}

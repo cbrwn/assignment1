@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\effects">
-      <UniqueIdentifier>{5be8b5f7-f098-4ffd-be4c-b04cd7e7bda8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\effects">
-      <UniqueIdentifier>{2e3b2add-3aec-4992-9842-a1eacf483019}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\tiles">
       <UniqueIdentifier>{a66649dc-6237-47b8-a97d-a8146898482f}</UniqueIdentifier>
     </Filter>
@@ -42,9 +36,6 @@
     <ClCompile Include="peoplemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="textpopup.cpp">
-      <Filter>Source Files\effects</Filter>
-    </ClCompile>
     <ClCompile Include="tile.cpp">
       <Filter>Source Files\tiles</Filter>
     </ClCompile>
@@ -56,6 +47,9 @@
     </ClCompile>
     <ClCompile Include="tile_military.cpp">
       <Filter>Source Files\tiles</Filter>
+    </ClCompile>
+    <ClCompile Include="uimanager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,9 +65,6 @@
     <ClInclude Include="peoplemanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="textpopup.h">
-      <Filter>Header Files\effects</Filter>
-    </ClInclude>
     <ClInclude Include="tile_shop.h">
       <Filter>Header Files\tiles</Filter>
     </ClInclude>
@@ -85,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="tile_military.h">
       <Filter>Header Files\tiles</Filter>
+    </ClInclude>
+    <ClInclude Include="uimanager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

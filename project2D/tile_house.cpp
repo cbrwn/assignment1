@@ -4,17 +4,17 @@
 #include "tile_house.h"
 
 TileHouse::TileHouse(Game* game, bool right)
-	: Tile(game, game->m_imageManager->getTexture("tiles/house_left"))
+	: Tile(game, game->getImageManager()->getTexture("tiles/house_left"))
 {
 	m_tileType = TileType::HOUSE;
 	if (right)
-		setTexture(game->m_imageManager->getTexture("tiles/house_right"));
+		setTexture(game->getImageManager()->getTexture("tiles/house_right"));
 
 	// set roof texture
 	if (right)
-		m_roofTexture = game->m_imageManager->getTexture("tiles/house_roof_right");
+		m_roofTexture = game->getImageManager()->getTexture("tiles/house_roof_right");
 	else
-		m_roofTexture = game->m_imageManager->getTexture("tiles/house_roof_left");
+		m_roofTexture = game->getImageManager()->getTexture("tiles/house_roof_left");
 
 	m_people = 0;
 	m_capacity = 5;

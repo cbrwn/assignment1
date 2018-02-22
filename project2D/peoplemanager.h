@@ -17,8 +17,9 @@ public:
 
 	void update(float delta);
 
-	int getTotalPopulation()	{ return m_totalPopulation; }
-	int getUnemployed()			{ return m_unemployedPopulation; }
+	int getTotalPopulation() { return m_totalPopulation; }
+	int getUnemployed() { return m_unemployedPopulation; }
+	int getTotalSoldiers() { return m_totalSoldiers; }
 private:
 	Game* m_game;
 
@@ -31,9 +32,12 @@ private:
 
 	int							m_totalPopulation;
 	int							m_unemployedPopulation;
+	int							m_totalSoldiers;
 
 	void updateShops();
+	void updateMilitary();
 
 	int updateTotalPopulation();
 	int updateUnemployedPopulation();
+	int updateTotalSoldiers();
 };

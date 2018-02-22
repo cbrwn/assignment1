@@ -4,12 +4,12 @@
 #include "tile_shop.h"
 
 TileShop::TileShop(Game* game, bool right)
-	: Tile(game, game->m_imageManager->getTexture("tiles/shop_left"))
+	: Tile(game, game->getImageManager()->getTexture("tiles/shop_left"))
 {
 	m_tileType = TileType::SHOP;
 
 	if (right)
-		m_texture = game->m_imageManager->getTexture("tiles/shop_right");
+		m_texture = game->getImageManager()->getTexture("tiles/shop_right");
 
 	m_employees = 0;
 	m_maxEmployees = 2;
@@ -25,17 +25,6 @@ void TileShop::update()
 
 	// moneyMade will be 0 if there are no employees which makes sense
 	m_game->addMoney(moneyMade);
-
-	if (moneyMade > 0)
-	{
-		// get the world position of this tile
-		float wx, wy;
-		m_game->getTileWorldPosition(m_ix, m_iy, &wx, &wy);
-
-		char* txt = new char[16];
-		sprintf_s(txt, 16, "$%d", moneyMade);
-		m_game->addTextPopup(txt, wx, wy + TILE_HEIGHT/2.0f);
-	}
 }
 
 char* TileShop::getMouseoverText()

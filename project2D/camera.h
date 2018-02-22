@@ -6,10 +6,12 @@
 		including movement and player controls
 */
 
+class Game;
+
 class Camera
 {
 public:
-	Camera();
+	Camera(Game* game);
 
 	void update(float delta);
 
@@ -25,14 +27,16 @@ public:
 	float getX();
 	float getY();
 	float getScale();
-	void getPosition(float* x, float* y);
+	void  getPosition(float* x, float* y);
 
-	void setSpeed(float spd);
+	void  setSpeed(float spd);
 	float getSpeed();
 
-	void setZoomSpeed(float spd);
+	void  setZoomSpeed(float spd);
 	float getZoomSpeed();
 private:
+	Game* m_game;
+
 	// destination positions
 	float m_targetX, m_targetY;
 	float m_targetScale;
@@ -43,7 +47,7 @@ private:
 	float m_arrowSpeed; // speed to move the camera with arrow keys
 
 	// dragging control
-	bool m_dragging;
+	bool  m_dragging;
 	float m_dragStartMX, m_dragStartMY; // starting mouse position
 	float m_dragStartCX, m_dragStartCY; // starting camera pos
 

@@ -3,7 +3,7 @@
 #include "camera.h"
 #include "game.h"
 
-Camera::Camera()
+Camera::Camera(Game* game) : m_game(game)
 {
 	// default values
 	m_targetX = 0; m_targetY = 0;
@@ -39,14 +39,15 @@ void Camera::update(float delta)
 		float wx = (float)mx; float wy = (float)my;
 		screenToWorld(&wx, &wy);
 
-		if (!m_dragging)
+		if (!m_dragging && m_game->isMouseInGame() &&
+			input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_RIGHT))
 		{
 			// start dragging if mouse is down
 			m_dragging = true;
 			m_dragStartMX = wx; m_dragStartMY = wy;
 			m_dragStartCX = m_actualX; m_dragStartCY = m_actualY;
 		}
-		else
+		if(m_dragging)
 		{
 			// move the camera with the mouse
 			setX(m_dragStartCX + (m_dragStartMX - wx)*2.0f);
@@ -78,11 +79,9 @@ void Camera::update(float delta)
 // takes x,y as screen coordinates and translates them to world coordinates
 void Camera::screenToWorld(float* x, float* y)
 {
-	Game* game = Game::getInstance();
-	float screenWidth = (float)game->getWindowWidth();
-	float screenHeight = (float)game->getWindowHeight();
+	float screenWidth = (float)m_game->getWindowWidth();
+	float screenHeight = (float)m_game->getWindowHeight();
 
-	// get the percentage 
 	float xPercentage = *x / screenWidth;
 	float yPercentage = *y / screenHeight;
 
