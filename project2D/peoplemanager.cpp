@@ -5,6 +5,7 @@
 
 #include "tile.h"
 #include "tile_house.h"
+#include "tile_military.h"
 #include "tile_shop.h"
 
 PeopleManager::PeopleManager(Game* game)
@@ -23,6 +24,7 @@ void PeopleManager::update(float delta)
 	{
 		// update our lists of buildings
 		m_allHouses.clear();
+		m_allMilitaryBases.clear();
 		m_allShops.clear();
 		for (int y = 0; y < WORLD_HEIGHT; y++)
 		{
@@ -38,6 +40,9 @@ void PeopleManager::update(float delta)
 						break;
 					case TileType::SHOP:
 						m_allShops.push_back((TileShop*)thisTile);
+						break;
+					case TileType::MILITARY:
+						m_allMilitaryBases.push_back((TileMilitary*)thisTile);
 						break;
 					}
 				}

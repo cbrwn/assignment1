@@ -7,6 +7,7 @@
 
 class Game;
 class TileHouse;
+class TileMilitary;
 class TileShop;
 
 class PeopleManager
@@ -16,18 +17,20 @@ public:
 
 	void update(float delta);
 
-	int getTotalPopulation() { return m_totalPopulation; }
-	int getUnemployed() { return m_unemployedPopulation; }
+	int getTotalPopulation()	{ return m_totalPopulation; }
+	int getUnemployed()			{ return m_unemployedPopulation; }
 private:
 	Game* m_game;
 
 	// keep track of the time since the last update
-	float					m_timeSinceUpdate;
+	float						m_timeSinceUpdate;
 
-	std::vector<TileHouse*>	m_allHouses;
-	std::vector<TileShop*>  m_allShops;
-	int						m_totalPopulation;
-	int						m_unemployedPopulation;
+	std::vector<TileHouse*>		m_allHouses;
+	std::vector<TileMilitary*>	m_allMilitaryBases;
+	std::vector<TileShop*>		m_allShops;
+
+	int							m_totalPopulation;
+	int							m_unemployedPopulation;
 
 	void updateShops();
 

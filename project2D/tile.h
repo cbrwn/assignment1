@@ -4,11 +4,14 @@
 
 class Game;
 
+// when adding a new TileType, remember to set the tileName
+// in game.cpp
 enum TileType
 {
 	GRASS = 0,
 	HOUSE,
-	SHOP
+	SHOP,
+	MILITARY
 };
 
 class Tile

@@ -13,6 +13,7 @@
 #include "tile.h"
 #include "tile_house.h"
 #include "tile_shop.h"
+#include "tile_military.h"
 
 Game* Game::m_instance = nullptr;
 
@@ -36,6 +37,7 @@ bool Game::startup()
 	m_tileNames[GRASS] = "Grass";
 	m_tileNames[HOUSE] = "House";
 	m_tileNames[SHOP] = "Shop";
+	m_tileNames[MILITARY] = "Military Base";
 
 	//this->setShowCursor(false);
 
@@ -62,9 +64,7 @@ bool Game::startup()
 	m_mapStartY = 800;
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 		for (int x = 0; x < WORLD_WIDTH; x++)
-		{
 			m_tiles[y][x] = new Tile(this, m_imageManager->getTexture("tiles/grass_flat"));
-		}
 
 	m_money = 10000;
 
@@ -115,7 +115,7 @@ void Game::update(float deltaTime)
 		}
 	}
 
-	const int highestPlaceMode = 2;
+	const int highestPlaceMode = 3;
 	if (input->wasKeyPressed(aie::INPUT_KEY_COMMA))
 	{
 		m_placeMode--;
@@ -398,6 +398,9 @@ void Game::tileClicked(Tile* tile)
 		break;
 	case TileType::SHOP:
 		newTile = new TileShop(this, facing);
+		break;
+	case TileType::MILITARY:
+		newTile = new TileMilitary(this, facing);
 		break;
 	default:
 		printf("Unknown place mode: %d\n", m_placeMode);
