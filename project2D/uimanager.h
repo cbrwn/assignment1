@@ -17,8 +17,6 @@ public:
 private:
 	Game* m_game;
 
-	aie::Texture** m_tileImages;
-
 	float m_panelHeight;
 	const unsigned int m_panelColour;
 };

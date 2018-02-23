@@ -1,3 +1,11 @@
+////////////////////////////////////////////
+// Game
+// The main class of the game, in charge
+//   of updating and drawing everything
+//   as well as providing some gameplay
+//   functionality
+////////////////////////////////////////////
+
 #include <ctime>
 #include <functional>
 
@@ -88,18 +96,6 @@ void Game::update(float deltaTime)
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 
-	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) &&
-		isMouseInGame())
-	{
-		float mx, my;
-		this->getMouseWorldPosition(&mx, &my);
-		Tile* mouseOver = getTileAtPosition(mx, my);
-		if (mouseOver != nullptr)
-		{
-			tileClicked(mouseOver);
-		}
-	}
-
 	switch (m_placeMode)
 	{
 	case BUILDING:
@@ -174,7 +170,7 @@ void Game::draw()
 	switch (m_placeMode)
 	{
 	case BUILDING:
-		getBuildingManager()->draw(m_2dRenderer);
+		getBuildingManager()->drawPlacement(m_2dRenderer);
 		break;
 	case ZONE:
 		break;
@@ -267,20 +263,6 @@ void Game::draw()
 	m_2dRenderer->end();
 }
 
-void Game::updateTiles()
-{
-	for (int y = 0; y < WORLD_HEIGHT; y++)
-	{
-		for (int x = 0; x < WORLD_WIDTH; x++)
-		{
-			Tile* thisTile = m_tiles[y][x];
-			if (thisTile == nullptr)
-				continue;
-			thisTile->update();
-		}
-	}
-}
-
 void Game::getMouseWorldPosition(float* x, float* y)
 {
 	int mx, my;
@@ -367,9 +349,4 @@ void Game::removeBuilding(Building* toRemove)
 			break;
 		}
 	}
-}
-
-void Game::tileClicked(Tile* tile)
-{
-	// tmp
 }

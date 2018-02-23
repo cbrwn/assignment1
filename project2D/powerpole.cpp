@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+// Power Pole
+// Carries electricity from Power Plants to
+//   everything that uses it
+////////////////////////////////////////////
+
 #include "powerpole.h"
 #include "game.h"
 
@@ -19,7 +25,8 @@ void PowerPole::draw(aie::Renderer2D* renderer)
 	float wx, wy;
 	m_game->getTileWorldPosition(m_posX + 1, m_posY, &wx, &wy);
 
-	// sprite origins come from the pixel coordinate divided by the total height
+	// keep origin at the bottom-middle of the sprite
+	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
 	renderer->drawSprite(m_texture, wx, wy, 0, 0, 0, 0, xOrigin, yOrigin);

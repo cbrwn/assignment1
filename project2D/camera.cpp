@@ -1,3 +1,10 @@
+////////////////////////////////////////////
+// Camera
+// Controls everything to do with the view
+//   of the game - letting the player move
+//   it and smoothly moving it
+////////////////////////////////////////////
+
 #include <Input.h>
 
 #include "camera.h"

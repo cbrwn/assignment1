@@ -1,10 +1,16 @@
+////////////////////////////////////////////
+// ImageManager
+// Manager class which handles any texture
+//   required by the game
+// Responsible for loading, storing and 
+//   destroying textures
+////////////////////////////////////////////
+
 #include <iostream>
 
 #include "imagemanager.h"
 
-ImageManager::ImageManager()
-{
-}
+ImageManager::ImageManager() { }
 
 ImageManager::~ImageManager()
 {

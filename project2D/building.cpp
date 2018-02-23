@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+// Building
+// Base class for all buildings which can be
+//    placed in the world
+////////////////////////////////////////////
+
 #include "building.h"
 #include "game.h"
 

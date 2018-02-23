@@ -2,6 +2,8 @@
 
 #include <Renderer2D.h>
 
+// when adding a new building type, don't forget to
+//  add it to the factory in buildingmanager.cpp
 enum BuildingType
 {
 	POWERPLANT = 0,

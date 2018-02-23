@@ -1,3 +1,10 @@
+////////////////////////////////////////////
+// BuildingManager
+// This class is responsible for all things
+//   to do with buildings, such as creating
+//   and drawing them
+////////////////////////////////////////////
+
 #include <iostream>
 #include <Input.h>
 
@@ -29,17 +36,20 @@ void BuildingManager::buildingMode()
 
 	aie::Input* input = aie::Input::getInstance();
 
+	// B to toggle building mode
 	if (input->wasKeyPressed(aie::INPUT_KEY_B))
 	{
 		m_game->setPlaceMode(PlaceMode::NONE);
 		return;
 	}
 
+	// controlling the selected building with keyboard
 	if (input->wasKeyPressed(aie::INPUT_KEY_PERIOD))
 		m_selectedBuilding++;
 	if (input->wasKeyPressed(aie::INPUT_KEY_COMMA))
 		m_selectedBuilding--;
 
+	// wrap around
 	if (m_selectedBuilding >= (int)BUILDINGTYPECOUNT)
 		m_selectedBuilding = 0;
 	if (m_selectedBuilding < 0)
@@ -77,25 +87,27 @@ void BuildingManager::buildingMode()
 	}
 }
 
-void BuildingManager::draw(aie::Renderer2D* renderer)
+// draws everything while in building mode
+// basically just the translucent ghost building to show the player
+//   what they're building
+void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 {
 	if (m_ghostBuilding)
 	{
 		const float alpha = 0.4f;
+		// tint green if we can place
 		if(canPlaceBuilding())
 			renderer->setRenderColour(0, 1, 0, alpha);
-		else
+		else // and red if not
 			renderer->setRenderColour(1, 0, 0, alpha);
 		m_ghostBuilding->draw(renderer);
 	}
-
-	renderer->setRenderColour(1, 1, 1);
-	renderer->drawText(m_game->m_uiFontLarge, "BUILDING", 4, 200);
 }
 
 void BuildingManager::updateBuildings(float delta)
 {
 	// sort buildings from back to front
+	// todo: use a better sort algorithm
 	int buildingCount = (int)m_buildings->size();
 	for (int i = 0; i < buildingCount - 1; ++i)
 	{
@@ -167,10 +179,8 @@ bool BuildingManager::canPlaceBuilding()
 		// will appear to be 2x2
 		int left = right - (width-1);
 		int top = bottom - (height-1);
-		// left > right
-		// right < left
-		// top > bottom
-		// bottom < top
+
+		// check if they're intersecting
 		if (!(buildingLeft > right || buildingRight < left || 
 			buildingTop > bottom || buildingBottom < top))
 		{

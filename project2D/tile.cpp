@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+// Tile
+// Basic class to represent each tile of
+//   the map
+////////////////////////////////////////////
+
 #include <Renderer2D.h>
 
 #include "game.h"
@@ -13,9 +19,7 @@ void Tile::draw(aie::Renderer2D * renderer, float dx, float dy)
 	renderer->drawSprite(m_texture, dx, dy, 0, 0, 0, 0, 0, 0.5f);
 }
 
-void Tile::update()
-{
-}
+void Tile::update() { }
 
 aie::Texture* Tile::getTexture()
 {

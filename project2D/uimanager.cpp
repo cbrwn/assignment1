@@ -1,3 +1,9 @@
+////////////////////////////////////////////
+// UiManager
+// Base class for all buildings which can be
+//    placed in the world
+////////////////////////////////////////////
+
 #include <Input.h>
 #include <Font.h>
 
