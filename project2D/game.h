@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "Application.h"
 #include "Renderer2D.h"
 #include "imagemanager.h"
@@ -15,10 +16,23 @@ class TextPopup;
 class Tile;
 
 class ImageManager;
-class PeopleManager;
 class UiManager;
 
-enum TileType;
+class Building;
+class BuildingManager;
+
+// temp
+class PowerPlant;
+
+enum PlaceMode
+{
+	NONE = 0,
+	BUILDING,
+	ZONE
+};
+
+// typedef building vector so it's shorter to type
+typedef std::vector<Building*> BuildingList;
 
 class Game : public aie::Application
 {
@@ -37,26 +51,27 @@ public:
 
 	void updateTiles();
 
-	void getMouseXY(float* x, float* y);
+	void getMouseWorldPosition(float* x, float* y);
 	bool isMouseInGame();
 
 	Tile* getTile(int x, int y) { return m_tiles[y][x]; }
-	Tile* getTileAtPosition(int x, int y);
-	void  getTileAtPosition(int px, int py, int *ix, int *iy);
+	Tile* getTileAtPosition(float x, float y);
+	void  getTileAtPosition(float px, float py, int *ix, int *iy);
 	void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
 
-	int  getMoney() { return m_money; }
-	void setMoney(int money) { m_money = money; }
-	void addMoney(int money) { m_money += money; }
+	void addBuilding(Building* build);
+	void removeBuilding(Building* toRemove);
 
-	char* getTileName(TileType type);
+	inline int  getMoney() { return m_money; }
+	inline void setMoney(int money) { m_money = money; }
+	inline void addMoney(int money) { m_money += money; }
 
-	int  getPlaceMode() { return m_placeMode; }
-	void setPlaceMode(int mode) { m_placeMode = mode; }
+	inline PlaceMode getPlaceMode() { return m_placeMode; }
+	inline void setPlaceMode(PlaceMode mode) { m_placeMode = mode; }
 
-	ImageManager*	getImageManager() { return m_imageManager; }
-	PeopleManager*	getPeopleManager() { return m_peopleManager; }
-	UiManager*		getUimanager() { return m_uiManager; }
+	inline ImageManager*	getImageManager() { return m_imageManager; }
+	inline UiManager*		getUimanager() { return m_uiManager; }
+	inline BuildingManager* getBuildingManager() { return m_buildingManager; }
 
 protected:
 	aie::Renderer2D*	m_2dRenderer;
@@ -65,16 +80,17 @@ protected:
 
 	Tile*				m_tiles[WORLD_HEIGHT][WORLD_WIDTH];
 	ImageManager*		m_imageManager;
-	PeopleManager*		m_peopleManager;
 	UiManager*			m_uiManager;
+
+	BuildingManager*	m_buildingManager;
 
 	float				m_mapStartX, m_mapStartY;
 
-	char*				m_tileNames[64];
-	int					m_placeMode;
-
 	// actual gameplay variables
+	PlaceMode m_placeMode;
 	int m_money;
+
+	BuildingList m_buildings;
 
 	void tileClicked(Tile* tile);
 };

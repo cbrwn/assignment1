@@ -7,13 +7,11 @@
 
 #include "camera.h"
 #include "game.h"
-#include "peoplemanager.h"
 #include "uimanager.h"
+#include "building.h"
+#include "buildingmanager.h"
 
 #include "tile.h"
-#include "tile_house.h"
-#include "tile_shop.h"
-#include "tile_military.h"
 
 Game::Game()
 {
@@ -32,32 +30,27 @@ bool Game::startup()
 	// sky blue background
 	setBackgroundColour(0.12f, 0.63f, 1.0f);
 
-	// set up tile names
-	m_tileNames[GRASS] = "Grass";
-	m_tileNames[HOUSE] = "House";
-	m_tileNames[SHOP] = "Shop";
-	m_tileNames[MILITARY] = "Military Base";
-
 	m_2dRenderer = new aie::Renderer2D();
 	m_camera = new Camera(this);
 	m_imageManager = new ImageManager();
 	m_uiManager = new UiManager(this);
 
-	m_peopleManager = new PeopleManager(this);
+	m_buildingManager = new BuildingManager(this, &m_buildings);
 
-	m_camera->setScale(1.3f);
+	//m_camera->setScale(1.3f);
 
 	m_font = new aie::Font("./font/consolas.ttf", 32);
 	m_uiFont = new aie::Font("./font/roboto.ttf", 16);
 	m_uiFontLarge = new aie::Font("./font/roboto.ttf", 24);
 
 	// initialize tiles to grass tiles
-	m_placeMode = 0;
 	m_mapStartX = 1200;
 	m_mapStartY = 800;
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 		for (int x = 0; x < WORLD_WIDTH; x++)
 			m_tiles[y][x] = new Tile(this, m_imageManager->getTexture("tiles/grass_flat"));
+
+	m_placeMode = PlaceMode::NONE;
 
 	m_money = 10000;
 
@@ -73,8 +66,12 @@ void Game::shutdown()
 	delete m_camera;
 
 	delete m_imageManager;
-	delete m_peopleManager;
 	delete m_uiManager;
+
+	delete m_buildingManager;
+	for (auto b : m_buildings)
+		if(b)
+			delete b;
 
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -95,29 +92,29 @@ void Game::update(float deltaTime)
 		isMouseInGame())
 	{
 		float mx, my;
-		this->getMouseXY(&mx, &my);
-		Tile* mouseOver = getTileAtPosition((int)mx, (int)my);
+		this->getMouseWorldPosition(&mx, &my);
+		Tile* mouseOver = getTileAtPosition(mx, my);
 		if (mouseOver != nullptr)
 		{
 			tileClicked(mouseOver);
 		}
 	}
 
-	const int highestPlaceMode = 3;
-	if (input->wasKeyPressed(aie::INPUT_KEY_COMMA))
+	switch (m_placeMode)
 	{
-		m_placeMode--;
-		if (m_placeMode < 0)
-			m_placeMode = highestPlaceMode;
-	}
-	if (input->wasKeyPressed(aie::INPUT_KEY_PERIOD))
-	{
-		m_placeMode++;
-		if (m_placeMode > highestPlaceMode)
-			m_placeMode = 0;
+	case BUILDING:
+		getBuildingManager()->buildingMode();
+		break;
+	case ZONE:
+		break;
+	default:
+		if (input->wasKeyPressed(aie::INPUT_KEY_B))
+			setPlaceMode(PlaceMode::BUILDING);
+		break;
 	}
 
-	m_peopleManager->update(deltaTime);
+	getBuildingManager()->updateBuildings(deltaTime);
+
 	m_camera->update(deltaTime);
 	m_uiManager->update(deltaTime);
 }
@@ -138,8 +135,8 @@ void Game::draw()
 
 	// draw tiles
 	float mx, my;
-	this->getMouseXY(&mx, &my);
-	Tile* mouseOver = this->getTileAtPosition((int)mx, (int)my);
+	this->getMouseWorldPosition(&mx, &my);
+	Tile* mouseOver = this->getTileAtPosition(mx, my);
 	// don't show mouseover stuff if the mouse is over the UI
 	if (!isMouseInGame())
 		mouseOver = nullptr;
@@ -160,16 +157,32 @@ void Game::draw()
 			float ypos;
 			getTileWorldPosition(x, y, &xpos, &ypos);
 
+			ypos -= 20.0f;
+
 			// account for the difference in height in the texture
 			// and keep the bottoms aligned
 			float dify = TILE_HEIGHT - (float)thisTile->getTexture()->getHeight();
 
 			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f);
-
-			// make sure the tile knows its place in the array
-			thisTile->setIndices(x, y);
 		}
 	}
+
+	// draw buildings
+	getBuildingManager()->drawBuildings(m_2dRenderer);
+
+	// draw overlay stuff from place mode
+	switch (m_placeMode)
+	{
+	case BUILDING:
+		getBuildingManager()->draw(m_2dRenderer);
+		break;
+	case ZONE:
+		break;
+	default:
+		break;
+	}
+
+	//tempPowerPlant->draw(m_2dRenderer);
 
 	// done drawing sprites
 	m_2dRenderer->end();
@@ -185,7 +198,7 @@ void Game::draw()
 	aie::Input::getInstance()->getMouseXY(&smx, &smy);
 
 	// draw mouseover information
-	if (mouseOver != nullptr)
+	/*if (mouseOver != nullptr)
 	{
 		char* info = mouseOver->getMouseoverText();
 		// change the font here if needed
@@ -224,24 +237,18 @@ void Game::draw()
 
 			delete info;
 		}
-	}
+	}*/
 
 	//===========
 	// hud stuff
 	//===========
-
-	// show population
-	char pop[64];
-	sprintf_s(pop, 64, "Population: %d", m_peopleManager->getTotalPopulation());
-	m_2dRenderer->setRenderColour(1, 1, 1);
-	m_2dRenderer->drawText(m_uiFontLarge, pop, 2, (float)getWindowHeight() - 18);
 
 	// show money
 	char mny[32];
 	sprintf_s(mny, 32, "$%d", m_money);
 	float moneyWidth = m_uiFontLarge->getStringWidth(mny);
 	m_2dRenderer->setRenderColour(0, 0.4f, 0);
-	m_2dRenderer->drawText(m_uiFontLarge, mny, 
+	m_2dRenderer->drawText(m_uiFontLarge, mny,
 		getWindowWidth() - moneyWidth - 2, (float)getWindowHeight() - 18);
 
 	m_uiManager->draw(m_2dRenderer);
@@ -274,7 +281,7 @@ void Game::updateTiles()
 	}
 }
 
-void Game::getMouseXY(float* x, float* y)
+void Game::getMouseWorldPosition(float* x, float* y)
 {
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
@@ -295,7 +302,7 @@ bool Game::isMouseInGame()
 }
 
 // gets the tile at world position x,y 
-Tile* Game::getTileAtPosition(int x, int y)
+Tile* Game::getTileAtPosition(float x, float y)
 {
 	int ix, iy;
 	this->getTileAtPosition(x, y, &ix, &iy);
@@ -306,27 +313,25 @@ Tile* Game::getTileAtPosition(int x, int y)
 }
 
 // gets the array indices of the tile at world position px,py and puts them into ix,iy
-void Game::getTileAtPosition(int px, int py, int* ix, int* iy)
+void Game::getTileAtPosition(float px, float py, int* ix, int* iy)
 {
 	// get shorter names for the measurements we use to offset the tiles
 	const float tw = TILE_WIDTH / 2.0f;
 	const float th = TILE_HEIGHT / 3.0f;
 
-	// make float copies of px and py instead of passing them as floats because I'm dumb
-	float fpx = (float)px;
-	float fpy = (float)py;
-
-	// idk dude i'm too tired to write comments
-	fpy -= th;
-
 	// invert y since y=0 is at the bottom
-	fpy *= -1;
+	py *= -1;
 
-	fpx -= m_mapStartX;
-	fpy += m_mapStartY;
+	// offset to the start of the map
+	px -= m_mapStartX;
+	py += m_mapStartY;
 
-	int resultX = (int)((fpx / tw + fpy / th) / 2);
-	int resultY = (int)((fpy / th - fpx / tw) / 2);
+	// account for the origin of the tile drawing (see tile.cpp)
+	px -= tw;
+	py += th;
+
+	int resultX = (int)((px / tw + py / th) / 2);
+	int resultY = (int)((py / th - px / tw) / 2);
 
 	if (resultX < 0 || resultX >= WORLD_WIDTH)
 		resultX = -1;
@@ -346,41 +351,25 @@ void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 	*oy = -ypos;
 }
 
-char* Game::getTileName(TileType type)
+void Game::addBuilding(Building* build)
 {
-	return m_tileNames[type];
+	m_buildings.push_back(build);
+}
+
+void Game::removeBuilding(Building* toRemove)
+{
+	for (BuildingList::iterator it = m_buildings.begin(); it != m_buildings.end(); ++it)
+	{
+		if (*it == toRemove)
+		{
+			delete *it;
+			m_buildings.erase(it);
+			break;
+		}
+	}
 }
 
 void Game::tileClicked(Tile* tile)
 {
-	int ix, iy;
-	tile->getIndices(&ix, &iy);
-
-	bool facing = false;
-	if (rand() % 2 == 0)
-		facing = true;
-
-	// check which tile we want to place
-	Tile* newTile;
-	switch (m_placeMode)
-	{
-	case TileType::GRASS:
-		newTile = new Tile(this, m_imageManager->getTexture("tiles/grass_flat"));
-		break;
-	case TileType::HOUSE:
-		newTile = new TileHouse(this, facing);
-		break;
-	case TileType::SHOP:
-		newTile = new TileShop(this, facing);
-		break;
-	case TileType::MILITARY:
-		newTile = new TileMilitary(this, facing);
-		break;
-	default:
-		printf("Unknown place mode: %d\n", m_placeMode);
-		return;
-	}
-	delete tile; // free up where the old tile was
-	// and replace it
-	m_tiles[iy][ix] = newTile;
+	// tmp
 }

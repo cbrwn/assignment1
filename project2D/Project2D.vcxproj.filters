@@ -19,6 +19,12 @@
     <Filter Include="Source Files\tiles">
       <UniqueIdentifier>{839d856c-aa08-437a-ae4b-1725eab51d50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\buildings">
+      <UniqueIdentifier>{be9245be-0f9d-498e-b476-85b2aa3ec0fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\buildings">
+      <UniqueIdentifier>{92357c38-37e6-4a39-b7ff-8ef782e24bbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -33,23 +39,23 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="peoplemanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tile.cpp">
-      <Filter>Source Files\tiles</Filter>
-    </ClCompile>
-    <ClCompile Include="tile_house.cpp">
-      <Filter>Source Files\tiles</Filter>
-    </ClCompile>
-    <ClCompile Include="tile_shop.cpp">
-      <Filter>Source Files\tiles</Filter>
-    </ClCompile>
-    <ClCompile Include="tile_military.cpp">
       <Filter>Source Files\tiles</Filter>
     </ClCompile>
     <ClCompile Include="uimanager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="buildingmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="building.cpp">
+      <Filter>Source Files\buildings</Filter>
+    </ClCompile>
+    <ClCompile Include="powerplant.cpp">
+      <Filter>Source Files\buildings</Filter>
+    </ClCompile>
+    <ClCompile Include="powerpole.cpp">
+      <Filter>Source Files\buildings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -62,23 +68,23 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="peoplemanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tile_shop.h">
-      <Filter>Header Files\tiles</Filter>
-    </ClInclude>
     <ClInclude Include="tile.h">
-      <Filter>Header Files\tiles</Filter>
-    </ClInclude>
-    <ClInclude Include="tile_house.h">
-      <Filter>Header Files\tiles</Filter>
-    </ClInclude>
-    <ClInclude Include="tile_military.h">
       <Filter>Header Files\tiles</Filter>
     </ClInclude>
     <ClInclude Include="uimanager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="buildingmanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="building.h">
+      <Filter>Header Files\buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="powerplant.h">
+      <Filter>Header Files\buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="powerpole.h">
+      <Filter>Header Files\buildings</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

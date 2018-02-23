@@ -2,8 +2,6 @@
 
 #include <Renderer2D.h>
 
-#define UI_SELECTION_BOX_COUNT 4
-
 class Game;
 
 class UiManager
@@ -23,11 +21,4 @@ private:
 
 	float m_panelHeight;
 	const unsigned int m_panelColour;
-
-	float	m_boxPositions[UI_SELECTION_BOX_COUNT];
-	float	m_boxPositionY;
-	float	m_boxWidth;
-	int		m_mouseOverIndex;
-
-	bool isInsideBox(int x, int y, int boxIndex);
 };

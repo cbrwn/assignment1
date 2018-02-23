@@ -162,26 +162,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="building.cpp" />
+    <ClCompile Include="buildingmanager.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="imagemanager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="peoplemanager.cpp" />
+    <ClCompile Include="powerplant.cpp" />
+    <ClCompile Include="powerpole.cpp" />
     <ClCompile Include="tile.cpp" />
-    <ClCompile Include="tile_house.cpp" />
-    <ClCompile Include="tile_military.cpp" />
-    <ClCompile Include="tile_shop.cpp" />
     <ClCompile Include="uimanager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="building.h" />
+    <ClInclude Include="buildingmanager.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="imagemanager.h" />
-    <ClInclude Include="peoplemanager.h" />
+    <ClInclude Include="powerplant.h" />
+    <ClInclude Include="powerpole.h" />
     <ClInclude Include="tile.h" />
-    <ClInclude Include="tile_house.h" />
-    <ClInclude Include="tile_military.h" />
-    <ClInclude Include="tile_shop.h" />
     <ClInclude Include="uimanager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
