@@ -23,7 +23,8 @@ ImageManager::~ImageManager()
 	}
 }
 
-// gets a texture by name, and if it doesn't exist, tries to load it and store it into our map
+// gets a texture by name, and if it doesn't exist, tries to load it and 
+// store it into our map
 aie::Texture* ImageManager::getTexture(char* name)
 {
 	const char* fileNameTemplate = "./textures/%s.png";

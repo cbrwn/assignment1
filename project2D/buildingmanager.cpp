@@ -19,6 +19,7 @@ BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	: m_game(game), m_buildings(buildings)
 {
 	m_selectedBuilding = 0;
+	m_updateTimer = 0;
 	m_ghostBuilding = nullptr;
 }
 
@@ -64,26 +65,41 @@ void BuildingManager::buildingMode()
 	m_game->getTileAtPosition(mx, my, &tileX, &tileY);
 
 	// update the ghost building to show which building we're choosing
-	if (m_ghostBuilding == nullptr || (int)m_ghostBuilding->getType() != m_selectedBuilding)
+	if (m_ghostBuilding == nullptr
+		|| (int)m_ghostBuilding->getType() != m_selectedBuilding)
 	{
 		if (m_ghostBuilding)
 			delete m_ghostBuilding;
-		m_ghostBuilding = makeBuilding((BuildingType)m_selectedBuilding, tileX, tileY);
+		m_ghostBuilding = makeBuilding((BuildingType)m_selectedBuilding,
+			tileX, tileY, true);
 	}
 
 	// make sure the ghost building is where our mouse is
 	if (m_ghostBuilding)
 		m_ghostBuilding->setPosition(tileX, tileY);
 
+	// we can stop here if placing things isn't allowed
+	if (!(canPlaceBuilding() && m_game->isMouseInGame()))
+		return;
+
 	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) &&
-		canPlaceBuilding() && m_game->isMouseInGame())
+		m_ghostBuilding->getBuildStyle() == BuildStyle::SINGLE)
 	{
 		// place building!
-		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding, tileX, tileY));
+		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
+			tileX, tileY));
 		// cancel building mode if shift isn't held
 		// so player can place multiple buildings easily by holding shift
 		if (!input->isKeyDown(aie::INPUT_KEY_LEFT_SHIFT))
 			m_game->setPlaceMode(PlaceMode::NONE);
+	}
+
+	// line style lets you click and drag
+	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT) &&
+		m_ghostBuilding->getBuildStyle() == BuildStyle::LINE)
+	{
+		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
+			tileX, tileY));
 	}
 }
 
@@ -96,7 +112,7 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 	{
 		const float alpha = 0.4f;
 		// tint green if we can place
-		if(canPlaceBuilding())
+		if (canPlaceBuilding())
 			renderer->setRenderColour(0, 1, 0, alpha);
 		else // and red if not
 			renderer->setRenderColour(1, 0, 0, alpha);
@@ -131,17 +147,28 @@ void BuildingManager::updateBuildings(float delta)
 		}
 	}
 
-	for (auto b : *m_buildings)
-		b->update();
+	// update all buildings every once in a while
+	m_updateTimer += delta;
+	if (m_updateTimer >= BUILDING_UPDATE_TIME)
+	{
+		m_updateTimer = 0;
+
+		for (auto b : *m_buildings)
+			b->update();
+	}
 }
 
 void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 {
 	for (auto b : *m_buildings)
+	{
+		renderer->setRenderColour(1, 1, 1);
 		b->draw(renderer);
+	}
 }
 
-// returns whether or not the currently selected building can be placed at its position
+// returns whether or not the currently selected building can be placed at 
+//   its position
 bool BuildingManager::canPlaceBuilding()
 {
 	if (!m_ghostBuilding)
@@ -160,8 +187,8 @@ bool BuildingManager::canPlaceBuilding()
 	int ghostSizeX, ghostSizeY;
 	m_ghostBuilding->getSize(&ghostSizeX, &ghostSizeY);
 
-	int buildingLeft = buildingRight - (ghostSizeX-1);
-	int buildingTop = buildingBottom - (ghostSizeY-1);
+	int buildingLeft = buildingRight - (ghostSizeX - 1);
+	int buildingTop = buildingBottom - (ghostSizeY - 1);
 	// some part of the building is outside of the world bounds
 	if (buildingLeft < 0 || buildingLeft >= WORLD_WIDTH ||
 		buildingTop < 0 || buildingTop >= WORLD_HEIGHT)
@@ -177,11 +204,11 @@ bool BuildingManager::canPlaceBuilding()
 		b->getSize(&width, &height);
 		// subtract 1 from size because a building with the size 1x1
 		// will appear to be 2x2
-		int left = right - (width-1);
-		int top = bottom - (height-1);
+		int left = right - (width - 1);
+		int top = bottom - (height - 1);
 
 		// check if they're intersecting
-		if (!(buildingLeft > right || buildingRight < left || 
+		if (!(buildingLeft > right || buildingRight < left ||
 			buildingTop > bottom || buildingBottom < top))
 		{
 			return false;
@@ -191,19 +218,32 @@ bool BuildingManager::canPlaceBuilding()
 }
 
 // creates a building with type type
-// similar to a "factory" - https://en.wikipedia.org/wiki/Factory_method_pattern
-Building* BuildingManager::makeBuilding(BuildingType type, int xTile, int yTile)
+// similar to a "factory"
+// https://en.wikipedia.org/wiki/Factory_method_pattern
+Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
+	int yTile, bool ghost)
 {
+	// in case we want to use the building we made for something else,
+	// such as storing power poles in their vector
+	Building* b;
+
 	switch (type)
 	{
 	case BuildingType::POWERPLANT:
 		return new PowerPlant(m_game, xTile, yTile);
 		break;
 	case BuildingType::POWERPOLE:
-		return new PowerPole(m_game, xTile, yTile);
+		b = new PowerPole(m_game, xTile, yTile);
+		if (!ghost)
+		{
+			// keep track of our power poles
+			m_powerPoles.push_back(b);
+		}
+		return b;
 		break;
 	default:
-		printf("Tried to create a building that doesn't exist! Type: %d\n", (int)type);
+		printf("Tried to create a building that doesn't exist! Type: %d\n",
+			(int)type);
 		break;
 	}
 	return nullptr;

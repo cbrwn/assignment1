@@ -9,5 +9,7 @@ public:
 
 	virtual void draw(aie::Renderer2D* renderer) override;
 	virtual void update() override;
+
+	bool isTouchingBuilding(Building* b);
 private:
 };

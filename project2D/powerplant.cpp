@@ -4,7 +4,9 @@
 //   electricity
 ////////////////////////////////////////////
 
+#include "buildingmanager.h"
 #include "powerplant.h"
+#include "powerpole.h"
 #include "game.h"
 
 PowerPlant::PowerPlant(Game* game, int x, int y)
@@ -31,9 +33,26 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
-	renderer->drawSprite(m_texture, wx, wy, 0, 0, 0, 0, xOrigin, yOrigin);
+	renderer->drawSprite(m_texture, wx, wy-4, 0, 0, 0, 0, xOrigin, yOrigin);
+
+	if (m_hasPower)
+	{
+		renderer->setRenderColour(0, 1, 0);
+		renderer->drawCircle(wx, wy, 5);
+	}
 }
 
 void PowerPlant::update()
 {
+	Building::update();
+
+	m_hasPower = true;
+
+	// give nearby power poles some power
+	for (Building* b : *m_game->getBuildingManager()->getPowerPoles())
+	{
+		PowerPole* p = (PowerPole*)b;
+		if (p->isTouchingBuilding(this))
+			p->givePower();
+	}
 }

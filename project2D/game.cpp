@@ -56,7 +56,8 @@ bool Game::startup()
 	m_mapStartY = 800;
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 		for (int x = 0; x < WORLD_WIDTH; x++)
-			m_tiles[y][x] = new Tile(this, m_imageManager->getTexture("tiles/grass_flat"));
+			m_tiles[y][x] = new Tile(this, 
+				m_imageManager->getTexture("tiles/grass_flat"));
 
 	m_placeMode = PlaceMode::NONE;
 
@@ -89,10 +90,11 @@ void Game::shutdown()
 
 void Game::update(float deltaTime)
 {
-	// input example
+	if (deltaTime > 0.33f)
+		deltaTime = 0.33f;
+
 	aie::Input* input = aie::Input::getInstance();
 
-	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 
@@ -157,7 +159,8 @@ void Game::draw()
 
 			// account for the difference in height in the texture
 			// and keep the bottoms aligned
-			float dify = TILE_HEIGHT - (float)thisTile->getTexture()->getHeight();
+			float dify = TILE_HEIGHT - 
+				(float)thisTile->getTexture()->getHeight();
 
 			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f);
 		}
@@ -247,7 +250,7 @@ void Game::draw()
 	m_2dRenderer->drawText(m_uiFontLarge, mny,
 		getWindowWidth() - moneyWidth - 2, (float)getWindowHeight() - 18);
 
-	m_uiManager->draw(m_2dRenderer);
+	//m_uiManager->draw(m_2dRenderer);
 
 	// show fps
 	char fps[32];
@@ -294,7 +297,8 @@ Tile* Game::getTileAtPosition(float x, float y)
 	return m_tiles[iy][ix];
 }
 
-// gets the array indices of the tile at world position px,py and puts them into ix,iy
+// gets the array indices of the tile at world position px,py and puts 
+// them into ix,iy
 void Game::getTileAtPosition(float px, float py, int* ix, int* iy)
 {
 	// get shorter names for the measurements we use to offset the tiles
@@ -340,7 +344,8 @@ void Game::addBuilding(Building* build)
 
 void Game::removeBuilding(Building* toRemove)
 {
-	for (BuildingList::iterator it = m_buildings.begin(); it != m_buildings.end(); ++it)
+	for (BuildingList::iterator it = m_buildings.begin(); 
+		it != m_buildings.end(); ++it)
 	{
 		if (*it == toRemove)
 		{

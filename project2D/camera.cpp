@@ -57,8 +57,8 @@ void Camera::update(float delta)
 		if(m_dragging)
 		{
 			// move the camera with the mouse
-			setX(m_dragStartCX + (m_dragStartMX - wx)*2.0f);
-			setY(m_dragStartCY + (m_dragStartMY - wy)*2.0f);
+			setX(m_dragStartCX + (m_dragStartMX - wx)*4.0f);
+			setY(m_dragStartCY + (m_dragStartMY - wy)*4.0f);
 		}
 	}
 	else

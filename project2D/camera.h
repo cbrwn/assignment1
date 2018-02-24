@@ -17,13 +17,15 @@ public:
 
 	void screenToWorld(float* x, float* y);
 
-	// these set the target positions - the positions the camera will smoothly move to
+	// these set the target positions - the positions the camera will smoothly 
+	// move to
 	void setPosition(float x, float y);
 	void setX(float x);
 	void setY(float y);
 	void setScale(float s);
 
-	// these will get the actual values, not the destinations which are set above
+	// these will get the actual values, not the destinations which are set 
+	// above
 	float getX();
 	float getY();
 	float getScale();
