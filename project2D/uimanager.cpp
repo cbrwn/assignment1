@@ -125,6 +125,12 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 		"Power Pole"
 	};
 
+	aie::Texture* buildingIcons[BUILDINGTYPE_COUNT] = {
+		m_game->getImageManager()->getTexture("icons/demolish"),
+		m_game->getImageManager()->getTexture("icons/powerplant"),
+		m_game->getImageManager()->getTexture("icons/powerpole")
+	};
+
 	// draw all the boxes
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
 	{
@@ -140,8 +146,11 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 			renderer->setRenderColour(0.1f, 0.1f, 0.1f);
 		renderer->drawBox(xPos, yPos, thisRect.width, thisRect.height);
 
-		// draw zone name text
+		// draw building icon
 		renderer->setRenderColour(1, 1, 1);
+		renderer->drawSprite(buildingIcons[i], xPos, yPos + thisRect.height / 6.0f);
+
+		// draw building name
 		float stringWidth = m_game->m_uiFont->getStringWidth(buildingNames[i]);
 		renderer->drawText(m_game->m_uiFont, buildingNames[i], xPos - stringWidth / 2.0f,
 			yPos - thisRect.height / 2.5f);
