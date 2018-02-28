@@ -202,6 +202,14 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 		renderer->drawBox(xPos, yPos + thisRect.height / 6.0f, thisRect.width / 2.0f,
 			thisRect.width / 2.0f);
 
+		// draw the X from the demolition icon for de-zone
+		if (i == ZONETYPE_NONE)
+		{
+			renderer->setRenderColour(1, 1, 1, 1);
+			renderer->drawSprite(m_game->getImageManager()->getTexture("icons/demolish"), xPos,
+				yPos + thisRect.height / 6.0f);
+		}
+
 		// draw zone name text
 		renderer->setRenderColour(1, 1, 1);
 		float stringWidth = m_game->m_uiFont->getStringWidth(zoneNames[i]);
