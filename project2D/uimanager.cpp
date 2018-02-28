@@ -45,6 +45,10 @@ UiManager::UiManager(Game* game)
 		currentX += selectBoxWidth + selectBoxPadding;
 	}
 
+	// selector box
+
+	m_selectorBox = { 32, game->getWindowHeight() - 16.0f, 64, 32 };
+
 	// set the information we'll be showing in the panels
 	m_zoneColours[ZONETYPE_NONE] = 0x00000000; // don't draw a box
 	m_zoneColours[ZONETYPE_RESIDENTIAL] = 0x00ff00ff; // green
@@ -99,6 +103,9 @@ void UiManager::update(float delta)
 					break;
 				}
 	}
+
+	// make sure the selector box is always at the top of the screen
+	m_selectorBox.y = m_game->getWindowHeight() - m_selectorBox.height/2.0f;
 }
 
 void UiManager::draw(aie::Renderer2D* renderer)
@@ -108,6 +115,14 @@ void UiManager::draw(aie::Renderer2D* renderer)
 		drawBuildingPanel(renderer);
 	if (m_zonePanelY >= 0.0f)
 		drawZonePanel(renderer);
+
+	// draw selector box
+	renderer->setRenderColour(m_panelColour);
+	renderer->drawBox(m_selectorBox.x, m_selectorBox.y, m_selectorBox.width,
+		m_selectorBox.height);
+	renderer->setRenderColour(m_panelColour - 0x33333333);
+	renderer->drawLine(m_selectorBox.x, m_selectorBox.y - m_selectorBox.height/3.0f, 
+		m_selectorBox.x, m_selectorBox.y + m_selectorBox.height/3.0f);
 }
 
 void UiManager::setShownPanel(int panel)
@@ -144,8 +159,8 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 	{
 		Rect thisRect = m_buildingBoxes[i];
 
-		float xPos = thisRect.left + thisRect.width / 2.0f;
-		float yPos = m_buildingPanelY - (thisRect.top - thisRect.height / 2.0f);
+		float xPos = thisRect.x + thisRect.width / 2.0f;
+		float yPos = m_buildingPanelY - (thisRect.y - thisRect.height / 2.0f);
 
 		// draw back rect
 		if (m_game->getBuildingManager()->getSelectedBuilding() == i)
@@ -182,8 +197,8 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 	{
 		Rect thisRect = m_zoneBoxes[i];
 
-		float xPos = thisRect.left + thisRect.width / 2.0f;
-		float yPos = m_zonePanelY - (thisRect.top - thisRect.height / 2.0f);
+		float xPos = thisRect.x + thisRect.width / 2.0f;
+		float yPos = m_zonePanelY - (thisRect.y - thisRect.height / 2.0f);
 
 		// draw back rect
 		if (m_game->getZoneManager()->getSelectedType() == i)
@@ -218,9 +233,9 @@ bool UiManager::isMouseInRect(Rect r, float yoffset)
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
 
-	float yPos = r.top - yoffset;
+	float yPos = r.y - yoffset;
 
-	if (mx > r.left && mx < r.left + r.width
+	if (mx > r.x && mx < r.x + r.width
 		&& my > yPos - r.height / 2.0f && my < yPos + r.height*2.0f)
 		return true;
 	return false;

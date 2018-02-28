@@ -12,7 +12,7 @@ class Game;
 
 struct Rect
 {
-	float left, top;
+	float x, y;
 	float width, height;
 };
 
@@ -35,6 +35,9 @@ private:
 	const float m_panelY;
 
 	int m_shownPanel;
+
+	// rect for the panel selector
+	Rect m_selectorBox;
 
 	// the positions and destination positions of the panels
 	float m_buildingPanelY, m_buildingPanelDestY;
