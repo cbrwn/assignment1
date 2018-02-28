@@ -78,12 +78,21 @@ void BuildingManager::buildingMode()
 	if (m_ghostBuilding)
 		m_ghostBuilding->setPosition(tileX, tileY);
 
+	// demolish buildings
+	if (m_selectedBuilding == BUILDINGTYPE_NONE 
+		&& input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
+	{
+		Building* underMouse = getBuildingAtIndex(tileX, tileY);
+		if (underMouse)
+			m_game->removeBuilding(underMouse);
+	}
+
 	// we can stop here if placing things isn't allowed
 	if (!(canPlaceBuilding() && m_game->isMouseInGame()))
 		return;
 
-	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) &&
-		m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_SINGLE)
+	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) 
+		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_SINGLE)
 	{
 		// place building!
 		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
@@ -95,8 +104,8 @@ void BuildingManager::buildingMode()
 	}
 
 	// line style lets you click and drag
-	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT) &&
-		m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
+	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT) 
+		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
 	{
 		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY));
@@ -143,6 +152,20 @@ void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 	{
 		renderer->setRenderColour(1, 1, 1);
 		b->draw(renderer);
+	}
+}
+
+void BuildingManager::removePowerPole(Building* pole)
+{
+	// remove the pointer to this from the poles list in buildingmanager
+	for (BuildingList::iterator it = m_powerPoles.begin();
+		it != m_powerPoles.end(); ++it)
+	{
+		if (pole == *it)
+		{
+			m_powerPoles.erase(it);
+			break;
+		}
 	}
 }
 
@@ -196,6 +219,31 @@ bool BuildingManager::canPlaceBuilding()
 	return true;
 }
 
+Building * BuildingManager::getBuildingAtIndex(int ix, int iy)
+{
+	// now test against every other building
+	for (auto b : *m_buildings)
+	{
+		// grab bounds of this building
+		int right, bottom;
+		b->getPosition(&right, &bottom);
+		int width, height;
+		b->getSize(&width, &height);
+		// subtract 1 from size because a building with the size 1x1
+		// will appear to be 2x2
+		int left = right - (width - 1);
+		int top = bottom - (height - 1);
+
+		// check if they're intersecting
+		if (!(ix > right || ix < left ||
+			iy > bottom || iy < top))
+		{
+			return b;
+		}
+	}
+	return nullptr;
+}
+
 // creates a building with type type
 // similar to a "factory"
 // https://en.wikipedia.org/wiki/Factory_method_pattern
@@ -208,10 +256,13 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 
 	switch (type)
 	{
-	case BuildingType::BUILDINGTYPE_POWERPLANT:
+	case BUILDINGTYPE_NONE:
+		return nullptr;
+		break;
+	case BUILDINGTYPE_POWERPLANT:
 		return new PowerPlant(m_game, xTile, yTile);
 		break;
-	case BuildingType::BUILDINGTYPE_POWERPOLE:
+	case BUILDINGTYPE_POWERPOLE:
 		b = new PowerPole(m_game, xTile, yTile);
 		if (!ghost)
 		{

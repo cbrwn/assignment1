@@ -168,8 +168,10 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="imagemanager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="particle.cpp" />
     <ClCompile Include="powerplant.cpp" />
     <ClCompile Include="powerpole.cpp" />
+    <ClCompile Include="smokeparticle.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="uimanager.cpp" />
     <ClCompile Include="zonemanager.cpp" />
@@ -180,8 +182,10 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="imagemanager.h" />
+    <ClInclude Include="particle.h" />
     <ClInclude Include="powerplant.h" />
     <ClInclude Include="powerpole.h" />
+    <ClInclude Include="smokeparticle.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="uimanager.h" />
     <ClInclude Include="zonemanager.h" />

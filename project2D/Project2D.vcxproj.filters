@@ -25,6 +25,12 @@
     <Filter Include="Source Files\buildings">
       <UniqueIdentifier>{92357c38-37e6-4a39-b7ff-8ef782e24bbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\particles">
+      <UniqueIdentifier>{1d0e9166-a5f2-4474-b9ef-f68cee927fee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\particles">
+      <UniqueIdentifier>{843b3e37-b00c-4002-8354-56c78386f1e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -60,6 +66,12 @@
     <ClCompile Include="zonemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="smokeparticle.cpp">
+      <Filter>Source Files\particles</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.cpp">
+      <Filter>Source Files\particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -91,6 +103,12 @@
     </ClInclude>
     <ClInclude Include="zonemanager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>Header Files\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="smokeparticle.h">
+      <Filter>Header Files\particles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

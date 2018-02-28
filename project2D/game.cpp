@@ -21,6 +21,8 @@
 #include "zonemanager.h"
 
 #include "tile.h"
+#include "particle.h"
+#include "smokeparticle.h"
 
 Game::Game()
 {
@@ -92,6 +94,9 @@ void Game::shutdown()
 		if (b)
 			delete b;
 
+	for (auto p : m_particles)
+		delete p;
+
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -108,6 +113,29 @@ void Game::update(float deltaTime)
 {
 	if (deltaTime > 0.33f)
 		deltaTime = 0.33f;
+
+	// update particles
+	for (auto p : m_particles)
+		p->update(deltaTime);
+
+	// delete any particles that need it
+	bool didDelete = true;
+	while (didDelete)
+	{
+		didDelete = false;
+		for (ParticleList::iterator it = m_particles.begin();
+			it != m_particles.end(); ++it)
+		{
+			Particle* thisParticle = *it;
+			if (thisParticle && thisParticle->getOpacity() <= 0)
+			{
+				delete *it;
+				m_particles.erase(it);
+				didDelete = true;
+				break;
+			}
+		}
+	}
 
 	aie::Input* input = aie::Input::getInstance();
 
@@ -208,6 +236,10 @@ void Game::draw()
 
 	// draw buildings
 	getBuildingManager()->drawBuildings(m_2dRenderer);
+
+	// draw particles
+	for (auto p : m_particles)
+		p->draw(m_2dRenderer);
 
 	// draw overlay stuff from place mode
 	switch (m_placeMode)
@@ -396,6 +428,25 @@ void Game::addBuilding(Building* build)
 
 void Game::removeBuilding(Building* toRemove)
 {
+	int ix, iy;
+	int iw, ih;
+	toRemove->getPosition(&ix, &iy);
+	toRemove->getSize(&iw, &ih);
+	// make smokey particles on each tile it occupied
+	for (int x = ix - iw; x <= ix; x++)
+	{
+		for (int y = iy - ih; y <= iy; y++)
+		{
+			// grab the world position
+			float wx, wy;
+			getTileWorldPosition(x, y, &wx, &wy);
+			wx += TILE_WIDTH / 2.0f;
+			spawnSmokeParticle(wx, wy);
+		}
+	}
+
+	if (toRemove->getType() == BUILDINGTYPE_POWERPOLE)
+		getBuildingManager()->removePowerPole(toRemove);
 	for (BuildingList::iterator it = m_buildings.begin();
 		it != m_buildings.end(); ++it)
 	{
@@ -441,4 +492,10 @@ void Game::setPlaceMode(PlaceMode mode)
 {
 	m_placeMode = mode;
 	getUiManager()->setShownPanel((int)mode);
+}
+
+void Game::spawnSmokeParticle(float x, float y)
+{
+	auto p = new SmokeParticle(this, x, y);
+	m_particles.push_back(p);
 }

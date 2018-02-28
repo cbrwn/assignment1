@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "building.h"
 
 class PowerPole : public Building
@@ -11,5 +12,4 @@ public:
 	virtual void update() override;
 
 	bool isTouchingBuilding(Building* b);
-private:
 };

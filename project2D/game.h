@@ -13,6 +13,7 @@
 
 class Camera;
 class Tile;
+class Particle;
 
 class ImageManager;
 class UiManager;
@@ -39,8 +40,9 @@ enum ViewMode
 	VIEWMODE_ZONE = 0b00000001
 };
 
-// typedef building vector so it's shorter to type
+// typedef vectors so they're shorter to type
 typedef std::vector<Building*> BuildingList;
+typedef std::vector<Particle*> ParticleList;
 
 class Game : public aie::Application
 {
@@ -83,6 +85,9 @@ public:
 	inline PlaceMode getPlaceMode() { return m_placeMode; }
 	void setPlaceMode(PlaceMode mode);
 
+	// particle stuff
+	void spawnSmokeParticle(float x, float y);
+
 	// getters for all of the managers
 	inline ImageManager*	getImageManager() { return m_imageManager; }
 	inline UiManager*		getUiManager() { return m_uiManager; }
@@ -96,12 +101,14 @@ protected:
 
 	float				m_mapStartX, m_mapStartY;
 	Tile***				m_tiles;
-	BuildingList m_buildings;
+	BuildingList		m_buildings;
 
 	ImageManager*		m_imageManager;
 	UiManager*			m_uiManager;
 	BuildingManager*	m_buildingManager;
 	ZoneManager*		m_zoneManager;
+
+	ParticleList m_particles;
 
 	// gameplay variables
 	PlaceMode m_placeMode;

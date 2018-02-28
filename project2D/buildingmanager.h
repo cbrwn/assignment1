@@ -24,12 +24,14 @@ public:
 	void drawPlacement(aie::Renderer2D* renderer);
 
 	bool canPlaceBuilding();
+	Building* getBuildingAtIndex(int ix, int iy);
 
 	// general building functions
 	void updateBuildings(float delta);
 	void drawBuildings(aie::Renderer2D* renderer);
 
 	inline BuildingList* getPowerPoles() { return &m_powerPoles; }
+	void removePowerPole(Building* pole);
 
 	inline int getSelectedBuilding() { return m_selectedBuilding; }
 	inline void setSelectedBuilding(int id) { m_selectedBuilding = id; }

@@ -4,9 +4,11 @@
 
 // when adding a new building type, don't forget to
 //  add it to the factory in buildingmanager.cpp
+//  and the building UI in uimanager.cpp
 enum BuildingType
 {
-	BUILDINGTYPE_POWERPLANT = 0,
+	BUILDINGTYPE_NONE = 0,
+	BUILDINGTYPE_POWERPLANT,
 	BUILDINGTYPE_POWERPOLE,
 
 	BUILDINGTYPE_COUNT
