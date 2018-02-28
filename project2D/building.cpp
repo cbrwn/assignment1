@@ -15,8 +15,11 @@ Building::Building(Game* game, int x, int y)
 	// default values
 	m_sizeX = 1;
 	m_sizeY = 1;
-	m_buildStyle = BuildStyle::SINGLE;
+	m_buildStyle = BuildStyle::BUILDSTYLE_SINGLE;
 	m_hasPower = false;
+
+	// grab the world position
+	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
 }
 
 void Building::update()
@@ -34,4 +37,13 @@ void Building::update()
 			break;
 		}
 	}
+}
+
+void Building::setPosition(int x, int y)
+{
+	m_posX = x; 
+	m_posY = y;
+
+	// update world positions
+	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
 }

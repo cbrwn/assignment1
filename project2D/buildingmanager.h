@@ -47,5 +47,7 @@ private:
 	Building*		m_ghostBuilding;
 
 	float			m_updateTimer;
+
+	void updatePowerPoles();
 };
 

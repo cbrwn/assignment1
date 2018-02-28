@@ -57,6 +57,9 @@
     <ClCompile Include="powerpole.cpp">
       <Filter>Source Files\buildings</Filter>
     </ClCompile>
+    <ClCompile Include="zonemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="powerpole.h">
       <Filter>Header Files\buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="zonemanager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@
 PowerPlant::PowerPlant(Game* game, int x, int y)
 	: Building(game, x, y)
 {
-	m_type = BuildingType::POWERPLANT;
+	m_type = BuildingType::BUILDINGTYPE_POWERPLANT;
 	m_sizeX = 4;
 	m_sizeY = 4;
 	

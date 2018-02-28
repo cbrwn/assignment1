@@ -10,8 +10,8 @@
 PowerPole::PowerPole(Game* game, int x, int y)
 	: Building(game, x, y)
 {
-	m_type = BuildingType::POWERPOLE;
-	m_buildStyle = BuildStyle::LINE;
+	m_type = BuildingType::BUILDINGTYPE_POWERPOLE;
+	m_buildStyle = BuildStyle::BUILDSTYLE_LINE;
 	m_sizeX = 1;
 	m_sizeY = 1;
 
@@ -22,20 +22,16 @@ void PowerPole::draw(aie::Renderer2D* renderer)
 {
 	if (m_posX < 0 || m_posY < 0)
 		return;
-	// grab the world position of our base tile
-	float wx, wy;
-	m_game->getTileWorldPosition(m_posX + 1, m_posY, &wx, &wy);
-
 	// keep origin at the bottom-middle of the sprite
 	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
-	renderer->drawSprite(m_texture, wx, wy, 0, 0, 0, 0, xOrigin, yOrigin);
+	renderer->drawSprite(m_texture, m_worldX, m_worldY, 0, 0, 0, 0, xOrigin, yOrigin);
 
 	if (m_hasPower)
 	{
 		renderer->setRenderColour(0, 1, 0);
-		renderer->drawCircle(wx, wy, 5);
+		renderer->drawCircle(m_worldX, m_worldY, 5);
 	}
 }
 

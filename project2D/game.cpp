@@ -18,6 +18,7 @@
 #include "uimanager.h"
 #include "building.h"
 #include "buildingmanager.h"
+#include "zonemanager.h"
 
 #include "tile.h"
 
@@ -44,6 +45,7 @@ bool Game::startup()
 	m_uiManager = new UiManager(this);
 
 	m_buildingManager = new BuildingManager(this, &m_buildings);
+	m_zoneManager = new ZoneManager(this, &m_tiles);
 
 	//m_camera->setScale(1.3f);
 
@@ -51,15 +53,22 @@ bool Game::startup()
 	m_uiFont = new aie::Font("./font/roboto.ttf", 16);
 	m_uiFontLarge = new aie::Font("./font/roboto.ttf", 24);
 
-	// initialize tiles to grass tiles
 	m_mapStartX = 1200;
 	m_mapStartY = 800;
-	for (int y = 0; y < WORLD_HEIGHT; y++)
-		for (int x = 0; x < WORLD_WIDTH; x++)
-			m_tiles[y][x] = new Tile(this, 
-				m_imageManager->getTexture("tiles/grass_flat"));
 
-	m_placeMode = PlaceMode::NONE;
+	m_tiles = new Tile**[WORLD_HEIGHT];
+
+	// initialize tiles to grass tiles
+	for (int y = 0; y < WORLD_HEIGHT; y++)
+	{
+		m_tiles[y] = new Tile*[WORLD_WIDTH];
+		for (int x = 0; x < WORLD_WIDTH; x++)
+			m_tiles[y][x] = new Tile(this,
+				m_imageManager->getTexture("tiles/grass_flat"));
+	}
+
+	m_placeMode = PlaceMode::PLACEMODE_NONE;
+	m_viewMode = (ViewMode)0;
 
 	m_money = 10000;
 
@@ -77,15 +86,22 @@ void Game::shutdown()
 	delete m_imageManager;
 	delete m_uiManager;
 
+	delete m_zoneManager;
 	delete m_buildingManager;
 	for (auto b : m_buildings)
-		if(b)
+		if (b)
 			delete b;
 
 	for (int y = 0; y < WORLD_HEIGHT; y++)
+	{
 		for (int x = 0; x < WORLD_WIDTH; x++)
+		{
 			if (m_tiles[y][x] != nullptr)
 				delete m_tiles[y][x];
+		}
+		delete m_tiles[y];
+	}
+	delete[] m_tiles;
 }
 
 void Game::update(float deltaTime)
@@ -98,23 +114,39 @@ void Game::update(float deltaTime)
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 
-	switch (m_placeMode)
+	// keys to switch between modes!
+
+	// only want these to trigger if the mode isn't already what we want
+	//   so it can fall through to the manager's update function to handle 
+	//   turning it off
+	bool switchToBuilding = m_placeMode != PLACEMODE_BUILDING
+		&& input->wasKeyPressed(aie::INPUT_KEY_B);
+	bool switchToZone = m_placeMode != PLACEMODE_ZONE
+		&& input->wasKeyPressed(aie::INPUT_KEY_Z);
+
+	if (switchToBuilding)
+		setPlaceMode(PLACEMODE_BUILDING);
+	else if (switchToZone)
+		setPlaceMode(PLACEMODE_ZONE);
+	else
 	{
-	case BUILDING:
-		getBuildingManager()->buildingMode();
-		break;
-	case ZONE:
-		break;
-	default:
-		if (input->wasKeyPressed(aie::INPUT_KEY_B))
-			setPlaceMode(PlaceMode::BUILDING);
-		break;
+		switch (m_placeMode)
+		{
+		case PLACEMODE_BUILDING:
+			getBuildingManager()->buildingMode();
+			break;
+		case PLACEMODE_ZONE:
+			getZoneManager()->zoneMode();
+			break;
+		default:
+			break;
+		}
 	}
 
 	getBuildingManager()->updateBuildings(deltaTime);
 
 	m_camera->update(deltaTime);
-	m_uiManager->update(deltaTime);
+	getUiManager()->update(deltaTime);
 }
 
 void Game::draw()
@@ -138,6 +170,8 @@ void Game::draw()
 	// don't show mouseover stuff if the mouse is over the UI
 	if (!isMouseInGame())
 		mouseOver = nullptr;
+	// todo: replace with view mode
+	bool tintTiles = getPlaceMode() == PLACEMODE_ZONE;
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -145,6 +179,8 @@ void Game::draw()
 			Tile* thisTile = m_tiles[y][x];
 			if (thisTile == nullptr)
 				continue;
+
+
 			float rg = 1.0f;
 			if (mouseOver == thisTile)
 				rg = 0.5f;
@@ -159,10 +195,14 @@ void Game::draw()
 
 			// account for the difference in height in the texture
 			// and keep the bottoms aligned
-			float dify = TILE_HEIGHT - 
+			float dify = TILE_HEIGHT -
 				(float)thisTile->getTexture()->getHeight();
 
-			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f);
+			// don't let the tile class tint the sprite if this is
+			//   being moused over
+			bool tintThisTile = tintTiles && thisTile != mouseOver;
+
+			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f, tintThisTile);
 		}
 	}
 
@@ -172,10 +212,11 @@ void Game::draw()
 	// draw overlay stuff from place mode
 	switch (m_placeMode)
 	{
-	case BUILDING:
+	case PLACEMODE_BUILDING:
 		getBuildingManager()->drawPlacement(m_2dRenderer);
 		break;
-	case ZONE:
+	case PLACEMODE_ZONE:
+		getZoneManager()->drawZones(m_2dRenderer);
 		break;
 	default:
 		break;
@@ -250,7 +291,7 @@ void Game::draw()
 	m_2dRenderer->drawText(m_uiFontLarge, mny,
 		getWindowWidth() - moneyWidth - 2, (float)getWindowHeight() - 18);
 
-	//m_uiManager->draw(m_2dRenderer);
+	getUiManager()->draw(m_2dRenderer);
 
 	// show fps
 	char fps[32];
@@ -328,6 +369,16 @@ void Game::getTileAtPosition(float px, float py, int* ix, int* iy)
 	*iy = resultY;
 }
 
+void Game::getTileAtMousePosition(int* ix, int* iy)
+{
+	// first get the mouse's world position
+	float mx, my;
+	getMouseWorldPosition(&mx, &my);
+
+	// then grab the tile's indices
+	getTileAtPosition(mx, my, ix, iy);
+}
+
 void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 {
 	float xpos = (ix - iy) * TILE_WIDTH / 2.0f + m_mapStartX;
@@ -340,11 +391,12 @@ void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 void Game::addBuilding(Building* build)
 {
 	m_buildings.push_back(build);
+	sortBuildings();
 }
 
 void Game::removeBuilding(Building* toRemove)
 {
-	for (BuildingList::iterator it = m_buildings.begin(); 
+	for (BuildingList::iterator it = m_buildings.begin();
 		it != m_buildings.end(); ++it)
 	{
 		if (*it == toRemove)
@@ -354,4 +406,39 @@ void Game::removeBuilding(Building* toRemove)
 			break;
 		}
 	}
+	sortBuildings();
+}
+
+void Game::sortBuildings()
+{
+	// sort buildings from back to front
+	// todo: use a better sort algorithm
+	int buildingCount = (int)m_buildings.size();
+	for (int i = 0; i < buildingCount - 1; ++i)
+	{
+		for (int j = buildingCount - 1; j >= i + 1; --j)
+		{
+			// first building's position
+			int ax, ay;
+			m_buildings[i]->getPosition(&ax, &ay);
+
+			// second building's position
+			int bx, by;
+			m_buildings[i + 1]->getPosition(&bx, &by);
+
+			if (ax > bx || ay > by)
+			{
+				// swap em
+				Building* a = m_buildings[i];
+				m_buildings[i] = m_buildings[i + 1];
+				m_buildings[i + 1] = a;
+			}
+		}
+	}
+}
+
+void Game::setPlaceMode(PlaceMode mode)
+{
+	m_placeMode = mode;
+	getUiManager()->setShownPanel((int)mode);
 }

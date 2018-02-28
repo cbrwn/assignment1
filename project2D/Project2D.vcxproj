@@ -172,6 +172,7 @@
     <ClCompile Include="powerpole.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="uimanager.cpp" />
+    <ClCompile Include="zonemanager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="building.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="powerpole.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="uimanager.h" />
+    <ClInclude Include="zonemanager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

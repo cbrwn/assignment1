@@ -32,7 +32,7 @@ BuildingManager::~BuildingManager()
 void BuildingManager::buildingMode()
 {
 	// double check to make sure we're in building mode
-	if (m_game->getPlaceMode() != PlaceMode::BUILDING)
+	if (m_game->getPlaceMode() != PlaceMode::PLACEMODE_BUILDING)
 		return;
 
 	aie::Input* input = aie::Input::getInstance();
@@ -40,7 +40,7 @@ void BuildingManager::buildingMode()
 	// B to toggle building mode
 	if (input->wasKeyPressed(aie::INPUT_KEY_B))
 	{
-		m_game->setPlaceMode(PlaceMode::NONE);
+		m_game->setPlaceMode(PlaceMode::PLACEMODE_NONE);
 		return;
 	}
 
@@ -51,10 +51,10 @@ void BuildingManager::buildingMode()
 		m_selectedBuilding--;
 
 	// wrap around
-	if (m_selectedBuilding >= (int)BUILDINGTYPECOUNT)
+	if (m_selectedBuilding >= (int)BUILDINGTYPE_COUNT)
 		m_selectedBuilding = 0;
 	if (m_selectedBuilding < 0)
-		m_selectedBuilding = (int)BUILDINGTYPECOUNT - 1;
+		m_selectedBuilding = (int)BUILDINGTYPE_COUNT - 1;
 
 	// grab the mouse position
 	float mx, my;
@@ -83,7 +83,7 @@ void BuildingManager::buildingMode()
 		return;
 
 	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) &&
-		m_ghostBuilding->getBuildStyle() == BuildStyle::SINGLE)
+		m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_SINGLE)
 	{
 		// place building!
 		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
@@ -91,12 +91,12 @@ void BuildingManager::buildingMode()
 		// cancel building mode if shift isn't held
 		// so player can place multiple buildings easily by holding shift
 		if (!input->isKeyDown(aie::INPUT_KEY_LEFT_SHIFT))
-			m_game->setPlaceMode(PlaceMode::NONE);
+			m_game->setPlaceMode(PlaceMode::PLACEMODE_NONE);
 	}
 
 	// line style lets you click and drag
 	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT) &&
-		m_ghostBuilding->getBuildStyle() == BuildStyle::LINE)
+		m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
 	{
 		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY));
@@ -122,31 +122,6 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 
 void BuildingManager::updateBuildings(float delta)
 {
-	// sort buildings from back to front
-	// todo: use a better sort algorithm
-	int buildingCount = (int)m_buildings->size();
-	for (int i = 0; i < buildingCount - 1; ++i)
-	{
-		for (int j = buildingCount - 1; j >= i + 1; --j)
-		{
-			// first building's position
-			int ax, ay;
-			(*m_buildings)[i]->getPosition(&ax, &ay);
-
-			// second building's position
-			int bx, by;
-			(*m_buildings)[i + 1]->getPosition(&bx, &by);
-
-			if (ax > bx || ay > by)
-			{
-				// swap em
-				Building* a = (*m_buildings)[i];
-				(*m_buildings)[i] = (*m_buildings)[i + 1];
-				(*m_buildings)[i + 1] = a;
-			}
-		}
-	}
-
 	// update all buildings every once in a while
 	m_updateTimer += delta;
 	if (m_updateTimer >= BUILDING_UPDATE_TIME)
@@ -155,6 +130,10 @@ void BuildingManager::updateBuildings(float delta)
 
 		for (auto b : *m_buildings)
 			b->update();
+
+		// force power poles to be correctly powered instantly
+		// without this, power poles would sometimes update one at a time
+		updatePowerPoles();
 	}
 }
 
@@ -229,10 +208,10 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 
 	switch (type)
 	{
-	case BuildingType::POWERPLANT:
+	case BuildingType::BUILDINGTYPE_POWERPLANT:
 		return new PowerPlant(m_game, xTile, yTile);
 		break;
-	case BuildingType::POWERPOLE:
+	case BuildingType::BUILDINGTYPE_POWERPOLE:
 		b = new PowerPole(m_game, xTile, yTile);
 		if (!ghost)
 		{
@@ -247,4 +226,23 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		break;
 	}
 	return nullptr;
+}
+
+// updates ALL power poles until the power state hasn't changed
+void BuildingManager::updatePowerPoles()
+{
+	bool powerChanged = true;
+	while (powerChanged)
+	{
+		powerChanged = false;
+		for (auto b : m_powerPoles)
+		{
+			bool beforeUpdate = b->hasPower();
+			b->update();
+			// compare the power state to before the update and continue the
+			// loop to continue until all power states are correct
+			if (beforeUpdate != b->hasPower())
+				powerChanged = true;
+		}
+	}
 }

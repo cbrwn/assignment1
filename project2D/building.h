@@ -6,10 +6,10 @@
 //  add it to the factory in buildingmanager.cpp
 enum BuildingType
 {
-	POWERPLANT = 0,
-	POWERPOLE,
+	BUILDINGTYPE_POWERPLANT = 0,
+	BUILDINGTYPE_POWERPOLE,
 
-	BUILDINGTYPECOUNT
+	BUILDINGTYPE_COUNT
 };
 
 // enum to describe building styles
@@ -17,9 +17,9 @@ enum BuildingType
 //    in a line (click & drag) or in a rectangle (click & drag)
 enum BuildStyle
 {
-	SINGLE = 0,
-	LINE,
-	RECTANGLE
+	BUILDSTYLE_SINGLE = 0,
+	BUILDSTYLE_LINE,
+	BUILDSTYLE_RECT
 };
 
 class Game;
@@ -32,7 +32,7 @@ public:
 	virtual void update();
 	virtual void draw(aie::Renderer2D* renderer) = 0;
 
-	inline void setPosition(int x, int y) { m_posX = x; m_posY = y; }
+	void setPosition(int x, int y);
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
 
@@ -47,6 +47,8 @@ protected:
 
 	int				m_posX, m_posY;
 	int				m_sizeX, m_sizeY;
+	// world position of the bulding from the tile number
+	float			m_worldX, m_worldY;
 
 	bool			m_hasPower;
 
