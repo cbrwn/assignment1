@@ -44,6 +44,26 @@ UiManager::UiManager(Game* game)
 			selectBoxWidth, m_panelY - (selectBoxPadding * 2.0f) };
 		currentX += selectBoxWidth + selectBoxPadding;
 	}
+
+	// set the information we'll be showing in the panels
+	m_zoneColours[ZONETYPE_NONE] = 0x00000000; // don't draw a box
+	m_zoneColours[ZONETYPE_RESIDENTIAL] = 0x00ff00ff; // green
+	m_zoneColours[ZONETYPE_COMMERCIAL] = 0x0000ffff; // blue
+	m_zoneColours[ZONETYPE_INDUSTRIAL] = 0xffff00ff; // yellow
+
+	m_zoneNames[ZONETYPE_NONE] = "De-zone";
+	m_zoneNames[ZONETYPE_RESIDENTIAL] = "Residential";
+	m_zoneNames[ZONETYPE_COMMERCIAL] = "Commercial";
+	m_zoneNames[ZONETYPE_INDUSTRIAL] = "Industrial";
+
+	ImageManager* img = m_game->getImageManager();
+	m_buildingIcons[BUILDINGTYPE_NONE] = img->getTexture("icons/demolish");
+	m_buildingIcons[BUILDINGTYPE_POWERPLANT] = img->getTexture("icons/powerplant");
+	m_buildingIcons[BUILDINGTYPE_POWERPOLE] = img->getTexture("icons/powerpole");
+	
+	m_buildingNames[BUILDINGTYPE_NONE] = "Demolish";
+	m_buildingNames[BUILDINGTYPE_POWERPLANT] = "Power Plant";
+	m_buildingNames[BUILDINGTYPE_POWERPOLE] = "Power Pole";
 }
 
 UiManager::~UiManager()
@@ -119,18 +139,6 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 	renderer->setRenderColour(1, 1, 1);
 	renderer->drawText(m_game->m_uiFontLarge, "Buildings", 8, m_buildingPanelY - 8);
 
-	const char* buildingNames[BUILDINGTYPE_COUNT] = {
-		"Demolish",
-		"Power Plant",
-		"Power Pole"
-	};
-
-	aie::Texture* buildingIcons[BUILDINGTYPE_COUNT] = {
-		m_game->getImageManager()->getTexture("icons/demolish"),
-		m_game->getImageManager()->getTexture("icons/powerplant"),
-		m_game->getImageManager()->getTexture("icons/powerpole")
-	};
-
 	// draw all the boxes
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
 	{
@@ -148,11 +156,11 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 
 		// draw building icon
 		renderer->setRenderColour(1, 1, 1);
-		renderer->drawSprite(buildingIcons[i], xPos, yPos + thisRect.height / 6.0f);
+		renderer->drawSprite(m_buildingIcons[i], xPos, yPos + thisRect.height / 6.0f);
 
 		// draw building name
-		float stringWidth = m_game->m_uiFont->getStringWidth(buildingNames[i]);
-		renderer->drawText(m_game->m_uiFont, buildingNames[i], xPos - stringWidth / 2.0f,
+		float stringWidth = m_game->m_uiFont->getStringWidth(m_buildingNames[i]);
+		renderer->drawText(m_game->m_uiFont, m_buildingNames[i], xPos - stringWidth / 2.0f,
 			yPos - thisRect.height / 2.5f);
 	}
 }
@@ -168,19 +176,6 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 	// panel title
 	renderer->setRenderColour(1, 1, 1);
 	renderer->drawText(m_game->m_uiFontLarge, "Zones", 8, m_zonePanelY - 8);
-
-	const unsigned int zoneColours[ZONETYPE_COUNT] = {
-		0x00000000, // none
-		0x00ff00ff, // residential - green
-		0x0000ffff, // commercial - blue
-		0xffff00ff  // industrial - yellow
-	};
-	const char* zoneNames[ZONETYPE_COUNT] = {
-		"De-zone",
-		"Residential",
-		"Commercial",
-		"Industrial"
-	};
 
 	// draw all the boxes
 	for (int i = 0; i < ZONETYPE_COUNT; i++)
@@ -198,7 +193,7 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 		renderer->drawBox(xPos, yPos, thisRect.width, thisRect.height);
 
 		// draw coloured box indicating which type of zone
-		renderer->setRenderColour(zoneColours[i]);
+		renderer->setRenderColour(m_zoneColours[i]);
 		renderer->drawBox(xPos, yPos + thisRect.height / 6.0f, thisRect.width / 2.0f,
 			thisRect.width / 2.0f);
 
@@ -212,8 +207,8 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 
 		// draw zone name text
 		renderer->setRenderColour(1, 1, 1);
-		float stringWidth = m_game->m_uiFont->getStringWidth(zoneNames[i]);
-		renderer->drawText(m_game->m_uiFont, zoneNames[i], xPos - stringWidth / 2.0f,
+		float stringWidth = m_game->m_uiFont->getStringWidth(m_zoneNames[i]);
+		renderer->drawText(m_game->m_uiFont, m_zoneNames[i], xPos - stringWidth / 2.0f,
 			yPos - thisRect.height / 2.5f);
 	}
 }
