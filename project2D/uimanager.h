@@ -29,7 +29,7 @@ public:
 
 	bool isMouseOverUi();
 private:
-	Game * m_game;
+	Game* m_game;
 
 	const unsigned int m_panelColour;
 	const float m_panelY;
@@ -46,6 +46,9 @@ private:
 	Rect m_zoneBoxes[ZONETYPE_COUNT];
 	Rect m_buildingBoxes[BUILDINGTYPE_COUNT];
 
+	aie::Texture* m_buildingSelectorIcon;
+	aie::Texture* m_zoneSelectorIcon;
+
 	// information to show in panels
 	unsigned int	m_zoneColours[ZONETYPE_COUNT];
 	const char*		m_zoneNames[ZONETYPE_COUNT];
@@ -55,5 +58,7 @@ private:
 	void drawBuildingPanel(aie::Renderer2D* renderer);
 	void drawZonePanel(aie::Renderer2D* renderer);
 
-	bool isMouseInRect(Rect r, float yoffset);
+	void selectorBoxClicked(int panel);
+
+	bool isMouseInRect(Rect r, float yoffset, bool centerOrigin = false);
 };

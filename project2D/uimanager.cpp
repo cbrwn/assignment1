@@ -71,6 +71,9 @@ UiManager::UiManager(Game* game)
 	m_buildingNames[BUILDINGTYPE_NONE] = "Demolish";
 	m_buildingNames[BUILDINGTYPE_POWERPLANT] = "Power Plant";
 	m_buildingNames[BUILDINGTYPE_POWERPOLE] = "Power Pole";
+
+	m_buildingSelectorIcon = img->getTexture("icons/building");
+	m_zoneSelectorIcon = img->getTexture("icons/zone");
 }
 
 UiManager::~UiManager()
@@ -89,6 +92,9 @@ void UiManager::update(float delta)
 	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
 		&& isMouseOverUi())
 	{
+		int mx, my;
+		input->getMouseXY(&mx, &my);
+
 		// check for zone panel clickage when it's visible
 		if (m_zonePanelY >= 0.0f)
 			for (int i = 0; i < ZONETYPE_COUNT; i++)
@@ -106,6 +112,15 @@ void UiManager::update(float delta)
 					m_game->getBuildingManager()->setSelectedBuilding(i);
 					break;
 				}
+
+		// check for selector box clicks
+		if (isMouseInRect(m_selectorBox, 0, true))
+		{
+			if (mx < m_selectorBox.x) // left side was clicked
+				selectorBoxClicked(UI_PANEL_BUILDINGS);
+			else // right side was clicked
+				selectorBoxClicked(UI_PANEL_ZONES);
+		}
 	}
 
 	// make sure the selector box is always at the top of the screen
@@ -128,6 +143,12 @@ void UiManager::draw(aie::Renderer2D* renderer)
 	renderer->drawLine(m_selectorBox.x, 
 		m_selectorBox.y - m_selectorBox.height/3.0f, m_selectorBox.x, 
 		m_selectorBox.y + m_selectorBox.height/3.0f);
+	// selector icons
+	renderer->setRenderColour(1, 1, 1);
+	float buildingIconX = m_selectorBox.x - (m_selectorBox.width / 4.0f);
+	renderer->drawSprite(m_buildingSelectorIcon, buildingIconX, m_selectorBox.y);
+	float zoneIconX = m_selectorBox.x + (m_selectorBox.width / 4.0f);
+	renderer->drawSprite(m_zoneSelectorIcon, zoneIconX, m_selectorBox.y);
 }
 
 void UiManager::setShownPanel(int panel)
@@ -143,6 +164,8 @@ void UiManager::setShownPanel(int panel)
 
 bool UiManager::isMouseOverUi()
 {
+	if (isMouseInRect(m_selectorBox, 0, true))
+		return true;
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
 	return (my < m_zonePanelY || my < m_buildingPanelY);
@@ -237,10 +260,29 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 	}
 }
 
-bool UiManager::isMouseInRect(Rect r, float yoffset)
+// toggles the panel clicked on using the selector box
+void UiManager::selectorBoxClicked(int panel)
+{
+	if (m_shownPanel == panel)
+	{
+		m_game->setPlaceMode((PlaceMode)0);
+		setShownPanel(0);
+	}
+	else
+	{
+		m_game->setPlaceMode((PlaceMode)panel);
+		setShownPanel(panel);
+	}
+}
+
+bool UiManager::isMouseInRect(Rect r, float yoffset, bool centerOrigin)
 {
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
+
+	// adjust rectangle if the origin of the rect is the center
+	if(centerOrigin)
+		r.x -= r.width / 2.0f;
 
 	float yPos = r.y - yoffset;
 
