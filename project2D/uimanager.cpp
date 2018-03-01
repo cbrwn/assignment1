@@ -61,9 +61,12 @@ UiManager::UiManager(Game* game)
 	m_zoneNames[ZONETYPE_INDUSTRIAL] = "Industrial";
 
 	ImageManager* img = m_game->getImageManager();
-	m_buildingIcons[BUILDINGTYPE_NONE] = img->getTexture("icons/demolish");
-	m_buildingIcons[BUILDINGTYPE_POWERPLANT] = img->getTexture("icons/powerplant");
-	m_buildingIcons[BUILDINGTYPE_POWERPOLE] = img->getTexture("icons/powerpole");
+	m_buildingIcons[BUILDINGTYPE_NONE] = 
+		img->getTexture("icons/demolish");
+	m_buildingIcons[BUILDINGTYPE_POWERPLANT] = 
+		img->getTexture("icons/powerplant");
+	m_buildingIcons[BUILDINGTYPE_POWERPOLE] = 
+		img->getTexture("icons/powerpole");
 	
 	m_buildingNames[BUILDINGTYPE_NONE] = "Demolish";
 	m_buildingNames[BUILDINGTYPE_POWERPLANT] = "Power Plant";
@@ -77,7 +80,8 @@ UiManager::~UiManager()
 void UiManager::update(float delta)
 {
 	const float smoothSpeed = 10.0f;
-	m_buildingPanelY -= (m_buildingPanelY - m_buildingPanelDestY) * delta * smoothSpeed;
+	m_buildingPanelY -= (m_buildingPanelY - m_buildingPanelDestY) * 
+		delta * smoothSpeed;
 	m_zonePanelY -= (m_zonePanelY - m_zonePanelDestY) * delta * smoothSpeed;
 
 	// do input
@@ -121,8 +125,9 @@ void UiManager::draw(aie::Renderer2D* renderer)
 	renderer->drawBox(m_selectorBox.x, m_selectorBox.y, m_selectorBox.width,
 		m_selectorBox.height);
 	renderer->setRenderColour(m_panelColour - 0x33333333);
-	renderer->drawLine(m_selectorBox.x, m_selectorBox.y - m_selectorBox.height/3.0f, 
-		m_selectorBox.x, m_selectorBox.y + m_selectorBox.height/3.0f);
+	renderer->drawLine(m_selectorBox.x, 
+		m_selectorBox.y - m_selectorBox.height/3.0f, m_selectorBox.x, 
+		m_selectorBox.y + m_selectorBox.height/3.0f);
 }
 
 void UiManager::setShownPanel(int panel)
@@ -131,7 +136,8 @@ void UiManager::setShownPanel(int panel)
 	//    (including the title)
 	const float hiddenValue = -50.0f;
 	m_shownPanel = panel;
-	m_buildingPanelDestY = panel == UI_PANEL_BUILDINGS ? m_panelY : hiddenValue;
+	m_buildingPanelDestY = panel == UI_PANEL_BUILDINGS ? m_panelY : 
+		hiddenValue;
 	m_zonePanelDestY = panel == UI_PANEL_ZONES ? m_panelY : hiddenValue;
 }
 
@@ -145,14 +151,16 @@ bool UiManager::isMouseOverUi()
 void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 {
 	renderer->setRenderColour(m_panelColour);
-	renderer->drawBox(m_game->getWindowWidth() / 2.0f, m_buildingPanelY / 2.0f,
-		(float)m_game->getWindowWidth(), m_buildingPanelY);
+	renderer->drawBox(m_game->getWindowWidth() / 2.0f, 
+		m_buildingPanelY / 2.0f, (float)m_game->getWindowWidth(), 
+		m_buildingPanelY);
 
 	// box behind panel title
 	renderer->drawBox(32, m_buildingPanelY, 136, 24);
 	// panel title
 	renderer->setRenderColour(1, 1, 1);
-	renderer->drawText(m_game->m_uiFontLarge, "Buildings", 8, m_buildingPanelY - 8);
+	renderer->drawText(m_game->m_uiFontLarge, "Buildings", 8, 
+		m_buildingPanelY - 8);
 
 	// draw all the boxes
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
@@ -171,12 +179,13 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 
 		// draw building icon
 		renderer->setRenderColour(1, 1, 1);
-		renderer->drawSprite(m_buildingIcons[i], xPos, yPos + thisRect.height / 6.0f);
+		renderer->drawSprite(m_buildingIcons[i], xPos, 
+			yPos + thisRect.height / 6.0f);
 
 		// draw building name
-		float stringWidth = m_game->m_uiFont->getStringWidth(m_buildingNames[i]);
-		renderer->drawText(m_game->m_uiFont, m_buildingNames[i], xPos - stringWidth / 2.0f,
-			yPos - thisRect.height / 2.5f);
+		float nameWidth = m_game->m_uiFont->getStringWidth(m_buildingNames[i]);
+		renderer->drawText(m_game->m_uiFont, m_buildingNames[i], 
+			xPos - nameWidth / 2.0f, yPos - thisRect.height / 2.5f);
 	}
 }
 
@@ -209,22 +218,22 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 
 		// draw coloured box indicating which type of zone
 		renderer->setRenderColour(m_zoneColours[i]);
-		renderer->drawBox(xPos, yPos + thisRect.height / 6.0f, thisRect.width / 2.0f,
-			thisRect.width / 2.0f);
+		renderer->drawBox(xPos, yPos + thisRect.height / 6.0f, 
+			thisRect.width / 2.0f, thisRect.width / 2.0f);
 
 		// draw the X from the demolition icon for de-zone
 		if (i == ZONETYPE_NONE)
 		{
 			renderer->setRenderColour(1, 1, 1, 1);
-			renderer->drawSprite(m_game->getImageManager()->getTexture("icons/demolish"), xPos,
+			renderer->drawSprite(m_buildingIcons[0], xPos, 
 				yPos + thisRect.height / 6.0f);
 		}
 
 		// draw zone name text
 		renderer->setRenderColour(1, 1, 1);
 		float stringWidth = m_game->m_uiFont->getStringWidth(m_zoneNames[i]);
-		renderer->drawText(m_game->m_uiFont, m_zoneNames[i], xPos - stringWidth / 2.0f,
-			yPos - thisRect.height / 2.5f);
+		renderer->drawText(m_game->m_uiFont, m_zoneNames[i], 
+			xPos - stringWidth / 2.0f, yPos - thisRect.height / 2.5f);
 	}
 }
 

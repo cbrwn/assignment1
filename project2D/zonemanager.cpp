@@ -22,7 +22,8 @@ void ZoneManager::zoneMode()
 	}
 
 	// zone creation
-	if (!m_dragging && input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
+	if (!m_dragging 
+		&& input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
 		&& m_game->isMouseInGame())
 	{
 		m_game->getTileAtMousePosition(&m_dragStartX, &m_dragStartY);
@@ -102,16 +103,20 @@ void ZoneManager::drawZones(aie::Renderer2D* renderer)
 
 		// top-left tile
 		float topLeftX, topLeftY;
-		m_game->getTileWorldPosition(dragMinX, dragMinY, &topLeftX, &topLeftY);
+		m_game->getTileWorldPosition(dragMinX, dragMinY, 
+			&topLeftX, &topLeftY);
 		// top-right tile
 		float topRightX, topRightY;
-		m_game->getTileWorldPosition(dragMaxX + 1, dragMinY, &topRightX, &topRightY);
+		m_game->getTileWorldPosition(dragMaxX + 1, dragMinY, 
+			&topRightX, &topRightY);
 		// bottom-right tile
 		float bottomRightX, bottomRightY;
-		m_game->getTileWorldPosition(dragMaxX +1, dragMaxY, &bottomRightX, &bottomRightY);
+		m_game->getTileWorldPosition(dragMaxX +1, dragMaxY, 
+			&bottomRightX, &bottomRightY);
 		// bottom-left tile
 		float bottomLeftX, bottomLeftY;
-		m_game->getTileWorldPosition(dragMinX, dragMaxY, &bottomLeftX, &bottomLeftY);
+		m_game->getTileWorldPosition(dragMinX, dragMaxY, 
+			&bottomLeftX, &bottomLeftY);
 
 		// adjust so the lines line up with the borders of the tile sprites
 		const float xOffset = TILE_WIDTH/2.0f;
@@ -125,9 +130,13 @@ void ZoneManager::drawZones(aie::Renderer2D* renderer)
 
 		// draw a rectangle out of lines
 		renderer->setRenderColour(1, 1, 1);
-		renderer->drawLine(topLeftX, topLeftY, topRightX, topRightY, lineThickness);
-		renderer->drawLine(topRightX, topRightY, bottomRightX, bottomRightY, lineThickness);
-		renderer->drawLine(bottomRightX, bottomRightY, bottomLeftX, bottomLeftY, lineThickness);
-		renderer->drawLine(bottomLeftX, bottomLeftY, topLeftX, topLeftY, lineThickness);
+		renderer->drawLine(topLeftX, topLeftY, topRightX, topRightY, 
+			lineThickness);
+		renderer->drawLine(topRightX, topRightY, bottomRightX, bottomRightY, 
+			lineThickness);
+		renderer->drawLine(bottomRightX, bottomRightY, bottomLeftX, 
+			bottomLeftY, lineThickness);
+		renderer->drawLine(bottomLeftX, bottomLeftY, topLeftX, topLeftY, 
+			lineThickness);
 	}
 }

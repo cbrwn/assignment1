@@ -26,7 +26,8 @@ void PowerPole::draw(aie::Renderer2D* renderer)
 	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
-	renderer->drawSprite(m_texture, m_worldX, m_worldY, 0, 0, 0, 0, xOrigin, yOrigin);
+	renderer->drawSprite(m_texture, m_worldX, m_worldY, 0, 0, 0, 0, xOrigin, 
+		yOrigin);
 
 	if (m_hasPower)
 	{
