@@ -9,11 +9,13 @@
 #include <Input.h>
 
 #include "buildingmanager.h"
+#include "roadmanager.h"
 #include "game.h"
 
 #include "building.h"
 #include "powerplant.h"
 #include "powerpole.h"
+#include "road.h"
 
 BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	: m_game(game), m_buildings(buildings)
@@ -79,23 +81,23 @@ void BuildingManager::buildingMode()
 		m_ghostBuilding->setPosition(tileX, tileY);
 
 	// demolish buildings
-	if (m_selectedBuilding == BUILDINGTYPE_NONE 
+	if (m_selectedBuilding == BUILDINGTYPE_NONE
 		&& input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
 	{
 		Building* underMouse = getBuildingAtIndex(tileX, tileY);
 		if (underMouse)
-			m_game->removeBuilding(underMouse);
+			removeBuilding(underMouse);
 	}
 
 	// we can stop here if placing things isn't allowed
 	if (!(canPlaceBuilding() && m_game->isMouseInGame()))
 		return;
 
-	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT) 
+	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
 		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_SINGLE)
 	{
 		// place building!
-		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
+		addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY));
 		// cancel building mode if shift isn't held
 		// so player can place multiple buildings easily by holding shift
@@ -104,10 +106,10 @@ void BuildingManager::buildingMode()
 	}
 
 	// line style lets you click and drag
-	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT) 
+	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT)
 		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
 	{
-		m_game->addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
+		addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY));
 	}
 }
@@ -152,6 +154,76 @@ void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 	{
 		renderer->setRenderColour(1, 1, 1);
 		b->draw(renderer);
+	}
+}
+
+void BuildingManager::addBuilding(Building* build)
+{
+	m_buildings->push_back(build);
+	sortBuildings();
+}
+
+void BuildingManager::removeBuilding(Building* toRemove)
+{
+	int ix, iy;
+	int iw, ih;
+	toRemove->getPosition(&ix, &iy);
+	toRemove->getSize(&iw, &ih);
+	// make smokey particles on each tile it occupied
+	for (int x = ix - iw; x <= ix; x++)
+	{
+		for (int y = iy - ih; y <= iy; y++)
+		{
+			// grab the world position
+			float wx, wy;
+			m_game->getTileWorldPosition(x, y, &wx, &wy);
+			wx += TILE_WIDTH / 2.0f;
+			m_game->spawnSmokeParticle(wx, wy);
+		}
+	}
+
+	if (toRemove->getType() == BUILDINGTYPE_POWERPOLE)
+		removePowerPole(toRemove);
+	if (toRemove->getType() == BUILDINGTYPE_ROAD)
+		m_game->getRoadManager()->removeRoad(toRemove);
+	for (BuildingList::iterator it = m_buildings->begin();
+		it != m_buildings->end(); ++it)
+	{
+		if (*it == toRemove)
+		{
+			delete *it;
+			m_buildings->erase(it);
+			break;
+		}
+	}
+	sortBuildings();
+}
+
+void BuildingManager::sortBuildings()
+{
+	// sort buildings from back to front
+	// todo: use a better sort algorithm
+	int buildingCount = (int)m_buildings->size();
+	for (int i = 0; i < buildingCount - 1; ++i)
+	{
+		for (int j = buildingCount - 1; j >= i + 1; --j)
+		{
+			// first building's position
+			int ax, ay;
+			(*m_buildings)[i]->getPosition(&ax, &ay);
+
+			// second building's position
+			int bx, by;
+			(*m_buildings)[i + 1]->getPosition(&bx, &by);
+
+			if (ax > bx || ay > by)
+			{
+				// swap em
+				Building* a = (*m_buildings)[i];
+				(*m_buildings)[i] = (*m_buildings)[i + 1];
+				(*m_buildings)[i + 1] = a;
+			}
+		}
 	}
 }
 
@@ -219,7 +291,7 @@ bool BuildingManager::canPlaceBuilding()
 	return true;
 }
 
-Building * BuildingManager::getBuildingAtIndex(int ix, int iy)
+Building* BuildingManager::getBuildingAtIndex(int ix, int iy)
 {
 	// now test against every other building
 	for (auto b : *m_buildings)
@@ -264,11 +336,14 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		break;
 	case BUILDINGTYPE_POWERPOLE:
 		b = new PowerPole(m_game, xTile, yTile);
-		if (!ghost)
-		{
-			// keep track of our power poles
+		if (!ghost) // keep track of our power poles
 			m_powerPoles.push_back(b);
-		}
+		return b;
+		break;
+	case BUILDINGTYPE_ROAD:
+		b = new Road(m_game, xTile, yTile);
+		if (!ghost)
+			m_game->getRoadManager()->addRoad(b);
 		return b;
 		break;
 	default:

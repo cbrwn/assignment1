@@ -72,6 +72,12 @@
     <ClCompile Include="particle.cpp">
       <Filter>Source Files\particles</Filter>
     </ClCompile>
+    <ClCompile Include="road.cpp">
+      <Filter>Source Files\buildings</Filter>
+    </ClCompile>
+    <ClCompile Include="roadmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -109,6 +115,12 @@
     </ClInclude>
     <ClInclude Include="smokeparticle.h">
       <Filter>Header Files\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="road.h">
+      <Filter>Header Files\buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="roadmanager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

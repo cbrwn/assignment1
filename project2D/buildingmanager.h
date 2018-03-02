@@ -29,6 +29,10 @@ public:
 	// general building functions
 	void updateBuildings(float delta);
 	void drawBuildings(aie::Renderer2D* renderer);
+	
+	void addBuilding(Building* build);
+	void removeBuilding(Building* toRemove);
+	void sortBuildings();
 
 	inline BuildingList* getPowerPoles() { return &m_powerPoles; }
 	void removePowerPole(Building* pole);

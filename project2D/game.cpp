@@ -18,6 +18,7 @@
 #include "uimanager.h"
 #include "building.h"
 #include "buildingmanager.h"
+#include "roadmanager.h"
 #include "zonemanager.h"
 
 #include "tile.h"
@@ -47,6 +48,7 @@ bool Game::startup()
 	m_uiManager = new UiManager(this);
 
 	m_buildingManager = new BuildingManager(this, &m_buildings);
+	m_roadManager = new RoadManager(this);
 	m_zoneManager = new ZoneManager(this, &m_tiles);
 
 	//m_camera->setScale(1.3f);
@@ -70,7 +72,7 @@ bool Game::startup()
 	}
 
 	m_placeMode = PlaceMode::PLACEMODE_NONE;
-	m_viewMode = (ViewMode)0;
+	setViewMode((ViewMode)(VIEWMODE_ZONE | VIEWMODE_BUILDINGS));
 
 	m_money = 10000;
 
@@ -88,8 +90,9 @@ void Game::shutdown()
 	delete m_imageManager;
 	delete m_uiManager;
 
-	delete m_zoneManager;
 	delete m_buildingManager;
+	delete m_roadManager;
+	delete m_zoneManager;
 	for (auto b : m_buildings)
 		if (b)
 			delete b;
@@ -199,7 +202,8 @@ void Game::draw()
 	if (!isMouseInGame())
 		mouseOver = nullptr;
 	// todo: replace with view mode
-	bool tintTiles = getPlaceMode() == PLACEMODE_ZONE;
+	bool tintTiles = getPlaceMode() == PLACEMODE_ZONE
+		|| isViewModeEnabled(VIEWMODE_ZONE);
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
 		for (int x = 0; x < WORLD_WIDTH; x++)
@@ -235,7 +239,8 @@ void Game::draw()
 	}
 
 	// draw buildings
-	getBuildingManager()->drawBuildings(m_2dRenderer);
+	if (isViewModeEnabled(VIEWMODE_BUILDINGS) || getPlaceMode() == PLACEMODE_BUILDING)
+		getBuildingManager()->drawBuildings(m_2dRenderer);
 
 	// draw particles
 	for (auto p : m_particles)
@@ -268,48 +273,6 @@ void Game::draw()
 
 	int smx, smy;
 	aie::Input::getInstance()->getMouseXY(&smx, &smy);
-
-	// draw mouseover information
-	/*if (mouseOver != nullptr)
-	{
-		char* info = mouseOver->getMouseoverText();
-		// change the font here if needed
-		aie::Font* mouseOverFont = m_uiFont;
-		if (strlen(info) > 0)
-		{
-			int mx = smx + 10;
-			int my = smy - 20;
-
-			// get string size to draw the rectangle appropriately
-			float stringWidth = mouseOverFont->getStringWidth(info);
-			float stringHeight = mouseOverFont->getStringHeight(info);
-			// number of pixels of padding on each side of the text
-			const float padding = 4.0f;
-
-			// 2*padding to put padding on both sides
-			float boxWidth = stringWidth + (padding * 2.0f);
-			// 2* stringHeight to make room for the tile name too
-			float boxHeight = stringHeight * 2.0f + (padding * 2.0f);
-
-			// draw our box
-			m_2dRenderer->setRenderColour(0.33f, 0.33f, 0.33f);
-			m_2dRenderer->drawBox((float)mx + boxWidth / 2.0f, (float)my - boxHeight / 2.0f + stringHeight,
-				boxWidth, boxHeight);
-
-			// and then our text
-			// tile name first
-			m_2dRenderer->setRenderColour(1, 1, 0);
-			m_2dRenderer->drawText(mouseOverFont, m_tileNames[mouseOver->getType()],
-				(float)mx + padding, (float)my);
-
-			// and the mouseover info
-			m_2dRenderer->setRenderColour(1, 1, 1);
-			m_2dRenderer->drawText(mouseOverFont, info,
-				(float)mx + padding, (float)my - padding - stringHeight);
-
-			delete info;
-		}
-	}*/
 
 	//===========
 	// hud stuff
@@ -420,78 +383,73 @@ void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 	*oy = -ypos;
 }
 
-void Game::addBuilding(Building* build)
+void Game::drawTileRect(int left, int top, int right, int bottom)
 {
-	m_buildings.push_back(build);
-	sortBuildings();
-}
 
-void Game::removeBuilding(Building* toRemove)
-{
-	int ix, iy;
-	int iw, ih;
-	toRemove->getPosition(&ix, &iy);
-	toRemove->getSize(&iw, &ih);
-	// make smokey particles on each tile it occupied
-	for (int x = ix - iw; x <= ix; x++)
+	// grab the world positions of the tiles
+	// -------------------------------------
+
+	// swap the start/end if the rectangle is backwards
+	int dragMinX = left; int dragMinY = top;
+	int dragMaxX = right; int dragMaxY = bottom;
+	if (dragMinX > dragMaxX)
 	{
-		for (int y = iy - ih; y <= iy; y++)
-		{
-			// grab the world position
-			float wx, wy;
-			getTileWorldPosition(x, y, &wx, &wy);
-			wx += TILE_WIDTH / 2.0f;
-			spawnSmokeParticle(wx, wy);
-		}
+		dragMinX = right;
+		dragMaxX = left;
+	}
+	if (dragMinY > dragMaxY)
+	{
+		dragMinY = bottom;
+		dragMaxY = top;
 	}
 
-	if (toRemove->getType() == BUILDINGTYPE_POWERPOLE)
-		getBuildingManager()->removePowerPole(toRemove);
-	for (BuildingList::iterator it = m_buildings.begin();
-		it != m_buildings.end(); ++it)
-	{
-		if (*it == toRemove)
-		{
-			delete *it;
-			m_buildings.erase(it);
-			break;
-		}
-	}
-	sortBuildings();
-}
 
-void Game::sortBuildings()
-{
-	// sort buildings from back to front
-	// todo: use a better sort algorithm
-	int buildingCount = (int)m_buildings.size();
-	for (int i = 0; i < buildingCount - 1; ++i)
-	{
-		for (int j = buildingCount - 1; j >= i + 1; --j)
-		{
-			// first building's position
-			int ax, ay;
-			m_buildings[i]->getPosition(&ax, &ay);
+	// top-left tile
+	float topLeftX, topLeftY;
+	getTileWorldPosition(dragMinX, dragMinY,
+		&topLeftX, &topLeftY);
+	// top-right tile
+	float topRightX, topRightY;
+	getTileWorldPosition(dragMaxX + 1, dragMinY,
+		&topRightX, &topRightY);
+	// bottom-right tile
+	float bottomRightX, bottomRightY;
+	getTileWorldPosition(dragMaxX + 1, dragMaxY,
+		&bottomRightX, &bottomRightY);
+	// bottom-left tile
+	float bottomLeftX, bottomLeftY;
+	getTileWorldPosition(dragMinX, dragMaxY,
+		&bottomLeftX, &bottomLeftY);
 
-			// second building's position
-			int bx, by;
-			m_buildings[i + 1]->getPosition(&bx, &by);
+	// adjust so the lines line up with the borders of the tile sprites
+	const float xOffset = TILE_WIDTH / 2.0f;
+	const float yOffset = TILE_HEIGHT / 3.0f;
+	topLeftX += xOffset;
+	topLeftY += yOffset;
+	topRightX += xOffset;
+	topRightY += yOffset;
 
-			if (ax > bx || ay > by)
-			{
-				// swap em
-				Building* a = m_buildings[i];
-				m_buildings[i] = m_buildings[i + 1];
-				m_buildings[i + 1] = a;
-			}
-		}
-	}
+	const float lineThickness = 8.0f;
+	// draw a rectangle out of lines
+	m_2dRenderer->drawLine(topLeftX, topLeftY, topRightX, topRightY,
+		lineThickness);
+	m_2dRenderer->drawLine(topRightX, topRightY, bottomRightX, bottomRightY,
+		lineThickness);
+	m_2dRenderer->drawLine(bottomRightX, bottomRightY, bottomLeftX,
+		bottomLeftY, lineThickness);
+	m_2dRenderer->drawLine(bottomLeftX, bottomLeftY, topLeftX, topLeftY,
+		lineThickness);
 }
 
 void Game::setPlaceMode(PlaceMode mode)
 {
 	m_placeMode = mode;
 	getUiManager()->setShownPanel((int)mode);
+}
+
+bool Game::isViewModeEnabled(ViewMode mode)
+{
+	return (m_viewMode & mode);
 }
 
 void Game::spawnSmokeParticle(float x, float y)

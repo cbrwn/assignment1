@@ -52,11 +52,14 @@ bool PowerPole::isTouchingBuilding(Building* b)
 	int left = right - (w - 1);
 	int top = bottom - (h - 1);
 
+	// how many tiles away from the pole will still be powered
+	const int powerZone = 1;
+
 	// get distances from each side
-	int distLeft = abs(left - m_posX);
-	int distRight = abs(right - m_posX);
-	int distTop = abs(top - m_posY);
-	int distBottom = abs(bottom - m_posY);
+	int distLeft = abs(left - m_posX - powerZone);
+	int distRight = abs(right - m_posX + powerZone);
+	int distTop = abs(top - m_posY + powerZone);
+	int distBottom = abs(bottom - m_posY - powerZone);
 
 	// get the shortest distance on each axis
 	int closestSideX = distLeft;

@@ -171,6 +171,8 @@
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="powerplant.cpp" />
     <ClCompile Include="powerpole.cpp" />
+    <ClCompile Include="road.cpp" />
+    <ClCompile Include="roadmanager.cpp" />
     <ClCompile Include="smokeparticle.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="uimanager.cpp" />
@@ -185,6 +187,8 @@
     <ClInclude Include="particle.h" />
     <ClInclude Include="powerplant.h" />
     <ClInclude Include="powerpole.h" />
+    <ClInclude Include="road.h" />
+    <ClInclude Include="roadmanager.h" />
     <ClInclude Include="smokeparticle.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="uimanager.h" />

@@ -10,6 +10,7 @@ enum BuildingType
 	BUILDINGTYPE_NONE = 0,
 	BUILDINGTYPE_POWERPLANT,
 	BUILDINGTYPE_POWERPOLE,
+	BUILDINGTYPE_ROAD,
 
 	BUILDINGTYPE_COUNT
 };
@@ -37,6 +38,7 @@ public:
 	void setPosition(int x, int y);
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
+	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
 
 	inline bool hasPower() { return m_hasPower; }
 	// give this building power - used by power plants to give poles power

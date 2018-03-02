@@ -20,6 +20,7 @@ class UiManager;
 
 class Building;
 class BuildingManager;
+class RoadManager;
 class ZoneManager;
 
 // place modes are the modes the player can switch between to place
@@ -37,7 +38,8 @@ enum PlaceMode
 //  like toggling the ability to see zones
 enum ViewMode
 {
-	VIEWMODE_ZONE = 0b00000001
+	VIEWMODE_ZONE = 0b00000001,
+	VIEWMODE_BUILDINGS = 0b00000010
 };
 
 // typedef vectors so they're shorter to type
@@ -69,12 +71,7 @@ public:
 	void  getTileAtPosition(float px, float py, int *ix, int *iy);
 	void  getTileAtMousePosition(int *ix, int *iy);
 	void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
-
-	// building-related functions
-	// (could/should move to BuildingManager)
-	void addBuilding(Building* build);
-	void removeBuilding(Building* toRemove);
-	void sortBuildings();
+	void  drawTileRect(int left, int top, int right, int bottom);
 
 	// money-related functions
 	inline int  getMoney() { return m_money; }
@@ -85,6 +82,11 @@ public:
 	inline PlaceMode getPlaceMode() { return m_placeMode; }
 	void setPlaceMode(PlaceMode mode);
 
+	// view mode related functions
+	inline ViewMode getViewMode() { return m_viewMode; }
+	inline void setViewMode(ViewMode mode) { m_viewMode = mode; }
+	bool isViewModeEnabled(ViewMode mode);
+
 	// particle stuff
 	void spawnSmokeParticle(float x, float y);
 
@@ -92,6 +94,7 @@ public:
 	inline ImageManager*	getImageManager() { return m_imageManager; }
 	inline UiManager*		getUiManager() { return m_uiManager; }
 	inline BuildingManager* getBuildingManager() { return m_buildingManager; }
+	inline RoadManager*		getRoadManager() { return m_roadManager; }
 	inline ZoneManager*		getZoneManager() { return m_zoneManager; }
 
 protected:
@@ -99,16 +102,18 @@ protected:
 	aie::Font*			m_font;
 	Camera*				m_camera;
 
+	// map/world-related stuff
 	float				m_mapStartX, m_mapStartY;
 	Tile***				m_tiles;
 	BuildingList		m_buildings;
+	ParticleList m_particles;
 
+	// I like managers
 	ImageManager*		m_imageManager;
 	UiManager*			m_uiManager;
 	BuildingManager*	m_buildingManager;
+	RoadManager*		m_roadManager;
 	ZoneManager*		m_zoneManager;
-
-	ParticleList m_particles;
 
 	// gameplay variables
 	PlaceMode m_placeMode;
