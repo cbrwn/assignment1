@@ -82,7 +82,7 @@ void BuildingManager::buildingMode()
 
 	// demolish buildings
 	if (m_selectedBuilding == BUILDINGTYPE_NONE
-		&& input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT))
+		&& input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT))
 	{
 		Building* underMouse = getBuildingAtIndex(tileX, tileY);
 		if (underMouse)
