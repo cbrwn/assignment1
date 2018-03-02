@@ -25,6 +25,4 @@ void Road::draw(aie::Renderer2D* renderer)
 
 void Road::update()
 {
-	// roads don't need power which is updated in the building update
-	//   so we do nothing here
 }

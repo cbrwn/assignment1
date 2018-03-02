@@ -38,8 +38,9 @@ enum PlaceMode
 //  like toggling the ability to see zones
 enum ViewMode
 {
-	VIEWMODE_ZONE = 0b00000001,
-	VIEWMODE_BUILDINGS = 0b00000010
+	VIEWMODE_ZONE		= 0b00000001,
+	VIEWMODE_BUILDINGS	= 0b00000010,
+	VIEWMODE_POWER		= 0b00000100
 };
 
 // typedef vectors so they're shorter to type
@@ -66,12 +67,14 @@ public:
 	bool isMouseInGame();
 
 	// tile-related functions
-	Tile* getTile(int x, int y) { return m_tiles[y][x]; }
+	Tile* getTile(int x, int y);
 	Tile* getTileAtPosition(float x, float y);
 	void  getTileAtPosition(float px, float py, int *ix, int *iy);
 	void  getTileAtMousePosition(int *ix, int *iy);
 	void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
 	void  drawTileRect(int left, int top, int right, int bottom);
+	void  decayTilePower();
+	void  clearTilePower();
 
 	// money-related functions
 	inline int  getMoney() { return m_money; }
@@ -85,6 +88,7 @@ public:
 	// view mode related functions
 	inline ViewMode getViewMode() { return m_viewMode; }
 	inline void setViewMode(ViewMode mode) { m_viewMode = mode; }
+	void toggleViewMode(ViewMode mode);
 	bool isViewModeEnabled(ViewMode mode);
 
 	// particle stuff
@@ -106,7 +110,9 @@ protected:
 	float				m_mapStartX, m_mapStartY;
 	Tile***				m_tiles;
 	BuildingList		m_buildings;
-	ParticleList m_particles;
+	ParticleList		m_particles;
+
+	aie::Texture*		m_powerIcon;
 
 	// I like managers
 	ImageManager*		m_imageManager;

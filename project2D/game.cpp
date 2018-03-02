@@ -59,6 +59,8 @@ bool Game::startup()
 	m_uiFont = new aie::Font("./font/roboto.ttf", 16);
 	m_uiFontLarge = new aie::Font("./font/roboto.ttf", 24);
 
+	m_powerIcon = m_imageManager->getTexture("icons/power");
+
 	m_mapStartX = 1200;
 	m_mapStartY = 800;
 
@@ -178,6 +180,11 @@ void Game::update(float deltaTime)
 
 	getBuildingManager()->updateBuildings(deltaTime);
 
+	if (input->wasKeyPressed(aie::INPUT_KEY_P))
+	{
+		toggleViewMode(VIEWMODE_POWER);
+	}
+
 	m_camera->update(deltaTime);
 	getUiManager()->update(deltaTime);
 }
@@ -237,6 +244,28 @@ void Game::draw()
 			bool tintThisTile = tintTiles && thisTile != mouseOver;
 
 			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f, tintThisTile);
+		}
+	}
+
+	if (isViewModeEnabled(VIEWMODE_POWER))
+	{
+		for (int y = 0; y < WORLD_HEIGHT; y++)
+		{
+			for (int x = 0; x < WORLD_WIDTH; x++)
+			{
+				Tile* thisTile = m_tiles[y][x];
+				if (!thisTile)
+					continue;
+
+				float xpos, ypos;
+				getTileWorldPosition(x, y, &xpos, &ypos);
+
+				if (thisTile->hasPower())
+				{
+					m_2dRenderer->setRenderColour(1, 1, 0);
+					m_2dRenderer->drawSprite(m_powerIcon, xpos + TILE_WIDTH/2.0f, ypos);
+				}
+			}
 		}
 	}
 
@@ -332,6 +361,13 @@ bool Game::isMouseInGame()
 	return !m_uiManager->isMouseOverUi();
 }
 
+Tile* Game::getTile(int x, int y)
+{
+	if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
+		return nullptr;
+	return m_tiles[y][x];
+}
+
 // gets the tile at world position x,y 
 Tile* Game::getTileAtPosition(float x, float y)
 {
@@ -395,7 +431,6 @@ void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
 
 void Game::drawTileRect(int left, int top, int right, int bottom)
 {
-
 	// grab the world positions of the tiles
 	// -------------------------------------
 
@@ -412,7 +447,6 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		dragMinY = bottom;
 		dragMaxY = top;
 	}
-
 
 	// top-left tile
 	float topLeftX, topLeftY;
@@ -451,10 +485,78 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		lineThickness);
 }
 
+// decays tile power over time to make sure tiles that shouldn't have power
+//   don't keep their power
+// this works by removing power from tiles which only have adjacent unpowered
+//   tiles
+void Game::decayTilePower()
+{
+	std::vector<Tile*> outerTiles;
+	for (int y = 0; y < WORLD_HEIGHT; ++y)
+	{
+		for (int x = 0; x < WORLD_WIDTH; ++x)
+		{
+			Tile* t = getTile(x, y);
+			if (!t)
+				continue;
+			if (!t->hasPower())
+				continue;
+
+			// check adjacent tiles
+			for (int i = -1; i <= 1; i++)
+			{
+				// get horizontally adjacent tile
+				Tile* adjacentH = getTile(x + i, y);
+				// and vertical
+				Tile* adjacentV = getTile(x, y + i);
+
+				// add tile to the list if any of these don't have power
+				if (!adjacentH->hasPower() || !adjacentV->hasPower())
+				{
+					outerTiles.push_back(t);
+					break;
+				}
+			}
+		}
+	}
+
+	for (auto t : outerTiles)
+		t->takePower();
+}
+
+void Game::clearTilePower()
+{
+	for (int y = 0; y < WORLD_HEIGHT; ++y)
+	{
+		for (int x = 0; x < WORLD_WIDTH; ++x)
+		{
+			Tile* t = getTile(x, y);
+			if (!t)
+				continue;
+			t->takePower();
+		}
+	}
+}
+
 void Game::setPlaceMode(PlaceMode mode)
 {
 	m_placeMode = mode;
 	getUiManager()->setShownPanel((int)mode);
+}
+
+void Game::toggleViewMode(ViewMode mode)
+{
+	if (isViewModeEnabled(mode))
+	{
+		// clear the bit
+		int newMode = m_viewMode & ~(mode);
+		m_viewMode = (ViewMode)newMode;
+	}
+	else
+	{
+		// turn the bit on
+		m_viewMode = (ViewMode)(m_viewMode | mode);
+	}
 }
 
 bool Game::isViewModeEnabled(ViewMode mode)

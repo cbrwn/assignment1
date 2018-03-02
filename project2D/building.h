@@ -37,13 +37,12 @@ public:
 
 	void setPosition(int x, int y);
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
+	// getCenter is used for depth sorting
 	inline void getCenter(int* x, int* y) { *x = m_posX - (m_sizeX-1)/2; *y = m_posY - (m_sizeY-1)/2; }
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
 	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
 
-	inline bool hasPower() { return m_hasPower; }
-	// give this building power - used by power plants to give poles power
-	inline void givePower() { m_hasPower = true; }
+	bool updatePower();
 
 	inline BuildingType getType() { return m_type; }
 	inline BuildStyle getBuildStyle() { return m_buildStyle; }
@@ -55,6 +54,9 @@ protected:
 	// world position of the bulding from the tile number
 	float			m_worldX, m_worldY;
 
+	int				m_powerSpreadRange; // how far this building shares power
+	int				m_powerSearchRange; // how far this building looks for power
+	bool			m_producesPower;
 	bool			m_hasPower;
 
 	BuildingType	m_type;

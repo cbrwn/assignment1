@@ -34,9 +34,6 @@ public:
 	void removeBuilding(Building* toRemove);
 	void sortBuildings();
 
-	inline BuildingList* getPowerPoles() { return &m_powerPoles; }
-	void removePowerPole(Building* pole);
-
 	inline int getSelectedBuilding() { return m_selectedBuilding; }
 	inline void setSelectedBuilding(int id) { m_selectedBuilding = id; }
 
@@ -46,14 +43,10 @@ private:
 	Game*			m_game;
 	BuildingList*	m_buildings;
 
-	BuildingList	m_powerPoles;
-
 	int				m_selectedBuilding;
 	// translucent building to show what the outcome will look like
 	Building*		m_ghostBuilding;
 
 	float			m_updateTimer;
-
-	void updatePowerPoles();
 };
 

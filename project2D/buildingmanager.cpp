@@ -139,12 +139,27 @@ void BuildingManager::updateBuildings(float delta)
 	{
 		m_updateTimer = 0;
 
-		for (auto b : *m_buildings)
-			b->update();
+		//m_game->decayTilePower();
 
-		// force power poles to be correctly powered instantly
-		// without this, power poles would sometimes update one at a time
-		updatePowerPoles();
+		for (auto b : *m_buildings)
+		{
+			b->update();
+			//b->updatePower();
+		}
+
+		m_game->clearTilePower();
+
+		bool changedPower = true;
+		while (changedPower)
+		{
+			changedPower = false;
+			for (auto b : *m_buildings)
+			{
+				bool temp = b->updatePower();
+				if (!changedPower)
+					changedPower = temp;
+			}
+		}
 	}
 }
 
@@ -182,8 +197,6 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		}
 	}
 
-	if (toRemove->getType() == BUILDINGTYPE_POWERPOLE)
-		removePowerPole(toRemove);
 	if (toRemove->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->removeRoad(toRemove);
 	for (BuildingList::iterator it = m_buildings->begin();
@@ -236,20 +249,6 @@ void BuildingManager::sortBuildings()
 					changed = true;
 				}
 			}
-		}
-	}
-}
-
-void BuildingManager::removePowerPole(Building* pole)
-{
-	// remove the pointer to this from the poles list in buildingmanager
-	for (BuildingList::iterator it = m_powerPoles.begin();
-		it != m_powerPoles.end(); ++it)
-	{
-		if (pole == *it)
-		{
-			m_powerPoles.erase(it);
-			break;
 		}
 	}
 }
@@ -348,10 +347,7 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		return new PowerPlant(m_game, xTile, yTile);
 		break;
 	case BUILDINGTYPE_POWERPOLE:
-		b = new PowerPole(m_game, xTile, yTile);
-		if (!ghost) // keep track of our power poles
-			m_powerPoles.push_back(b);
-		return b;
+		return new PowerPole(m_game, xTile, yTile);
 		break;
 	case BUILDINGTYPE_ROAD:
 		b = new Road(m_game, xTile, yTile);
@@ -365,23 +361,4 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		break;
 	}
 	return nullptr;
-}
-
-// updates ALL power poles until the power state hasn't changed
-void BuildingManager::updatePowerPoles()
-{
-	bool powerChanged = true;
-	while (powerChanged)
-	{
-		powerChanged = false;
-		for (auto b : m_powerPoles)
-		{
-			bool beforeUpdate = b->hasPower();
-			b->update();
-			// compare the power state to before the update and continue the
-			// loop to continue until all power states are correct
-			if (beforeUpdate != b->hasPower())
-				powerChanged = true;
-		}
-	}
 }

@@ -29,11 +29,15 @@ public:
 	inline ZoneType getZoneType() { return m_zoneType; }
 	void setZoneType(ZoneType type);
 
+	inline bool hasPower() { return m_hasPower; }
+	inline void givePower() { m_hasPower = true; }
+	inline void takePower() { m_hasPower = false; }
 protected:
 	Game*			m_game;
 	aie::Texture*	m_texture;
 
 	ZoneType		m_zoneType;
+	bool			m_hasPower;
 private:
 	static unsigned int m_zoneTintColours[ZONETYPE_COUNT];
 };
