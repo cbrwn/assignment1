@@ -15,7 +15,7 @@ public:
 	RoadManager(Game* game);
 
 	// use building parent class for this param because we'll do all the
-	// type checking in here
+	//   type checking in here
 	void addRoad(Building* newRoad);
 	void removeRoad(Building* road);
 
@@ -24,4 +24,6 @@ private:
 	Game* m_game;
 
 	RoadList m_roads;
+
+	void updateRoadTextures();
 };

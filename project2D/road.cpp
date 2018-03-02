@@ -8,6 +8,8 @@ Road::Road(Game* game, int x, int y)
 
 	m_type = BUILDINGTYPE_ROAD;
 	m_buildStyle = BUILDSTYLE_LINE;
+
+	cfield = 0;
 }
 
 void Road::draw(aie::Renderer2D* renderer)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 #include <Texture.h>
 
 class ImageManager
@@ -11,5 +12,5 @@ public:
 
 	aie::Texture* getTexture(char* name);
 private:
-	std::map<char*, aie::Texture*> m_textures;
+	std::map<std::string, aie::Texture*> m_textures;
 };

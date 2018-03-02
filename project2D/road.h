@@ -9,4 +9,6 @@ public:
 
 	virtual void draw(aie::Renderer2D* renderer) override;
 	virtual void update() override;
+
+	char cfield;
 };

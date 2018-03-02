@@ -25,6 +25,8 @@
 #include "particle.h"
 #include "smokeparticle.h"
 
+#include "road.h"
+
 Game::Game()
 {
 }
@@ -293,6 +295,14 @@ void Game::draw()
 	sprintf_s(fps, 32, "FPS: %i", getFPS());
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
+
+	// show mouse tile coords
+	int tileX, tileY;
+	getTileAtMousePosition(&tileX, &tileY);
+	char pos[32];
+	Road* rum = getRoadManager()->getRoadAtPosition(tileX, tileY);
+	sprintf_s(pos, 32, "(%d, %d)%s %d", tileX, tileY, rum ? " Road!" : "", rum ? rum->cfield : 0);
+	m_2dRenderer->drawText(m_uiFont, pos, 2, 240);
 
 	// show screen's mouse position (as opposed to the world mouse position)
 	m_2dRenderer->setRenderColour(1, 1, 1);

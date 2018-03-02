@@ -32,9 +32,10 @@ aie::Texture* ImageManager::getTexture(char* name)
 	aie::Texture* loaded = m_textures[name];
 	if (loaded == nullptr)
 	{
+		const int fileNameSize = 512;
 		// texture doesn't exist - try loading
-		char fileName[256];
-		sprintf_s(fileName, 256, fileNameTemplate, name);
+		char fileName[fileNameSize];
+		sprintf_s(fileName, fileNameSize, fileNameTemplate, name);
 		aie::Texture* tex = new aie::Texture(fileName);
 		if (tex != nullptr)
 		{

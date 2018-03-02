@@ -48,6 +48,8 @@ void RoadManager::addRoad(Building* newRoad)
 			}
 		}
 	}
+
+	updateRoadTextures();
 }
 
 void RoadManager::removeRoad(Building* road)
@@ -61,6 +63,8 @@ void RoadManager::removeRoad(Building* road)
 			break;
 		}
 	}
+
+	updateRoadTextures();
 }
 
 // binary search for road at the given position
@@ -113,4 +117,62 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 
 	// wasn't found
 	return nullptr;
+}
+
+void RoadManager::updateRoadTextures()
+{
+
+
+	// update road textures based on neighbouring roads
+	for (auto r : m_roads)
+	{
+		// grab the road positions
+		int ix, iy;
+		r->getPosition(&ix, &iy);
+
+		// use a bitfield to hold which sides are connected
+		// 0bUDLR
+		// U = y-1, D = y+1, L = x-1, R = x+1
+		char connectField = 0;
+		if (getRoadAtPosition(ix, iy - 1)) // road is above
+			connectField |= 0b1000;
+		if (getRoadAtPosition(ix, iy + 1)) // road is below
+			connectField |= 0b0100;
+		if (getRoadAtPosition(ix - 1, iy)) // road is to the left
+			connectField |= 0b0010;
+		if (getRoadAtPosition(ix + 1, iy)) // road is to the right
+			connectField |= 0b0001;
+
+		r->cfield = connectField;
+
+		// straight up/down
+		// field is either 0b1000, 0b0100 or 0b1100
+		if (connectField % 4 == 0)
+		{
+			r->setTexture(m_game->getImageManager()->getTexture("buildings/road_left"));
+			continue;
+		}
+
+		// straight left/right
+		// field is either 0b0001, 0b0010, 0b0011 or 0b0000
+		if (connectField <= 0b0011)
+		{
+			r->setTexture(m_game->getImageManager()->getTexture("buildings/road_right"));
+			continue;
+		}
+
+		// check for intersection
+		// intersection should be used when all 4 bits are on
+		//   (this tile is surrounded by roads)
+		if (connectField == 0b1111)
+		{
+			r->setTexture(m_game->getImageManager()->getTexture("buildings/road_intersection"));
+			continue;
+		}
+
+		// if nothing else was done, we can use the result of the field in the filename
+		char texName[64];
+		sprintf_s(texName, 64, "buildings/road_turn%d", connectField);
+		r->setTexture(m_game->getImageManager()->getTexture(texName));
+	}
 }
