@@ -9,6 +9,8 @@
 #include "game.h"
 #include "tile.h"
 
+unsigned int Tile::m_zoneTintColours[ZONETYPE_COUNT];
+
 Tile::Tile(Game* game, aie::Texture* tex) :
 	m_game(game), m_texture(tex)
 {

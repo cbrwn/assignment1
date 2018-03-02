@@ -35,5 +35,5 @@ protected:
 
 	ZoneType		m_zoneType;
 private:
-	unsigned int m_zoneTintColours[ZONETYPE_COUNT];
+	static unsigned int m_zoneTintColours[ZONETYPE_COUNT];
 };

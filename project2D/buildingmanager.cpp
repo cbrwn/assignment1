@@ -204,24 +204,37 @@ void BuildingManager::sortBuildings()
 	// sort buildings from back to front
 	// todo: use a better sort algorithm
 	int buildingCount = (int)m_buildings->size();
-	for (int i = 0; i < buildingCount - 1; ++i)
+	bool changed = true;
+	while (changed)
 	{
-		for (int j = buildingCount - 1; j >= i + 1; --j)
+		changed = false;
+		for (int i = 0; i < buildingCount - 1; ++i)
 		{
-			// first building's position
-			int ax, ay;
-			(*m_buildings)[i]->getPosition(&ax, &ay);
-
-			// second building's position
-			int bx, by;
-			(*m_buildings)[i + 1]->getPosition(&bx, &by);
-
-			if (ax > bx || ay > by)
+			for (int j = buildingCount - 1; j >= i + 1; --j)
 			{
-				// swap em
-				Building* a = (*m_buildings)[i];
-				(*m_buildings)[i] = (*m_buildings)[i + 1];
-				(*m_buildings)[i + 1] = a;
+				// first building's position
+				int ax, ay;
+				(*m_buildings)[i]->getCenter(&ax, &ay);
+
+				// and world position
+				float awx, awy;
+				m_game->getTileWorldPosition(ax, ay, &awx, &awy);
+
+				// second building's position
+				int bx, by;
+				(*m_buildings)[i + 1]->getCenter(&bx, &by);
+				// and world position
+				float bwx, bwy;
+				m_game->getTileWorldPosition(bx, by, &bwx, &bwy);
+
+				if (bwy > awy)
+				{
+					// swap em
+					Building* a = (*m_buildings)[i];
+					(*m_buildings)[i] = (*m_buildings)[i + 1];
+					(*m_buildings)[i + 1] = a;
+					changed = true;
+				}
 			}
 		}
 	}
