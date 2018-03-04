@@ -26,4 +26,7 @@ private:
 	RoadList m_roads;
 
 	void updateRoadTextures();
+
+	void quickSortRoads(int min, int max);
+	int partitionRoads(int min, int max);
 };

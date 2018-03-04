@@ -4,6 +4,8 @@
 #include "roadmanager.h"
 #include "road.h"
 
+#include <chrono>
+
 RoadManager::RoadManager(Game* game)
 {
 	m_game = game;
@@ -17,39 +19,25 @@ void RoadManager::addRoad(Building* newRoad)
 	m_roads.push_back((Road*)newRoad);
 
 	// sort
-	// todo: use a better sort algorithm
 	int roadCount = (int)m_roads.size();
-	bool changed = true;
-	while (changed)
+	quickSortRoads(0, roadCount - 1);
+
+	// update textures if there's one adjacent to this new one
+	bool isAdjacent = false;
+	int newPosX, newPosY;
+	newRoad->getPosition(&newPosX, &newPosY);
+	for (int i = -1; i <= 1; ++i)
 	{
-		changed = false;
-		for (int i = 0; i < roadCount - 1; ++i)
+		Road* adjHorz = getRoadAtPosition(newPosX + i, newPosY);
+		Road* adjVert = getRoadAtPosition(newPosX, newPosY + i);
+		if (adjHorz || adjVert)
 		{
-			for (int j = roadCount - 1; j >= i + 1; --j)
-			{
-				// get first road's index
-				int ax, ay;
-				m_roads[i]->getPosition(&ax, &ay);
-				int aIndex = (ay * WORLD_WIDTH) + ax;
-
-				// and second road's index
-				int bx, by;
-				m_roads[i + 1]->getPosition(&bx, &by);
-				int bIndex = (by * WORLD_WIDTH) + bx;
-
-				if (bIndex < aIndex)
-				{
-					// swap!
-					Road* aRoad = m_roads[i];
-					m_roads[i] = m_roads[i + 1];
-					m_roads[i + 1] = aRoad;
-					changed = true;
-				}
-			}
+			isAdjacent = true;
+			break;
 		}
 	}
-
-	updateRoadTextures();
+	if (isAdjacent)
+		updateRoadTextures();
 }
 
 void RoadManager::removeRoad(Building* road)
@@ -84,8 +72,8 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 	int targetIndex = (y*WORLD_WIDTH) + x;
 
 	// binary search time
-	int min = 0;
-	int max = (int)m_roads.size() - 1;
+	int min = -1;
+	int max = (int)m_roads.size();
 	int mid = max / 2;
 
 	// grab the index of the mid road
@@ -121,8 +109,6 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 
 void RoadManager::updateRoadTextures()
 {
-
-
 	// update road textures based on neighbouring roads
 	for (auto r : m_roads)
 	{
@@ -175,4 +161,42 @@ void RoadManager::updateRoadTextures()
 		sprintf_s(texName, 64, "buildings/road_turn%d", connectField);
 		r->setTexture(m_game->getImageManager()->getTexture(texName));
 	}
+}
+
+void RoadManager::quickSortRoads(int min, int max)
+{
+	if (min < max)
+	{
+		int p = partitionRoads(min, max);
+		// now sort both sides of the partition index
+		quickSortRoads(min, p - 1);
+		quickSortRoads(p + 1, max);
+	}
+}
+
+// based on pseudocode from the Lomuto partition scheme:
+// https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+int RoadManager::partitionRoads(int min, int max)
+{
+	// use last road as the pivot
+	Road* pivot = m_roads[max];
+	int pivIndex = pivot->getOneDimensionalIndex();
+
+	int i = min - 1;
+	for (int j = min; j < max; ++j)
+	{
+		int thisIndex = m_roads[j]->getOneDimensionalIndex();
+		if (thisIndex < pivIndex)
+		{
+			i++;
+			// swap
+			Road* iRoad = m_roads[i];
+			m_roads[i] = m_roads[j];
+			m_roads[j] = iRoad;
+		}
+	}
+	// put the pivot in its place
+	m_roads[max] = m_roads[i + 1];
+	m_roads[i + 1] = pivot;
+	return i + 1;
 }

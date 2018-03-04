@@ -32,8 +32,10 @@ class Building
 public:
 	Building(Game* game, int x, int y);
 
-	virtual void update();
+	virtual void update(float delta);
 	virtual void draw(aie::Renderer2D* renderer) = 0;
+
+	void drawEyeball(aie::Renderer2D* renderer, float xPos, float yPos);
 
 	void setPosition(int x, int y);
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
@@ -41,6 +43,8 @@ public:
 	inline void getCenter(int* x, int* y) { *x = m_posX - (m_sizeX-1)/2; *y = m_posY - (m_sizeY-1)/2; }
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
 	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
+
+	inline void setAltitude(float alt) { m_altitude = alt; }
 
 	bool updatePower();
 
@@ -53,6 +57,10 @@ protected:
 	int				m_sizeX, m_sizeY;
 	// world position of the bulding from the tile number
 	float			m_worldX, m_worldY;
+
+	// used for dropping it into the world
+	float			m_altitude;
+	float			m_fallSpeed;
 
 	int				m_powerSpreadRange; // how far this building shares power
 	int				m_powerSearchRange; // how far this building looks for power

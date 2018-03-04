@@ -133,19 +133,16 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 
 void BuildingManager::updateBuildings(float delta)
 {
-	// update all buildings every once in a while
+	// the regular update function deals with per-frame stuff
+	for (auto b : *m_buildings)
+		b->update(delta);
+
+	// update everything else that needs to be updated once
+	//   every so often
 	m_updateTimer += delta;
 	if (m_updateTimer >= BUILDING_UPDATE_TIME)
 	{
 		m_updateTimer = 0;
-
-		//m_game->decayTilePower();
-
-		for (auto b : *m_buildings)
-		{
-			b->update();
-			//b->updatePower();
-		}
 
 		m_game->clearTilePower();
 
@@ -175,7 +172,7 @@ void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 void BuildingManager::addBuilding(Building* build)
 {
 	m_buildings->push_back(build);
-	sortBuildings();
+	sortBuildings(0, (int)m_buildings->size() - 1);
 }
 
 void BuildingManager::removeBuilding(Building* toRemove)
@@ -209,48 +206,55 @@ void BuildingManager::removeBuilding(Building* toRemove)
 			break;
 		}
 	}
-	sortBuildings();
+	sortBuildings(0, (int)m_buildings->size()-1);
 }
 
-void BuildingManager::sortBuildings()
+void BuildingManager::sortBuildings(int min, int max)
 {
-	// sort buildings from back to front
-	// todo: use a better sort algorithm
-	int buildingCount = (int)m_buildings->size();
-	bool changed = true;
-	while (changed)
+	if (min < max)
 	{
-		changed = false;
-		for (int i = 0; i < buildingCount - 1; ++i)
+		int p = partitionBuildings(min, max);
+		// then sort either side of the partition index
+		sortBuildings(min, p - 1);
+		sortBuildings(p + 1, max);
+	}
+}
+
+// based on pseudocode from the Lomuto partition scheme:
+// https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+int BuildingManager::partitionBuildings(int min, int max)
+{
+	// use last element as pivot
+	Building* pivot = (*m_buildings)[max];
+	// grab the numbers we'll be sorting by
+	int pivPosX, pivPosY; // first we get the center indices
+	pivot->getCenter(&pivPosX, &pivPosY);
+	float pivWorldX, pivWorldY; // then the world position
+	m_game->getTileWorldPosition(pivPosX, pivPosY, &pivWorldX, &pivWorldY);
+
+	int i = min - 1;
+	for (int j = min; j < max; ++j)
+	{
+		// grab the numbers of the item we're comparing
+		int jPosX, jPosY; // first the indices
+		(*m_buildings)[j]->getCenter(&jPosX, &jPosY);
+		float jWorldX, jWorldY; // and the world position
+		m_game->getTileWorldPosition(jPosX, jPosY, &jWorldX, &jWorldY);
+
+		// sort by the Y position of the center
+		if (jWorldY > pivWorldY)
 		{
-			for (int j = buildingCount - 1; j >= i + 1; --j)
-			{
-				// first building's position
-				int ax, ay;
-				(*m_buildings)[i]->getCenter(&ax, &ay);
-
-				// and world position
-				float awx, awy;
-				m_game->getTileWorldPosition(ax, ay, &awx, &awy);
-
-				// second building's position
-				int bx, by;
-				(*m_buildings)[i + 1]->getCenter(&bx, &by);
-				// and world position
-				float bwx, bwy;
-				m_game->getTileWorldPosition(bx, by, &bwx, &bwy);
-
-				if (bwy > awy)
-				{
-					// swap em
-					Building* a = (*m_buildings)[i];
-					(*m_buildings)[i] = (*m_buildings)[i + 1];
-					(*m_buildings)[i + 1] = a;
-					changed = true;
-				}
-			}
+			i++;
+			// swaparoo
+			Building* jBuild = (*m_buildings)[j];
+			(*m_buildings)[j] = (*m_buildings)[i];
+			(*m_buildings)[i] = jBuild;
 		}
 	}
+	// put the pivot in its place
+	(*m_buildings)[max] = (*m_buildings)[i + 1];
+	(*m_buildings)[i + 1] = pivot;
+	return i + 1;
 }
 
 // returns whether or not the currently selected building can be placed at 
@@ -336,7 +340,7 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 {
 	// in case we want to use the building we made for something else,
 	// such as storing power poles in their vector
-	Building* b;
+	Building* b = nullptr;
 
 	switch (type)
 	{
@@ -344,21 +348,23 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		return nullptr;
 		break;
 	case BUILDINGTYPE_POWERPLANT:
-		return new PowerPlant(m_game, xTile, yTile);
+		b = new PowerPlant(m_game, xTile, yTile);
 		break;
 	case BUILDINGTYPE_POWERPOLE:
-		return new PowerPole(m_game, xTile, yTile);
+		b = new PowerPole(m_game, xTile, yTile);
 		break;
 	case BUILDINGTYPE_ROAD:
 		b = new Road(m_game, xTile, yTile);
 		if (!ghost)
 			m_game->getRoadManager()->addRoad(b);
-		return b;
 		break;
 	default:
 		printf("Tried to create a building that doesn't exist! Type: %d\n",
 			(int)type);
 		break;
 	}
-	return nullptr;
+
+	if (ghost)
+		b->setAltitude(0);
+	return b;
 }

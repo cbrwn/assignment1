@@ -36,6 +36,8 @@ public:
 
 	void  setZoomSpeed(float spd);
 	float getZoomSpeed();
+
+	inline void setShakeAmount(float amt) { m_shakeAmount = amt; }
 private:
 	Game* m_game;
 
@@ -47,6 +49,8 @@ private:
 	float m_actualScale;
 	float m_smoothSpeed, m_zoomSpeed;
 	float m_arrowSpeed; // speed to move the camera with arrow keys
+
+	float m_shakeAmount;
 
 	// dragging control
 	bool  m_dragging;

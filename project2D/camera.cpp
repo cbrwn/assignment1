@@ -21,6 +21,8 @@ Camera::Camera(Game* game) : m_game(game)
 	m_zoomSpeed = 10.0f;
 	m_arrowSpeed = 1000.0f;
 
+	m_shakeAmount = 0.0f;
+
 	m_dragging = false;
 	m_lastScroll = 0.0f;
 }
@@ -81,6 +83,16 @@ void Camera::update(float delta)
 	m_actualY -= (m_actualY - m_targetY) * m_smoothSpeed * delta;
 	// and smoothly zoom in
 	m_actualScale -= (m_actualScale - m_targetScale) * m_zoomSpeed * delta;
+
+	if (m_shakeAmount > 0)
+	{
+		const int rndamt = 1000;
+		m_actualX += ((-rndamt/2 + rand() % rndamt) / 100.0f) * m_shakeAmount;
+		m_actualY += ((-rndamt/2 + rand() % rndamt) / 100.0f) * m_shakeAmount;
+
+		const float decreaseSpeed = 20.0f;
+		m_shakeAmount -= delta * decreaseSpeed;
+	}
 }
 
 // takes x,y as screen coordinates and translates them to world coordinates

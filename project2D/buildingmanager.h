@@ -32,7 +32,9 @@ public:
 	
 	void addBuilding(Building* build);
 	void removeBuilding(Building* toRemove);
-	void sortBuildings();
+	// quicksort functions!
+	void sortBuildings(int min, int max);
+	int partitionBuildings(int min, int max);
 
 	inline int getSelectedBuilding() { return m_selectedBuilding; }
 	inline void setSelectedBuilding(int id) { m_selectedBuilding = id; }

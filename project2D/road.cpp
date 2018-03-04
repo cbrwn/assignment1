@@ -19,10 +19,14 @@ void Road::draw(aie::Renderer2D* renderer)
 
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
-	renderer->drawSprite(m_texture, m_worldX, m_worldY - 4, 0, 0, 0, 0, xOrigin,
-		yOrigin);
+	renderer->drawSprite(m_texture, m_worldX, m_worldY - 4 + m_altitude, 
+		0, 0, 0, 0, xOrigin, yOrigin);
 }
 
-void Road::update()
+// used for sorting
+// turns the indices used in a 2 dimensional array (x, y)
+//   into a single index, as if it was in a 1D array
+int Road::getOneDimensionalIndex()
 {
+	return (m_posY * WORLD_WIDTH) + m_posX;
 }

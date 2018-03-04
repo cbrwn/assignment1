@@ -28,19 +28,25 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 		return;
 
 	// grab the world position of our base tile
-	float wx, wy;
+	//float wx, wy;
 	// x + 1 to account for the width of the tile
-	m_game->getTileWorldPosition(m_posX + 1, m_posY, &wx, &wy);
+	//m_game->getTileWorldPosition(m_posX + 1, m_posY, &wx, &wy);
 
 	// keep origin at the bottom-middle of the sprite
 	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
-	renderer->drawSprite(m_texture, wx, wy - 4, 0, 0, 0, 0, xOrigin, yOrigin);
+	renderer->drawSprite(m_texture, m_worldX,
+		m_worldY - 4 + m_altitude, 0, 0, 0, 0, xOrigin, yOrigin);
 
+	// eyeballs
+	drawEyeball(renderer, m_worldX + 84.0f, m_worldY + 128.0f + m_altitude);
+	drawEyeball(renderer, m_worldX + 194.0f, m_worldY + 184.0f + m_altitude);
+
+	return;
 	if (m_hasPower)
 	{
 		renderer->setRenderColour(0, 1, 0);
-		renderer->drawCircle(wx, wy, 5);
+		renderer->drawCircle(m_worldX, m_worldY, 5);
 	}
 }

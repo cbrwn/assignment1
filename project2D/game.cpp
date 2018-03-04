@@ -290,8 +290,6 @@ void Game::draw()
 		break;
 	}
 
-	//tempPowerPlant->draw(m_2dRenderer);
-
 	// done drawing sprites
 	m_2dRenderer->end();
 
@@ -326,12 +324,12 @@ void Game::draw()
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
 
 	// show mouse tile coords
-	int tileX, tileY;
+	/*int tileX, tileY;
 	getTileAtMousePosition(&tileX, &tileY);
 	char pos[32];
 	Road* rum = getRoadManager()->getRoadAtPosition(tileX, tileY);
 	sprintf_s(pos, 32, "(%d, %d)%s %d", tileX, tileY, rum ? " Road!" : "", rum ? rum->cfield : 0);
-	m_2dRenderer->drawText(m_uiFont, pos, 2, 240);
+	m_2dRenderer->drawText(m_uiFont, pos, 2, 240);*/
 
 	// show screen's mouse position (as opposed to the world mouse position)
 	m_2dRenderer->setRenderColour(1, 1, 1);
@@ -568,4 +566,9 @@ void Game::spawnSmokeParticle(float x, float y)
 {
 	auto p = new SmokeParticle(this, x, y);
 	m_particles.push_back(p);
+}
+
+void Game::doScreenShake(float amt)
+{
+	m_camera->setShakeAmount(amt);
 }

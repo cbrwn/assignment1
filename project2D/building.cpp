@@ -24,10 +24,72 @@ Building::Building(Game* game, int x, int y)
 
 	// grab the world position
 	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
+
+	m_altitude = 10000.0f;
+	m_fallSpeed = 20000.0f + (rand() % 500);
 }
 
-void Building::update()
+void Building::update(float delta)
 {
+	// fall from the sky!
+	if (m_altitude > 0)
+	{
+		m_altitude -= m_fallSpeed * delta;
+
+		// landed!
+		if (m_altitude <= 0)
+		{
+			m_altitude = 0;
+			// todo: smoke and screenshake and stuff
+			m_game->doScreenShake((float)m_sizeX * m_sizeY);
+
+			// smokey particles on the front-left side
+			for (int i = m_posX + 1; i > m_posX - m_sizeX; --i)
+			{
+				int y = m_posY + 1;
+				float px1, py1;
+				m_game->getTileWorldPosition(i, y, &px1, &py1);
+				m_game->spawnSmokeParticle(px1, py1);
+			}
+			// and front-right side
+			for (int i = m_posY + 1; i >= m_posY - m_sizeY; --i)
+			{
+				int x = m_posX + 1;
+				float px1, py1;
+				m_game->getTileWorldPosition(x, i, &px1, &py1);
+				m_game->spawnSmokeParticle(px1, py1);
+			}
+		}
+	}
+}
+
+void Building::drawEyeball(aie::Renderer2D* renderer, float xPos, float yPos)
+{
+	// get mouse position
+	float mx, my;
+	m_game->getMouseWorldPosition(&mx, &my);
+
+	// get angle to mouse
+	float difx = mx - xPos;
+	float dify = my - yPos;
+	float angle = atan2f(dify, difx);
+
+	const float eyeSize = 48.0f;
+	const float pupilSize = eyeSize / 2.0f;
+
+	// white of eye
+	renderer->setRenderColour(1, 1, 1);
+	renderer->drawCircle(xPos, yPos, eyeSize);
+
+	// pupil!
+	// base its distance from the center on the size
+	float dist = eyeSize - pupilSize;
+	// and get its x and y offsets from the angle
+	float xOff = cosf(angle) * dist;
+	float yOff = sinf(angle) * dist;
+
+	renderer->setRenderColour(0, 0, 0);
+	renderer->drawCircle(xPos + xOff, yPos + yOff, pupilSize);
 }
 
 void Building::setPosition(int x, int y)

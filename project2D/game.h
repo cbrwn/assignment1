@@ -93,6 +93,7 @@ public:
 
 	// particle stuff
 	void spawnSmokeParticle(float x, float y);
+	void doScreenShake(float amt);
 
 	// getters for all of the managers
 	inline ImageManager*	getImageManager() { return m_imageManager; }
