@@ -19,7 +19,7 @@ public:
 	inline void setSelectedType(ZoneType type) { m_selectedType = type; }
 	inline ZoneType getSelectedType() { return m_selectedType; }
 private:
-	Game*		m_game;
+	Game * m_game;
 	Tile****	m_tiles;
 
 	// zone creation variables

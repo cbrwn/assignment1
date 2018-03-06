@@ -1,11 +1,3 @@
-////////////////////////////////////////////
-// Game
-// The main class of the game, in charge
-//   of updating and drawing everything
-//   as well as providing some gameplay
-//   functionality
-////////////////////////////////////////////
-
 #include <ctime>
 #include <functional>
 
@@ -243,7 +235,8 @@ void Game::draw()
 			//   being moused over
 			bool tintThisTile = tintTiles && thisTile != mouseOver;
 
-			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f, tintThisTile);
+			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f,
+				tintThisTile);
 		}
 	}
 
@@ -263,14 +256,16 @@ void Game::draw()
 				if (thisTile->hasPower())
 				{
 					m_2dRenderer->setRenderColour(1, 1, 0);
-					m_2dRenderer->drawSprite(m_powerIcon, xpos + TILE_WIDTH/2.0f, ypos);
+					m_2dRenderer->drawSprite(m_powerIcon,
+						xpos + TILE_WIDTH / 2.0f, ypos);
 				}
 			}
 		}
 	}
 
 	// draw buildings
-	if (isViewModeEnabled(VIEWMODE_BUILDINGS) || getPlaceMode() == PLACEMODE_BUILDING)
+	if (isViewModeEnabled(VIEWMODE_BUILDINGS)
+		|| getPlaceMode() == PLACEMODE_BUILDING)
 		getBuildingManager()->drawBuildings(m_2dRenderer);
 
 	// draw particles
@@ -322,14 +317,6 @@ void Game::draw()
 	sprintf_s(fps, 32, "FPS: %i", getFPS());
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
-
-	// show mouse tile coords
-	/*int tileX, tileY;
-	getTileAtMousePosition(&tileX, &tileY);
-	char pos[32];
-	Road* rum = getRoadManager()->getRoadAtPosition(tileX, tileY);
-	sprintf_s(pos, 32, "(%d, %d)%s %d", tileX, tileY, rum ? " Road!" : "", rum ? rum->cfield : 0);
-	m_2dRenderer->drawText(m_uiFont, pos, 2, 240);*/
 
 	// show screen's mouse position (as opposed to the world mouse position)
 	m_2dRenderer->setRenderColour(1, 1, 1);

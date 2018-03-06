@@ -1,11 +1,5 @@
 #pragma once
 
-/*
-	Camera
-	This class controls everything to do with the camera
-		including movement and player controls
-*/
-
 class Game;
 
 class Camera

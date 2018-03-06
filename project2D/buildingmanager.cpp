@@ -1,10 +1,3 @@
-////////////////////////////////////////////
-// BuildingManager
-// This class is responsible for all things
-//   to do with buildings, such as creating
-//   and drawing them
-////////////////////////////////////////////
-
 #include <iostream>
 #include <Input.h>
 

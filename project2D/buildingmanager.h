@@ -16,7 +16,7 @@ typedef std::vector<Building*> BuildingList;
 class BuildingManager
 {
 public:
-	BuildingManager(Game* game, BuildingList* buildings);                      
+	BuildingManager(Game* game, BuildingList* buildings);
 	~BuildingManager();
 
 	// building mode related functions
@@ -29,7 +29,7 @@ public:
 	// general building functions
 	void updateBuildings(float delta);
 	void drawBuildings(aie::Renderer2D* renderer);
-	
+
 	void addBuilding(Building* build);
 	void removeBuilding(Building* toRemove);
 	// quicksort functions!
@@ -39,7 +39,7 @@ public:
 	inline int getSelectedBuilding() { return m_selectedBuilding; }
 	inline void setSelectedBuilding(int id) { m_selectedBuilding = id; }
 
-	Building* makeBuilding(BuildingType type, int xTile, int yTile, 
+	Building* makeBuilding(BuildingType type, int xTile, int yTile,
 		bool ghost = false);
 private:
 	Game*			m_game;

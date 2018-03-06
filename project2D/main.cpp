@@ -5,7 +5,7 @@
 
 #include "game.h"
 
-int main() 
+int main()
 {
 	// allocation
 	auto app = new Game();

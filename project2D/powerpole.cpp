@@ -1,9 +1,3 @@
-////////////////////////////////////////////
-// Power Pole
-// Carries electricity from Power Plants to
-//   everything that uses it
-////////////////////////////////////////////
-
 #include "powerpole.h"
 #include "tile.h"
 #include "game.h"
@@ -25,6 +19,7 @@ void PowerPole::draw(aie::Renderer2D* renderer)
 {
 	if (m_posX < 0 || m_posY < 0)
 		return;
+
 	// keep origin at the bottom-middle of the sprite
 	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;

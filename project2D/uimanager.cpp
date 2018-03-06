@@ -1,9 +1,3 @@
-////////////////////////////////////////////
-// UiManager
-// Base class for all buildings which can be
-//    placed in the world
-////////////////////////////////////////////
-
 #include <Input.h>
 #include <Font.h>
 
@@ -148,7 +142,8 @@ void UiManager::draw(aie::Renderer2D* renderer)
 	// selector icons
 	renderer->setRenderColour(1, 1, 1);
 	float buildingIconX = m_selectorBox.x - (m_selectorBox.width / 4.0f);
-	renderer->drawSprite(m_buildingSelectorIcon, buildingIconX, m_selectorBox.y);
+	renderer->drawSprite(m_buildingSelectorIcon, 
+		buildingIconX, m_selectorBox.y);
 	float zoneIconX = m_selectorBox.x + (m_selectorBox.width / 4.0f);
 	renderer->drawSprite(m_zoneSelectorIcon, zoneIconX, m_selectorBox.y);
 }

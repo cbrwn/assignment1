@@ -129,13 +129,12 @@ void RoadManager::updateRoadTextures()
 		if (getRoadAtPosition(ix + 1, iy)) // road is to the right
 			connectField |= 0b0001;
 
-		r->cfield = connectField;
-
 		// straight up/down
 		// field is either 0b1000, 0b0100 or 0b1100
 		if (connectField % 4 == 0)
 		{
-			r->setTexture(m_game->getImageManager()->getTexture("buildings/road_left"));
+			r->setTexture(m_game->getImageManager()->getTexture(
+				"buildings/road_left"));
 			continue;
 		}
 
@@ -143,7 +142,8 @@ void RoadManager::updateRoadTextures()
 		// field is either 0b0001, 0b0010, 0b0011 or 0b0000
 		if (connectField <= 0b0011)
 		{
-			r->setTexture(m_game->getImageManager()->getTexture("buildings/road_right"));
+			r->setTexture(m_game->getImageManager()->getTexture(
+				"buildings/road_right"));
 			continue;
 		}
 
@@ -152,11 +152,13 @@ void RoadManager::updateRoadTextures()
 		//   (this tile is surrounded by roads)
 		if (connectField == 0b1111)
 		{
-			r->setTexture(m_game->getImageManager()->getTexture("buildings/road_intersection"));
+			r->setTexture(m_game->getImageManager()->getTexture(
+				"buildings/road_intersection"));
 			continue;
 		}
 
-		// if nothing else was done, we can use the result of the field in the filename
+		// if nothing else was done, we can use the result of the field in the 
+		// filename
 		char texName[64];
 		sprintf_s(texName, 64, "buildings/road_turn%d", connectField);
 		r->setTexture(m_game->getImageManager()->getTexture(texName));

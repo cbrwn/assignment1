@@ -10,6 +10,4 @@ public:
 	virtual void draw(aie::Renderer2D* renderer) override;
 
 	int getOneDimensionalIndex();
-
-	char cfield;
 };

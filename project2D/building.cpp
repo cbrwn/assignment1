@@ -1,9 +1,3 @@
-////////////////////////////////////////////
-// Building
-// Base class for all buildings which can be
-//    placed in the world
-////////////////////////////////////////////
-
 #include "building.h"
 #include "buildingmanager.h"
 #include "powerpole.h"
@@ -99,6 +93,12 @@ void Building::setPosition(int x, int y)
 
 	// update world positions
 	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
+}
+
+void Building::getCenter(int * x, int * y)
+{
+	*x = m_posX - (m_sizeX - 1) / 2; 
+	*y = m_posY - (m_sizeY - 1) / 2;
 }
 
 bool Building::updatePower()

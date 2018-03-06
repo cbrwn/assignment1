@@ -19,7 +19,7 @@ class Tile
 public:
 	Tile(Game* game, aie::Texture* tex);
 
-	virtual void draw(aie::Renderer2D* renderer, float dx, float dy, 
+	virtual void draw(aie::Renderer2D* renderer, float dx, float dy,
 		bool zoneTint);
 	virtual void update();
 
