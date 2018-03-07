@@ -61,7 +61,8 @@ UiManager::UiManager(Game* game)
 		img->getTexture("icons/powerplant");
 	m_buildingIcons[BUILDINGTYPE_POWERPOLE] =
 		img->getTexture("icons/powerpole");
-	m_buildingIcons[BUILDINGTYPE_ROAD] = nullptr;
+	m_buildingIcons[BUILDINGTYPE_ROAD] =
+		img->getTexture("icons/road");
 
 	m_buildingNames[BUILDINGTYPE_NONE] = "Demolish";
 	m_buildingNames[BUILDINGTYPE_POWERPLANT] = "Power Plant";
