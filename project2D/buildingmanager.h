@@ -30,7 +30,7 @@ public:
 	void updateBuildings(float delta);
 	void drawBuildings(aie::Renderer2D* renderer);
 
-	void addBuilding(Building* build);
+	void addBuilding(Building* build, bool sort = true);
 	void removeBuilding(Building* toRemove);
 	// quicksort functions!
 	void sortBuildings(int min, int max);
@@ -48,6 +48,12 @@ private:
 	int				m_selectedBuilding;
 	// translucent building to show what the outcome will look like
 	Building*		m_ghostBuilding;
+
+	// dragging stuff
+	bool			m_dragging;
+	int				m_dragStartX, m_dragStartY;
+	int				m_dragPosX, m_dragPosY;
+	bool			m_isDragHorizontal;
 
 	float			m_updateTimer;
 };

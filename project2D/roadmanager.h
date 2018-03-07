@@ -14,10 +14,10 @@ class RoadManager
 public:
 	RoadManager(Game* game);
 
-	// use building parent class for this param because we'll do all the
-	//   type checking in here
-	void addRoad(Building* newRoad);
+	void addRoad(Building* newRoad, bool sort = true);
 	void removeRoad(Building* road);
+
+	void updateRoads();
 
 	Road* getRoadAtPosition(int x, int y);
 private:

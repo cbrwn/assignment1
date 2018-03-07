@@ -20,7 +20,7 @@ Building::Building(Game* game, int x, int y)
 	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
 
 	m_altitude = 10000.0f;
-	m_fallSpeed = 20000.0f + (rand() % 500);
+	m_fallSpeed = 20000.0f;
 }
 
 void Building::update(float delta)

@@ -73,7 +73,6 @@ public:
 	void  getTileAtMousePosition(int *ix, int *iy);
 	void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
 	void  drawTileRect(int left, int top, int right, int bottom);
-	void  decayTilePower();
 	void  clearTilePower();
 
 	// money-related functions

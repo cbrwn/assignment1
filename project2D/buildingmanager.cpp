@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Input.h>
+#include <algorithm>
 
 #include "buildingmanager.h"
 #include "roadmanager.h"
@@ -16,6 +17,8 @@ BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	m_selectedBuilding = 0;
 	m_updateTimer = 0;
 	m_ghostBuilding = nullptr;
+
+	m_dragging = false;
 }
 
 BuildingManager::~BuildingManager()
@@ -82,7 +85,82 @@ void BuildingManager::buildingMode()
 			removeBuilding(underMouse);
 	}
 
-	// we can stop here if placing things isn't allowed
+	if (m_selectedBuilding == BUILDINGTYPE_NONE)
+		return;
+
+	// line style lets you click and drag
+	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT)
+		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
+	{
+		if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
+			&& m_game->isMouseInGame())
+		{
+			// dragging start
+			m_dragStartX = tileX;
+			m_dragStartY = tileY;
+			m_dragging = true;
+		}
+		/*addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
+			tileX, tileY));*/
+
+		if (m_dragging)
+		{
+			// update the end point of the line so we can draw it
+			m_dragPosX = tileX;
+			m_dragPosY = tileY;
+
+			// check if the line we're drawing is horizontal or vertical
+			if (m_dragStartX == tileX)
+				m_isDragHorizontal = false;
+			if (m_dragStartY == tileY)
+				m_isDragHorizontal = true;
+
+			if (m_isDragHorizontal)
+				m_dragPosY = m_dragStartY;
+			else
+				m_dragPosX = m_dragStartX;
+		}
+
+	}
+	else if (m_dragging)
+	{
+		m_dragging = false;
+
+		// get the minimum/maximum of our selection so it's easier to loop
+		int minX = std::min(m_dragPosX, m_dragStartX);
+		int minY = std::min(m_dragPosY, m_dragStartY);
+		int maxX = std::max(m_dragPosX, m_dragStartX);
+		int maxY = std::max(m_dragPosY, m_dragStartY);
+
+		float altitude = 10000.0f;
+
+		// keep track of if we've placed something so we don't sort/update
+		//   when we don't need to
+		bool placed = false;
+		for (int y = minY; y <= maxY; ++y)
+		{
+			for (int x = minX; x <= maxX; ++x)
+			{
+				if (getBuildingAtIndex(x, y))
+					continue;
+
+				Building* newBuilding =
+					makeBuilding(m_ghostBuilding->getType(), x, y);
+				newBuilding->setAltitude(altitude);
+				addBuilding(newBuilding, false);
+				if (!placed)
+					placed = true;
+				altitude += 500.0f;
+			}
+		}
+		if (placed)
+		{
+			sortBuildings(0, (int)m_buildings->size() - 1);
+			if (m_ghostBuilding->getType() == BUILDINGTYPE_ROAD)
+				m_game->getRoadManager()->updateRoads();
+		}
+	}
+
 	if (!(canPlaceBuilding() && m_game->isMouseInGame()))
 		return;
 
@@ -96,14 +174,6 @@ void BuildingManager::buildingMode()
 		// so player can place multiple buildings easily by holding shift
 		if (!input->isKeyDown(aie::INPUT_KEY_LEFT_SHIFT))
 			m_game->setPlaceMode(PlaceMode::PLACEMODE_NONE);
-	}
-
-	// line style lets you click and drag
-	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT)
-		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
-	{
-		addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
-			tileX, tileY));
 	}
 }
 
@@ -121,6 +191,14 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 		else // and red if not
 			renderer->setRenderColour(1, 0, 0, alpha);
 		m_ghostBuilding->draw(renderer);
+	}
+
+	// draw dragging selection
+	if (m_dragging)
+	{
+
+		renderer->setRenderColour(1, 1, 1);
+		m_game->drawTileRect(m_dragStartX, m_dragStartY, m_dragPosX, m_dragPosY);
 	}
 }
 
@@ -162,10 +240,13 @@ void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 	}
 }
 
-void BuildingManager::addBuilding(Building* build)
+void BuildingManager::addBuilding(Building* build, bool sort)
 {
 	m_buildings->push_back(build);
-	sortBuildings(0, (int)m_buildings->size() - 1);
+	if (sort)
+		sortBuildings(0, (int)m_buildings->size() - 1);
+	if (build->getType() == BUILDINGTYPE_ROAD)
+		m_game->getRoadManager()->addRoad(build, sort);
 }
 
 void BuildingManager::removeBuilding(Building* toRemove)
@@ -199,7 +280,7 @@ void BuildingManager::removeBuilding(Building* toRemove)
 			break;
 		}
 	}
-	sortBuildings(0, (int)m_buildings->size()-1);
+	sortBuildings(0, (int)m_buildings->size() - 1);
 }
 
 void BuildingManager::sortBuildings(int min, int max)
@@ -348,8 +429,6 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		break;
 	case BUILDINGTYPE_ROAD:
 		b = new Road(m_game, xTile, yTile);
-		if (!ghost)
-			m_game->getRoadManager()->addRoad(b);
 		break;
 	default:
 		printf("Tried to create a building that doesn't exist! Type: %d\n",

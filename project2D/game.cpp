@@ -173,9 +173,11 @@ void Game::update(float deltaTime)
 	getBuildingManager()->updateBuildings(deltaTime);
 
 	if (input->wasKeyPressed(aie::INPUT_KEY_P))
-	{
 		toggleViewMode(VIEWMODE_POWER);
-	}
+	if (input->wasKeyPressed(aie::INPUT_KEY_O))
+		toggleViewMode(VIEWMODE_ZONE);
+	if (input->wasKeyPressed(aie::INPUT_KEY_I))
+		toggleViewMode(VIEWMODE_BUILDINGS);
 
 	m_camera->update(deltaTime);
 	getUiManager()->update(deltaTime);
@@ -202,7 +204,8 @@ void Game::draw()
 	// don't show mouseover stuff if the mouse is over the UI
 	if (!isMouseInGame())
 		mouseOver = nullptr;
-	// todo: replace with view mode
+
+	// only show zone tint when it's relevant
 	bool tintTiles = getPlaceMode() == PLACEMODE_ZONE
 		|| isViewModeEnabled(VIEWMODE_ZONE);
 	for (int y = 0; y < WORLD_HEIGHT; y++)
@@ -237,28 +240,13 @@ void Game::draw()
 
 			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f,
 				tintThisTile);
-		}
-	}
 
-	if (isViewModeEnabled(VIEWMODE_POWER))
-	{
-		for (int y = 0; y < WORLD_HEIGHT; y++)
-		{
-			for (int x = 0; x < WORLD_WIDTH; x++)
+			// draw power icon if needed
+			if (isViewModeEnabled(VIEWMODE_POWER) && thisTile->hasPower())
 			{
-				Tile* thisTile = m_tiles[y][x];
-				if (!thisTile)
-					continue;
-
-				float xpos, ypos;
-				getTileWorldPosition(x, y, &xpos, &ypos);
-
-				if (thisTile->hasPower())
-				{
-					m_2dRenderer->setRenderColour(1, 1, 0);
-					m_2dRenderer->drawSprite(m_powerIcon,
-						xpos + TILE_WIDTH / 2.0f, ypos);
-				}
+				m_2dRenderer->setRenderColour(1, 1, 0);
+				m_2dRenderer->drawSprite(m_powerIcon,
+					xpos + TILE_WIDTH / 2.0f, ypos + 20.0f);
 			}
 		}
 	}
@@ -470,45 +458,6 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		lineThickness);
 }
 
-// decays tile power over time to make sure tiles that shouldn't have power
-//   don't keep their power
-// this works by removing power from tiles which only have adjacent unpowered
-//   tiles
-void Game::decayTilePower()
-{
-	std::vector<Tile*> outerTiles;
-	for (int y = 0; y < WORLD_HEIGHT; ++y)
-	{
-		for (int x = 0; x < WORLD_WIDTH; ++x)
-		{
-			Tile* t = getTile(x, y);
-			if (!t)
-				continue;
-			if (!t->hasPower())
-				continue;
-
-			// check adjacent tiles
-			for (int i = -1; i <= 1; i++)
-			{
-				// get horizontally adjacent tile
-				Tile* adjacentH = getTile(x + i, y);
-				// and vertical
-				Tile* adjacentV = getTile(x, y + i);
-
-				// add tile to the list if any of these don't have power
-				if (!adjacentH->hasPower() || !adjacentV->hasPower())
-				{
-					outerTiles.push_back(t);
-					break;
-				}
-			}
-		}
-	}
-
-	for (auto t : outerTiles)
-		t->takePower();
-}
-
 void Game::clearTilePower()
 {
 	for (int y = 0; y < WORLD_HEIGHT; ++y)
@@ -516,7 +465,7 @@ void Game::clearTilePower()
 		for (int x = 0; x < WORLD_WIDTH; ++x)
 		{
 			Tile* t = getTile(x, y);
-			if (!t)
+			if (!t || !t->hasPower())
 				continue;
 			t->takePower();
 		}
@@ -555,6 +504,7 @@ void Game::spawnSmokeParticle(float x, float y)
 	m_particles.push_back(p);
 }
 
+// adds amt to the current shake amount
 void Game::doScreenShake(float amt)
 {
 	m_camera->setShakeAmount(amt);

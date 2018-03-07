@@ -44,7 +44,9 @@ public:
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
 	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
 
+	// silly dropping stuff
 	inline void setAltitude(float alt) { m_altitude = alt; }
+	inline void setFallSpeed(float spd) { m_fallSpeed = spd; }
 
 	bool updatePower();
 

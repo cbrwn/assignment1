@@ -11,16 +11,15 @@ RoadManager::RoadManager(Game* game)
 	m_game = game;
 }
 
-void RoadManager::addRoad(Building* newRoad)
+void RoadManager::addRoad(Building* newRoad, bool sort)
 {
 	if (newRoad->getType() != BUILDINGTYPE_ROAD)
 		return;
 
 	m_roads.push_back((Road*)newRoad);
 
-	// sort
-	int roadCount = (int)m_roads.size();
-	quickSortRoads(0, roadCount - 1);
+	if (!sort)
+		return;
 
 	// update textures if there's one adjacent to this new one
 	bool isAdjacent = false;
@@ -38,6 +37,14 @@ void RoadManager::addRoad(Building* newRoad)
 	}
 	if (isAdjacent)
 		updateRoadTextures();
+}
+
+void RoadManager::updateRoads()
+{
+	// sort
+	int roadCount = (int)m_roads.size();
+	quickSortRoads(0, roadCount - 1);
+	updateRoadTextures();
 }
 
 void RoadManager::removeRoad(Building* road)

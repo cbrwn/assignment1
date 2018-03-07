@@ -31,11 +31,4 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	// eyeballs
 	drawEyeball(renderer, m_worldX + 84.0f, m_worldY + 128.0f + m_altitude);
 	drawEyeball(renderer, m_worldX + 194.0f, m_worldY + 184.0f + m_altitude);
-
-	return;
-	if (m_hasPower)
-	{
-		renderer->setRenderColour(0, 1, 0);
-		renderer->drawCircle(m_worldX, m_worldY, 5);
-	}
 }
