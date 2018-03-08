@@ -93,15 +93,13 @@ void BuildingManager::buildingMode()
 		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
 	{
 		if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
-			&& m_game->isMouseInGame())
+			&& m_game->isMouseInGame() && tileX > -1 && tileY > -1)
 		{
 			// dragging start
 			m_dragStartX = tileX;
 			m_dragStartY = tileY;
 			m_dragging = true;
 		}
-		/*addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
-			tileX, tileY));*/
 
 		if (m_dragging)
 		{
@@ -110,10 +108,14 @@ void BuildingManager::buildingMode()
 			m_dragPosY = tileY;
 
 			// check if the line we're drawing is horizontal or vertical
-			if (m_dragStartX == tileX)
+			// based on the direction we're dragging
+			/*if (m_dragStartX == tileX)
 				m_isDragHorizontal = false;
 			if (m_dragStartY == tileY)
-				m_isDragHorizontal = true;
+				m_isDragHorizontal = true;*/
+			int horizontalDist = fabsf(m_dragStartX - m_dragPosX);
+			int verticalDist = fabsf(m_dragStartY - m_dragPosY);
+			m_isDragHorizontal = horizontalDist > verticalDist;
 
 			if (m_isDragHorizontal)
 				m_dragPosY = m_dragStartY;
@@ -126,20 +128,21 @@ void BuildingManager::buildingMode()
 	{
 		m_dragging = false;
 
-		// get the minimum/maximum of our selection so it's easier to loop
-		int minX = std::min(m_dragPosX, m_dragStartX);
-		int minY = std::min(m_dragPosY, m_dragStartY);
-		int maxX = std::max(m_dragPosX, m_dragStartX);
-		int maxY = std::max(m_dragPosY, m_dragStartY);
-
 		float altitude = 10000.0f;
 
 		// keep track of if we've placed something so we don't sort/update
 		//   when we don't need to
 		bool placed = false;
-		for (int y = minY; y <= maxY; ++y)
+
+		// get the direction we should spawn them in
+		int signX = (m_dragPosX - m_dragStartX) < 0 ? -1 : 1;
+		int signY = (m_dragPosY - m_dragStartY) < 0 ? -1 : 1;
+
+		// strange stuff in the for loop to spawn them in the direction
+		//   that the player dragged
+		for (int y = m_dragStartY; y != m_dragPosY + signY; y += signY)
 		{
-			for (int x = minX; x <= maxX; ++x)
+			for (int x = m_dragStartX; x != m_dragPosX + signX; x += signX)
 			{
 				if (getBuildingAtIndex(x, y))
 					continue;
@@ -148,9 +151,11 @@ void BuildingManager::buildingMode()
 					makeBuilding(m_ghostBuilding->getType(), x, y);
 				newBuilding->setAltitude(altitude);
 				addBuilding(newBuilding, false);
+
+				altitude += 500.0f;
+
 				if (!placed)
 					placed = true;
-				altitude += 500.0f;
 			}
 		}
 		if (placed)
@@ -242,6 +247,14 @@ void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 
 void BuildingManager::addBuilding(Building* build, bool sort)
 {
+	int posX, posY;
+	build->getPosition(&posX, &posY);
+	if (posX <= -1 || posY <= -1)
+	{
+		delete build;
+		return;
+	}
+
 	m_buildings->push_back(build);
 	if (sort)
 		sortBuildings(0, (int)m_buildings->size() - 1);

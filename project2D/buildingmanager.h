@@ -29,9 +29,9 @@ public:
 	// general building functions
 	void updateBuildings(float delta);
 	void drawBuildings(aie::Renderer2D* renderer);
-
 	void addBuilding(Building* build, bool sort = true);
 	void removeBuilding(Building* toRemove);
+
 	// quicksort functions!
 	void sortBuildings(int min, int max);
 	int partitionBuildings(int min, int max);
