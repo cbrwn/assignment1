@@ -25,6 +25,8 @@ public:
 
 	bool canPlaceBuilding();
 	Building* getBuildingAtIndex(int ix, int iy);
+	BuildingList* getBuildings() { return m_buildings; }
+	void clearBuildings();
 
 	// general building functions
 	void updateBuildings(float delta);
@@ -33,6 +35,7 @@ public:
 	void removeBuilding(Building* toRemove);
 
 	// quicksort functions!
+	void sortBuildings();
 	void sortBuildings(int min, int max);
 	int partitionBuildings(int min, int max);
 

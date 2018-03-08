@@ -16,6 +16,7 @@ public:
 
 	void addRoad(Building* newRoad, bool sort = true);
 	void removeRoad(Building* road);
+	void clearRoads();
 
 	void updateRoads();
 

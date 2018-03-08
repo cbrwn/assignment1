@@ -62,6 +62,11 @@ void RoadManager::removeRoad(Building* road)
 	updateRoadTextures();
 }
 
+void RoadManager::clearRoads()
+{
+	m_roads.clear();
+}
+
 // binary search for road at the given position
 Road* RoadManager::getRoadAtPosition(int x, int y)
 {

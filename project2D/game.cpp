@@ -11,6 +11,7 @@
 #include "building.h"
 #include "buildingmanager.h"
 #include "roadmanager.h"
+#include "savemanager.h"
 #include "zonemanager.h"
 
 #include "tile.h"
@@ -43,6 +44,7 @@ bool Game::startup()
 
 	m_buildingManager = new BuildingManager(this, &m_buildings);
 	m_roadManager = new RoadManager(this);
+	m_saveManager = new SaveManager(this);
 	m_zoneManager = new ZoneManager(this, &m_tiles);
 
 	//m_camera->setScale(1.3f);
@@ -86,12 +88,12 @@ void Game::shutdown()
 	delete m_imageManager;
 	delete m_uiManager;
 
+	m_buildingManager->clearBuildings();
+
 	delete m_buildingManager;
 	delete m_roadManager;
+	delete m_saveManager;
 	delete m_zoneManager;
-	for (auto b : m_buildings)
-		if (b)
-			delete b;
 
 	for (auto p : m_particles)
 		delete p;
@@ -181,6 +183,22 @@ void Game::update(float deltaTime)
 
 	m_camera->update(deltaTime);
 	getUiManager()->update(deltaTime);
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_F))
+	{
+		if (getSaveManager()->saveData())
+			printf("Saved successfully!\n");
+		else
+			printf("Something went wrong when saving!\n");
+	}
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_D))
+	{
+		if (getSaveManager()->loadData())
+			printf("Loaded successfully!\n");
+		else
+			printf("Something went wrong when loading!\n");
+	}
 }
 
 void Game::draw()

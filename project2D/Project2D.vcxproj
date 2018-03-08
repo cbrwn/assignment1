@@ -173,6 +173,7 @@
     <ClCompile Include="powerpole.cpp" />
     <ClCompile Include="road.cpp" />
     <ClCompile Include="roadmanager.cpp" />
+    <ClCompile Include="savemanager.cpp" />
     <ClCompile Include="smokeparticle.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="uimanager.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="powerpole.h" />
     <ClInclude Include="road.h" />
     <ClInclude Include="roadmanager.h" />
+    <ClInclude Include="savemanager.h" />
     <ClInclude Include="smokeparticle.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="uimanager.h" />

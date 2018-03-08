@@ -16,6 +16,7 @@ class Tile;
 class Particle;
 
 class ImageManager;
+class SaveManager;
 class UiManager;
 
 class Building;
@@ -99,6 +100,7 @@ public:
 	inline UiManager*		getUiManager() { return m_uiManager; }
 	inline BuildingManager* getBuildingManager() { return m_buildingManager; }
 	inline RoadManager*		getRoadManager() { return m_roadManager; }
+	inline SaveManager*		getSaveManager() { return m_saveManager; }
 	inline ZoneManager*		getZoneManager() { return m_zoneManager; }
 
 protected:
@@ -119,6 +121,7 @@ protected:
 	UiManager*			m_uiManager;
 	BuildingManager*	m_buildingManager;
 	RoadManager*		m_roadManager;
+	SaveManager*		m_saveManager;
 	ZoneManager*		m_zoneManager;
 
 	// gameplay variables

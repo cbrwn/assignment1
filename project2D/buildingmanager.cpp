@@ -109,12 +109,8 @@ void BuildingManager::buildingMode()
 
 			// check if the line we're drawing is horizontal or vertical
 			// based on the direction we're dragging
-			/*if (m_dragStartX == tileX)
-				m_isDragHorizontal = false;
-			if (m_dragStartY == tileY)
-				m_isDragHorizontal = true;*/
-			int horizontalDist = fabsf(m_dragStartX - m_dragPosX);
-			int verticalDist = fabsf(m_dragStartY - m_dragPosY);
+			int horizontalDist = (int)fabsf((float)m_dragStartX - m_dragPosX);
+			int verticalDist = (int)fabsf((float)m_dragStartY - m_dragPosY);
 			m_isDragHorizontal = horizontalDist > verticalDist;
 
 			if (m_isDragHorizontal)
@@ -122,7 +118,6 @@ void BuildingManager::buildingMode()
 			else
 				m_dragPosX = m_dragStartX;
 		}
-
 	}
 	else if (m_dragging)
 	{
@@ -296,6 +291,11 @@ void BuildingManager::removeBuilding(Building* toRemove)
 	sortBuildings(0, (int)m_buildings->size() - 1);
 }
 
+void BuildingManager::sortBuildings()
+{
+	sortBuildings(0, (int)m_buildings->size() - 1);
+}
+
 void BuildingManager::sortBuildings(int min, int max)
 {
 	if (min < max)
@@ -417,6 +417,14 @@ Building* BuildingManager::getBuildingAtIndex(int ix, int iy)
 		}
 	}
 	return nullptr;
+}
+
+void BuildingManager::clearBuildings()
+{
+	for (auto b : *m_buildings)
+		if (b)
+			delete b;
+	m_buildings->clear();
 }
 
 // creates a building with type type

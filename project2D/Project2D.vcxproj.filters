@@ -78,6 +78,9 @@
     <ClCompile Include="roadmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="savemanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -120,6 +123,9 @@
       <Filter>Header Files\buildings</Filter>
     </ClInclude>
     <ClInclude Include="roadmanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="savemanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
