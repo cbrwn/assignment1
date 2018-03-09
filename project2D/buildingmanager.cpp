@@ -82,7 +82,8 @@ void BuildingManager::buildingMode()
 
 	// demolish buildings
 	if (m_selectedBuilding == BUILDINGTYPE_NONE
-		&& input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT))
+		&& input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT)
+		&& m_game->isMouseInGame())
 	{
 		Building* underMouse = getBuildingAtIndex(tileX, tileY);
 		if (underMouse)
@@ -235,8 +236,8 @@ void BuildingManager::updateBuildings(float delta)
 	}
 
 	// update houses
-	m_houseTimer += delta;
-	if (m_houseTimer >= HOUSE_UPDATE_TIME)
+	m_houseTimer -= delta;
+	if (m_houseTimer <= 0)
 	{
 		int newBuildings = 0;
 		// update population stuff
@@ -283,7 +284,7 @@ void BuildingManager::updateBuildings(float delta)
 			removeBuilding(b);
 		}
 
-		m_houseTimer = 0;
+		m_houseTimer = HOUSE_UPDATE_TIME + (randBetween(-1.0f, 1.0f) * HOUSE_UPDATE_TIME * 0.5f);
 	}
 }
 
