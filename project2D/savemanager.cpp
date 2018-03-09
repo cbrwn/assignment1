@@ -53,6 +53,9 @@ bool SaveManager::loadData()
 	m_game->getRoadManager()->clearRoads();
 	m_game->getBuildingManager()->clearBuildings();
 
+	// randomly choose the direction to drop buildings in
+	bool horz = (rand() % 100) < 50;
+
 	// grab the buildings
 	for (int i = 0; i < buildingCount; i++)
 	{
@@ -69,10 +72,14 @@ bool SaveManager::loadData()
 		Building* build = m_game->getBuildingManager()->makeBuilding(
 			(BuildingType)buildingType, buildingX, buildingY);
 
+		// set altitude stuff to drop row-by-row
+		int dropDir = buildingX;
+		if (!horz)
+			dropDir = buildingY;
+
 		// I was going to make sure they're on the ground but this is
 		//   more fun
-		//build->setAltitude(0.0f);
-		build->setAltitude(1000.0f + (rand() % 10000));
+		build->setAltitude(dropDir * 500.0f);
 
 		m_game->getBuildingManager()->addBuilding(build, false);
 
