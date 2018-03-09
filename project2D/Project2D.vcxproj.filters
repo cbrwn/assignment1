@@ -90,6 +90,9 @@
     <ClCompile Include="vector2.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
+    <ClCompile Include="random.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vector2.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="random.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>

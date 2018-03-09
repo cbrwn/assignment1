@@ -59,7 +59,6 @@ protected:
 	int				m_posX, m_posY;
 	int				m_sizeX, m_sizeY;
 	// world position of the bulding from the tile number
-	//float			m_worldX, m_worldY;
 	Vector2			m_worldPos;
 
 	// used for dropping it into the world

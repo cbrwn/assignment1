@@ -78,9 +78,6 @@ public:
 	Vector2 getTileWorldPosition(int ix, int iy);
 	void	drawTileRect(int left, int top, int right, int bottom);
 	void	clearTilePower();
-	//Tile*	getTileAtPosition(float x, float y);
-	//void	getTileAtPosition(float px, float py, int *ix, int *iy);
-	//void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
 
 	// money-related functions
 	inline int  getMoney() { return m_money; }
@@ -98,7 +95,6 @@ public:
 	bool isViewModeEnabled(ViewMode mode);
 
 	// particle stuff
-	//void spawnSmokeParticle(float x, float y);
 	void spawnSmokeParticle(Vector2& pos);
 	void doScreenShake(float amt);
 
@@ -116,7 +112,6 @@ protected:
 	Camera*				m_camera;
 
 	// map/world-related stuff
-	//float				m_mapStartX, m_mapStartY;
 	Vector2				m_mapStart;
 	Tile***				m_tiles;
 	BuildingList		m_buildings;

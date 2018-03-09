@@ -171,6 +171,7 @@
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="powerplant.cpp" />
     <ClCompile Include="powerpole.cpp" />
+    <ClCompile Include="random.cpp" />
     <ClCompile Include="road.cpp" />
     <ClCompile Include="roadmanager.cpp" />
     <ClCompile Include="savemanager.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="particle.h" />
     <ClInclude Include="powerplant.h" />
     <ClInclude Include="powerpole.h" />
+    <ClInclude Include="random.h" />
     <ClInclude Include="road.h" />
     <ClInclude Include="roadmanager.h" />
     <ClInclude Include="savemanager.h" />

@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include "game.h"
+#include "random.h"
 
 Camera::Camera(Game* game) : m_game(game)
 {
@@ -79,12 +80,14 @@ void Camera::update(float delta)
 
 	if (m_shakeAmount > 0)
 	{
-		const int rndamt = 1000;
-		m_actualX += ((-rndamt/2 + rand() % rndamt) / 100.0f) * m_shakeAmount;
-		m_actualY += ((-rndamt/2 + rand() % rndamt) / 100.0f) * m_shakeAmount;
+		const float rndamt = 10.0f;
+		m_actualX += rndamt * m_shakeAmount
+			* (randBetween(0, 100) < 50 ? -1 : 1);
+		m_actualY += rndamt * m_shakeAmount
+			* (randBetween(0, 100) < 50 ? -1 : 1);
 
 		const float decreaseSpeed = 20.0f;
-		m_shakeAmount -= delta * decreaseSpeed;
+		m_shakeAmount -= m_shakeAmount * delta * decreaseSpeed;
 	}
 }
 

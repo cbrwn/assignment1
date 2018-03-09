@@ -1,5 +1,6 @@
 #include "smokeparticle.h"
 #include "game.h"
+#include "random.h"
 
 SmokeParticle::SmokeParticle(Game* game, Vector2& pos)
 	: Particle(game, pos)
@@ -7,11 +8,11 @@ SmokeParticle::SmokeParticle(Game* game, Vector2& pos)
 	m_texture = game->getImageManager()->getTexture("smoke");
 
 	// random velocities
-	m_vel.setX(((rand() % 10000) - 5000) / 50.0f);
-	m_vel.setY(((rand() % 10000) + 2000.0f) / 50.0f);
+	m_vel.setX(randBetween(-100.0f, 100.0f));
+	m_vel.setY(randBetween(40.0f, 200.0f));
 
 	// and random rotation
-	m_rotateDirection = (rand() % 1000) / 200.0f;
+	m_rotateDirection = randBetween(-3.0f, 3.0f);
 }
 
 void SmokeParticle::update(float delta)
