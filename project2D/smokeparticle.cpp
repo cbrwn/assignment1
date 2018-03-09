@@ -22,9 +22,6 @@ void SmokeParticle::update(float delta)
 	// update transform stuff
 	m_rotation += m_rotateDirection * delta;
 
-	m_vel.subX(m_vel.getX() * delta);
-	m_vel.subY(m_vel.getY() * delta);
-
-	m_pos.addX(m_vel.getX() * delta);
-	m_pos.addY(m_vel.getY() * delta);
+	m_vel -= (m_vel * delta);
+	m_pos += (m_vel * delta);
 }
