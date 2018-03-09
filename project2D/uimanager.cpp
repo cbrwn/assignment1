@@ -2,6 +2,7 @@
 #include <Font.h>
 
 #include "game.h"
+#include "imagemanager.h"
 #include "uimanager.h"
 #include "buildingmanager.h"
 #include "zonemanager.h"

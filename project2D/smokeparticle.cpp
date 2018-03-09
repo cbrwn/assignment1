@@ -1,5 +1,6 @@
 #include "smokeparticle.h"
 #include "game.h"
+#include "imagemanager.h"
 #include "random.h"
 
 SmokeParticle::SmokeParticle(Game* game, Vector2& pos)

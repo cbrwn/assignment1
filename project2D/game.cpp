@@ -7,6 +7,7 @@
 
 #include "camera.h"
 #include "game.h"
+#include "imagemanager.h"
 #include "uimanager.h"
 #include "building.h"
 #include "buildingmanager.h"
@@ -33,6 +34,7 @@ bool Game::startup()
 {
 	srand((unsigned int)time(NULL));
 	this->setVSync(true);
+
 
 	// sky blue background
 	setBackgroundColour(0.12f, 0.63f, 1.0f);
@@ -179,6 +181,8 @@ void Game::update(float deltaTime)
 		toggleViewMode(VIEWMODE_ZONE);
 	if (input->wasKeyPressed(aie::INPUT_KEY_I))
 		toggleViewMode(VIEWMODE_BUILDINGS);
+	if (input->wasKeyPressed(aie::INPUT_KEY_U))
+		toggleViewMode(VIEWMODE_ROADS);
 
 	m_camera->update(deltaTime);
 	getUiManager()->update(deltaTime);
@@ -266,9 +270,7 @@ void Game::draw()
 	}
 
 	// draw buildings
-	if (isViewModeEnabled(VIEWMODE_BUILDINGS)
-		|| getPlaceMode() == PLACEMODE_BUILDING)
-		getBuildingManager()->drawBuildings(m_2dRenderer);
+	getBuildingManager()->drawBuildings(m_2dRenderer);
 
 	// draw particles
 	for (auto p : m_particles)

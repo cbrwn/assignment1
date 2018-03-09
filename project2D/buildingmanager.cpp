@@ -234,6 +234,14 @@ void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 {
 	for (auto b : *m_buildings)
 	{
+		// if building view is off, we want to skip everything except roads
+		if (!m_game->isViewModeEnabled(VIEWMODE_BUILDINGS)
+			&& b->getType() != BUILDINGTYPE_ROAD)
+			continue;
+		// skip roads if road view is off
+		if (!m_game->isViewModeEnabled(VIEWMODE_ROADS)
+			&& b->getType() == BUILDINGTYPE_ROAD)
+			continue;
 		renderer->setRenderColour(1, 1, 1);
 		b->draw(renderer);
 	}

@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "game.h"
+#include "imagemanager.h"
 #include "roadmanager.h"
 #include "road.h"
 

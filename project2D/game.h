@@ -3,7 +3,6 @@
 #include <vector>
 #include "Application.h"
 #include "Renderer2D.h"
-#include "imagemanager.h"
 #include "vector2.h"
 
 #define TILE_WIDTH 132
@@ -43,7 +42,8 @@ enum ViewMode
 {
 	VIEWMODE_ZONE		= 0b00000001,
 	VIEWMODE_BUILDINGS	= 0b00000010,
-	VIEWMODE_POWER		= 0b00000100
+	VIEWMODE_POWER		= 0b00000100,
+	VIEWMODE_ROADS		= 0b00001000
 };
 
 // typedef vectors so they're shorter to type
