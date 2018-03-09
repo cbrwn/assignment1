@@ -23,7 +23,7 @@ class UiManager;
 class Building;
 class BuildingManager;
 class RoadManager;
-class ZoneManager;
+class TileManager;
 
 // place modes are the modes the player can switch between to place
 //   different kinds of things
@@ -65,19 +65,14 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 
+	inline Vector2& getMapStart() { return m_mapStart; }
+
 	// mouse-related functions
 	Vector2 getMouseWorldPosition();
 	Vector2 getMousePosition();
 	bool	isMouseInGame();
 
-	// tile-related functions
-	Tile*	getTile(int x, int y);
-	void	getTileAtMousePosition(int *ix, int *iy);
-	Tile*	getTileAtPosition(Vector2& pos);
-	void	getTileAtPosition(Vector2& pos, int* ix, int* iy);
-	Vector2 getTileWorldPosition(int ix, int iy);
 	void	drawTileRect(int left, int top, int right, int bottom);
-	void	clearTilePower();
 
 	// money-related functions
 	inline int  getMoney() { return m_money; }
@@ -91,8 +86,8 @@ public:
 	// view mode related functions
 	inline ViewMode getViewMode() { return m_viewMode; }
 	inline void setViewMode(ViewMode mode) { m_viewMode = mode; }
+	inline bool isViewModeEnabled(ViewMode mode) { return (m_viewMode & mode); };
 	void toggleViewMode(ViewMode mode);
-	bool isViewModeEnabled(ViewMode mode);
 
 	// particle stuff
 	void spawnSmokeParticle(Vector2& pos);
@@ -104,7 +99,7 @@ public:
 	inline BuildingManager* getBuildingManager() { return m_buildingManager; }
 	inline RoadManager*		getRoadManager() { return m_roadManager; }
 	inline SaveManager*		getSaveManager() { return m_saveManager; }
-	inline ZoneManager*		getZoneManager() { return m_zoneManager; }
+	inline TileManager*		getTileManager() { return m_tileManager; }
 
 protected:
 	aie::Renderer2D*	m_2dRenderer;
@@ -125,7 +120,7 @@ protected:
 	BuildingManager*	m_buildingManager;
 	RoadManager*		m_roadManager;
 	SaveManager*		m_saveManager;
-	ZoneManager*		m_zoneManager;
+	TileManager*		m_tileManager;
 
 	// gameplay variables
 	PlaceMode m_placeMode;

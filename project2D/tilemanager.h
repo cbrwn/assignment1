@@ -7,14 +7,21 @@ enum ZoneType;
 class Game;
 class Tile;
 
-class ZoneManager
+class TileManager
 {
 public:
-	ZoneManager(Game* game, Tile**** tiles);
+	TileManager(Game* game, Tile**** tiles);
 
-	void zoneMode();
+	void updateZoneEditing();
 
-	void drawZones(aie::Renderer2D* renderer);
+	void drawZoneSelection(aie::Renderer2D* renderer);
+
+	Tile*	getTile(int x, int y);
+	void	getTileAtMousePosition(int *ix, int *iy);
+	Tile*	getTileAtPosition(Vector2& pos);
+	void	getTileAtPosition(Vector2& pos, int* ix, int* iy);
+	Vector2 getTileWorldPosition(int ix, int iy);
+	void	clearTilePower();
 
 	inline void setSelectedType(ZoneType type) { m_selectedType = type; }
 	inline ZoneType getSelectedType() { return m_selectedType; }

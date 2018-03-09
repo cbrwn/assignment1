@@ -179,7 +179,7 @@
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="uimanager.cpp" />
     <ClCompile Include="vector2.cpp" />
-    <ClCompile Include="zonemanager.cpp" />
+    <ClCompile Include="tilemanager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="building.h" />
@@ -198,7 +198,7 @@
     <ClInclude Include="tile.h" />
     <ClInclude Include="uimanager.h" />
     <ClInclude Include="vector2.h" />
-    <ClInclude Include="zonemanager.h" />
+    <ClInclude Include="tilemanager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

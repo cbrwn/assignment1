@@ -5,7 +5,7 @@
 #include "imagemanager.h"
 #include "uimanager.h"
 #include "buildingmanager.h"
-#include "zonemanager.h"
+#include "tilemanager.h"
 
 #include "tile.h"
 
@@ -98,7 +98,7 @@ void UiManager::update(float delta)
 			for (int i = 0; i < ZONETYPE_COUNT; i++)
 				if (isMouseInRect(m_zoneBoxes[i], m_zonePanelY))
 				{
-					m_game->getZoneManager()->setSelectedType((ZoneType)i);
+					m_game->getTileManager()->setSelectedType((ZoneType)i);
 					break;
 				}
 
@@ -232,7 +232,7 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 		float yPos = m_zonePanelY - (thisRect.y - thisRect.height / 2.0f);
 
 		// draw back rect
-		if (m_game->getZoneManager()->getSelectedType() == i)
+		if (m_game->getTileManager()->getSelectedType() == i)
 			renderer->setRenderColour(0.6f, 0.6f, 0.6f);
 		else
 			renderer->setRenderColour(0.1f, 0.1f, 0.1f);

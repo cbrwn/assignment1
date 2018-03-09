@@ -5,6 +5,7 @@
 #include "buildingmanager.h"
 #include "roadmanager.h"
 #include "game.h"
+#include "tilemanager.h"
 
 #include "building.h"
 #include "powerplant.h"
@@ -59,7 +60,7 @@ void BuildingManager::buildingMode()
 
 	// get the index of the tile we're mousing over
 	int tileX, tileY;
-	m_game->getTileAtPosition(mousePos, &tileX, &tileY);
+	m_game->getTileManager()->getTileAtPosition(mousePos, &tileX, &tileY);
 
 	// update the ghost building to show which building we're choosing
 	if (m_ghostBuilding == nullptr
@@ -214,7 +215,7 @@ void BuildingManager::updateBuildings(float delta)
 	{
 		m_updateTimer = 0;
 
-		m_game->clearTilePower();
+		m_game->getTileManager()->clearTilePower();
 
 		bool changedPower = true;
 		while (changedPower)
@@ -276,7 +277,8 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		for (int y = iy - ih; y <= iy; y++)
 		{
 			// grab the world position
-			Vector2 tPos = m_game->getTileWorldPosition(x, y);
+			Vector2 tPos = 
+				m_game->getTileManager()->getTileWorldPosition(x, y);
 			tPos.setX(tPos.getX() + TILE_WIDTH / 2.0f);
 			m_game->spawnSmokeParticle(tPos);
 		}
@@ -323,7 +325,8 @@ int BuildingManager::partitionBuildings(int min, int max)
 	int pivPosX, pivPosY; // first we get the center indices
 	pivot->getCenter(&pivPosX, &pivPosY);
 	// then the world position
-	Vector2 pivPos = m_game->getTileWorldPosition(pivPosX, pivPosY);
+	Vector2 pivPos = 
+		m_game->getTileManager()->getTileWorldPosition(pivPosX, pivPosY);
 
 	int i = min - 1;
 	for (int j = min; j < max; ++j)
@@ -331,7 +334,8 @@ int BuildingManager::partitionBuildings(int min, int max)
 		// grab the numbers of the item we're comparing
 		int jPosX, jPosY; // first the indices
 		(*m_buildings)[j]->getCenter(&jPosX, &jPosY);
-		Vector2 jPos = m_game->getTileWorldPosition(jPosX, jPosY);
+		Vector2 jPos = 
+			m_game->getTileManager()->getTileWorldPosition(jPosX, jPosY);
 
 		// sort by the Y position of the center
 		if (jPos.getY() > pivPos.getY())

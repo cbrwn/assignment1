@@ -69,9 +69,6 @@
     <ClCompile Include="powerpole.cpp">
       <Filter>Source Files\buildings</Filter>
     </ClCompile>
-    <ClCompile Include="zonemanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="smokeparticle.cpp">
       <Filter>Source Files\particles</Filter>
     </ClCompile>
@@ -92,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="random.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="tilemanager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +122,6 @@
     <ClInclude Include="powerpole.h">
       <Filter>Header Files\buildings</Filter>
     </ClInclude>
-    <ClInclude Include="zonemanager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="particle.h">
       <Filter>Header Files\particles</Filter>
     </ClInclude>
@@ -145,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="random.h">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="tilemanager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

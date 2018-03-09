@@ -2,6 +2,7 @@
 #include "buildingmanager.h"
 #include "powerpole.h"
 #include "tile.h"
+#include "tilemanager.h"
 #include "game.h"
 
 Building::Building(Game* game, int x, int y)
@@ -17,7 +18,8 @@ Building::Building(Game* game, int x, int y)
 	m_producesPower = false;
 
 	// grab the world position
-	m_worldPos = m_game->getTileWorldPosition(m_posX + 1, m_posY);
+	m_worldPos = 
+		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);
 
 	m_altitude = 10000.0f;
 	m_fallSpeed = 20000.0f;
@@ -41,14 +43,16 @@ void Building::update(float delta)
 			for (int i = m_posX + 1; i > m_posX - m_sizeX; --i)
 			{
 				int y = m_posY + 1;
-				Vector2 v = m_game->getTileWorldPosition(i, y);
+				Vector2 v = 
+					m_game->getTileManager()->getTileWorldPosition(i, y);
 				m_game->spawnSmokeParticle(v);
 			}
 			// and front-right side
 			for (int i = m_posY + 1; i >= m_posY - m_sizeY; --i)
 			{
 				int x = m_posX + 1;
-				Vector2 v = m_game->getTileWorldPosition(x, i);
+				Vector2 v = 
+					m_game->getTileManager()->getTileWorldPosition(x, i);
 				m_game->spawnSmokeParticle(v);
 			}
 		}
@@ -88,7 +92,8 @@ void Building::setPosition(int x, int y)
 	m_posY = y;
 
 	// update world positions
-	m_worldPos = m_game->getTileWorldPosition(m_posX + 1, m_posY);
+	m_worldPos = 
+		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);
 }
 
 void Building::getCenter(int * x, int * y)
@@ -113,7 +118,7 @@ bool Building::updatePower()
 		{
 			for (int x = minX; x <= maxX; ++x)
 			{
-				Tile* thisTile = m_game->getTile(x, y);
+				Tile* thisTile = m_game->getTileManager()->getTile(x, y);
 				if (!thisTile)
 					continue;
 				if (thisTile->hasPower())
@@ -145,7 +150,7 @@ bool Building::updatePower()
 	{
 		for (int x = minX; x <= maxX; ++x)
 		{
-			Tile* thisTile = m_game->getTile(x, y);
+			Tile* thisTile = m_game->getTileManager()->getTile(x, y);
 			if (!thisTile)
 				continue;
 			if (!thisTile->hasPower())

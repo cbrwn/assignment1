@@ -7,6 +7,7 @@
 #include "roadmanager.h"
 #include "building.h"
 #include "tile.h"
+#include "tilemanager.h"
 
 SaveManager::SaveManager(Game* game)
 	: m_game(game)
@@ -45,7 +46,7 @@ bool SaveManager::loadData()
 		{
 			char zoneType;
 			file.read(&zoneType, 1);
-			m_game->getTile(x, y)->setZoneType((ZoneType)zoneType);
+			m_game->getTileManager()->getTile(x, y)->setZoneType((ZoneType)zoneType);
 		}
 	}
 
@@ -138,7 +139,7 @@ bool SaveManager::saveData()
 	{
 		for (int x = 0; x < worldWidth; ++x)
 		{
-			Tile* thisTile = m_game->getTile(x, y);
+			Tile* thisTile = m_game->getTileManager()->getTile(x, y);
 			char zoneType = thisTile->getZoneType();
 			file.write((char*)&zoneType, 1);
 		}

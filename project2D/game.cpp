@@ -13,7 +13,7 @@
 #include "buildingmanager.h"
 #include "roadmanager.h"
 #include "savemanager.h"
-#include "zonemanager.h"
+#include "tilemanager.h"
 
 #include "tile.h"
 #include "particle.h"
@@ -47,7 +47,7 @@ bool Game::startup()
 	m_buildingManager = new BuildingManager(this, &m_buildings);
 	m_roadManager = new RoadManager(this);
 	m_saveManager = new SaveManager(this);
-	m_zoneManager = new ZoneManager(this, &m_tiles);
+	m_tileManager = new TileManager(this, &m_tiles);
 
 	//m_camera->setScale(1.3f);
 
@@ -96,7 +96,7 @@ void Game::shutdown()
 	delete m_buildingManager;
 	delete m_roadManager;
 	delete m_saveManager;
-	delete m_zoneManager;
+	delete m_tileManager;
 
 	for (auto p : m_particles)
 		delete p;
@@ -168,7 +168,7 @@ void Game::update(float deltaTime)
 			getBuildingManager()->buildingMode();
 			break;
 		case PLACEMODE_ZONE:
-			getZoneManager()->zoneMode();
+			getTileManager()->updateZoneEditing();
 			break;
 		default:
 			break;
@@ -222,7 +222,7 @@ void Game::draw()
 
 	// draw tiles
 	Vector2 mousePos = getMouseWorldPosition();
-	Tile* mouseOver = getTileAtPosition(mousePos);
+	Tile* mouseOver = m_tileManager->getTileAtPosition(mousePos);
 	// don't show mouseover stuff if the mouse is over the UI
 	if (!isMouseInGame())
 		mouseOver = nullptr;
@@ -245,7 +245,7 @@ void Game::draw()
 
 			m_2dRenderer->setRenderColour(rg, rg, 1.0f);
 
-			Vector2 tilePos = getTileWorldPosition(x, y);
+			Vector2 tilePos = m_tileManager->getTileWorldPosition(x, y);
 
 			tilePos.setY(tilePos.getY() - 20.0f);
 
@@ -285,7 +285,7 @@ void Game::draw()
 		getBuildingManager()->drawPlacement(m_2dRenderer);
 		break;
 	case PLACEMODE_ZONE:
-		getZoneManager()->drawZones(m_2dRenderer);
+		getTileManager()->drawZoneSelection(m_2dRenderer);
 		break;
 	default:
 		break;
@@ -357,72 +357,6 @@ bool Game::isMouseInGame()
 	return !m_uiManager->isMouseOverUi();
 }
 
-Tile* Game::getTile(int x, int y)
-{
-	if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
-		return nullptr;
-	return m_tiles[y][x];
-}
-
-void Game::getTileAtMousePosition(int* ix, int* iy)
-{
-	// first get the mouse's world position
-	Vector2 mousePos = getMouseWorldPosition();
-
-	// then grab the tile's indices
-	getTileAtPosition(mousePos, ix, iy);
-}
-
-Tile* Game::getTileAtPosition(Vector2& pos)
-{
-	int ix, iy;
-	getTileAtPosition(pos, &ix, &iy);
-
-	if (ix < 0 || iy < 0)
-		return nullptr;
-	return m_tiles[iy][ix];
-}
-
-void Game::getTileAtPosition(Vector2& pos, int* ix, int* iy)
-{
-	// get shorter names for the measurements we use to offset the tiles
-	const float tw = TILE_WIDTH / 2.0f;
-	const float th = TILE_HEIGHT / 3.0f;
-
-	// grab local versions of the vector position
-	float px = pos.getX();
-	float py = pos.getY();
-
-	// invert y since y=0 is at the bottom
-	py *= -1;
-
-	// offset to the start of the map
-	px -= m_mapStart.getX();
-	py += m_mapStart.getY();
-
-	// account for the origin of the tile drawing (see tile.cpp)
-	px -= tw;
-	py += th;
-
-	int resultX = (int)((px / tw + py / th) / 2);
-	int resultY = (int)((py / th - px / tw) / 2);
-
-	if (resultX < 0 || resultX >= WORLD_WIDTH)
-		resultX = -1;
-	if (resultY < 0 || resultY >= WORLD_HEIGHT)
-		resultY = -1;
-
-	*ix = resultX;
-	*iy = resultY;
-}
-
-Vector2 Game::getTileWorldPosition(int ix, int iy)
-{
-	float xpos = (ix - iy) * TILE_WIDTH / 2.0f + m_mapStart.getX();
-	float ypos = (ix + iy) * TILE_HEIGHT / 3.0f - m_mapStart.getY();
-	return Vector2(xpos, -ypos);
-}
-
 void Game::drawTileRect(int left, int top, int right, int bottom)
 {
 	// grab the world positions of the tiles
@@ -442,10 +376,14 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		dragMaxY = top;
 	}
 
-	Vector2 topLeft = getTileWorldPosition(dragMinX, dragMinY);
-	Vector2 topRight = getTileWorldPosition(dragMaxX + 1, dragMinY);
-	Vector2 bottomRight = getTileWorldPosition(dragMaxX + 1, dragMaxY);
-	Vector2 bottomLeft = getTileWorldPosition(dragMinX, dragMaxY);
+	Vector2 topLeft = 
+		m_tileManager->getTileWorldPosition(dragMinX, dragMinY);
+	Vector2 topRight = 
+		m_tileManager->getTileWorldPosition(dragMaxX + 1, dragMinY);
+	Vector2 bottomRight = 
+		m_tileManager->getTileWorldPosition(dragMaxX + 1, dragMaxY);
+	Vector2 bottomLeft =
+		m_tileManager->getTileWorldPosition(dragMinX, dragMaxY);
 
 	// adjust so the lines line up with the borders of the tile sprites
 	const float xOffset = TILE_WIDTH / 2.0f;
@@ -467,20 +405,6 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		topLeft.getY(), lineThickness);
 }
 
-void Game::clearTilePower()
-{
-	for (int y = 0; y < WORLD_HEIGHT; ++y)
-	{
-		for (int x = 0; x < WORLD_WIDTH; ++x)
-		{
-			Tile* t = getTile(x, y);
-			if (!t || !t->hasPower())
-				continue;
-			t->takePower();
-		}
-	}
-}
-
 void Game::setPlaceMode(PlaceMode mode)
 {
 	m_placeMode = mode;
@@ -500,11 +424,6 @@ void Game::toggleViewMode(ViewMode mode)
 		// turn the bit on
 		m_viewMode = (ViewMode)(m_viewMode | mode);
 	}
-}
-
-bool Game::isViewModeEnabled(ViewMode mode)
-{
-	return (m_viewMode & mode);
 }
 
 void Game::spawnSmokeParticle(Vector2& pos)
