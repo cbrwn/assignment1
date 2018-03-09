@@ -55,12 +55,11 @@ void BuildingManager::buildingMode()
 		m_selectedBuilding = (int)BUILDINGTYPE_COUNT - 1;
 
 	// grab the mouse position
-	float mx, my;
-	m_game->getMouseWorldPosition(&mx, &my);
+	Vector2 mousePos = m_game->getMouseWorldPosition();
 
 	// get the index of the tile we're mousing over
 	int tileX, tileY;
-	m_game->getTileAtPosition(mx, my, &tileX, &tileY);
+	m_game->getTileAtPosition(mousePos, &tileX, &tileY);
 
 	// update the ghost building to show which building we're choosing
 	if (m_ghostBuilding == nullptr
@@ -269,10 +268,9 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		for (int y = iy - ih; y <= iy; y++)
 		{
 			// grab the world position
-			float wx, wy;
-			m_game->getTileWorldPosition(x, y, &wx, &wy);
-			wx += TILE_WIDTH / 2.0f;
-			m_game->spawnSmokeParticle(wx, wy);
+			Vector2 tPos = m_game->getTileWorldPosition(x, y);
+			tPos.setX(tPos.getX() + TILE_WIDTH / 2.0f);
+			m_game->spawnSmokeParticle(tPos);
 		}
 	}
 
@@ -316,8 +314,8 @@ int BuildingManager::partitionBuildings(int min, int max)
 	// grab the numbers we'll be sorting by
 	int pivPosX, pivPosY; // first we get the center indices
 	pivot->getCenter(&pivPosX, &pivPosY);
-	float pivWorldX, pivWorldY; // then the world position
-	m_game->getTileWorldPosition(pivPosX, pivPosY, &pivWorldX, &pivWorldY);
+	// then the world position
+	Vector2 pivPos = m_game->getTileWorldPosition(pivPosX, pivPosY);
 
 	int i = min - 1;
 	for (int j = min; j < max; ++j)
@@ -325,11 +323,10 @@ int BuildingManager::partitionBuildings(int min, int max)
 		// grab the numbers of the item we're comparing
 		int jPosX, jPosY; // first the indices
 		(*m_buildings)[j]->getCenter(&jPosX, &jPosY);
-		float jWorldX, jWorldY; // and the world position
-		m_game->getTileWorldPosition(jPosX, jPosY, &jWorldX, &jWorldY);
+		Vector2 jPos = m_game->getTileWorldPosition(jPosX, jPosY);
 
 		// sort by the Y position of the center
-		if (jWorldY > pivWorldY)
+		if (jPos.getY() > pivPos.getY())
 		{
 			i++;
 			// swaparoo

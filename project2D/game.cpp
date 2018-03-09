@@ -55,8 +55,7 @@ bool Game::startup()
 
 	m_powerIcon = m_imageManager->getTexture("icons/power");
 
-	m_mapStartX = 1200;
-	m_mapStartY = 800;
+	m_mapStart = Vector2(1200, 800);
 
 	m_tiles = new Tile**[WORLD_HEIGHT];
 
@@ -216,9 +215,8 @@ void Game::draw()
 	m_2dRenderer->begin();
 
 	// draw tiles
-	float mx, my;
-	this->getMouseWorldPosition(&mx, &my);
-	Tile* mouseOver = this->getTileAtPosition(mx, my);
+	Vector2 mousePos = getMouseWorldPosition();
+	Tile* mouseOver = getTileAtPosition(mousePos);
 	// don't show mouseover stuff if the mouse is over the UI
 	if (!isMouseInGame())
 		mouseOver = nullptr;
@@ -241,11 +239,9 @@ void Game::draw()
 
 			m_2dRenderer->setRenderColour(rg, rg, 1.0f);
 
-			float xpos;
-			float ypos;
-			getTileWorldPosition(x, y, &xpos, &ypos);
+			Vector2 tilePos = getTileWorldPosition(x, y);
 
-			ypos -= 20.0f;
+			tilePos.setY(tilePos.getY() - 20.0f);
 
 			// account for the difference in height in the texture
 			// and keep the bottoms aligned
@@ -256,15 +252,15 @@ void Game::draw()
 			//   being moused over
 			bool tintThisTile = tintTiles && thisTile != mouseOver;
 
-			thisTile->draw(m_2dRenderer, xpos, ypos - dify / 2.0f,
-				tintThisTile);
+			thisTile->draw(m_2dRenderer, tilePos.getX(),
+				tilePos.getY() - dify / 2.0f, tintThisTile);
 
 			// draw power icon if needed
 			if (isViewModeEnabled(VIEWMODE_POWER) && thisTile->hasPower())
 			{
 				m_2dRenderer->setRenderColour(1, 1, 0);
 				m_2dRenderer->drawSprite(m_powerIcon,
-					xpos + TILE_WIDTH / 2.0f, ypos + 20.0f);
+					tilePos.getX() + TILE_WIDTH / 2.0f, tilePos.getY() + 20.0f);
 			}
 		}
 	}
@@ -332,7 +328,7 @@ void Game::draw()
 	m_2dRenderer->end();
 }
 
-void Game::getMouseWorldPosition(float* x, float* y)
+Vector2 Game::getMouseWorldPosition()
 {
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
@@ -342,9 +338,14 @@ void Game::getMouseWorldPosition(float* x, float* y)
 	float ay = (float)my;
 
 	m_camera->screenToWorld(&ax, &ay);
+	return Vector2(ax, ay);
+}
 
-	*x = ax;
-	*y = ay;
+Vector2 Game::getMousePosition()
+{
+	int mx, my;
+	aie::Input::getInstance()->getMouseXY(&mx, &my);
+	return Vector2((float)mx, (float)my);
 }
 
 bool Game::isMouseInGame()
@@ -359,31 +360,41 @@ Tile* Game::getTile(int x, int y)
 	return m_tiles[y][x];
 }
 
-// gets the tile at world position x,y 
-Tile* Game::getTileAtPosition(float x, float y)
+void Game::getTileAtMousePosition(int* ix, int* iy)
+{
+	// first get the mouse's world position
+	Vector2 mousePos = getMouseWorldPosition();
+
+	// then grab the tile's indices
+	getTileAtPosition(mousePos, ix, iy);
+}
+
+Tile* Game::getTileAtPosition(Vector2& pos)
 {
 	int ix, iy;
-	this->getTileAtPosition(x, y, &ix, &iy);
+	getTileAtPosition(pos, &ix, &iy);
 
 	if (ix < 0 || iy < 0)
 		return nullptr;
 	return m_tiles[iy][ix];
 }
 
-// gets the array indices of the tile at world position px,py and puts 
-// them into ix,iy
-void Game::getTileAtPosition(float px, float py, int* ix, int* iy)
+void Game::getTileAtPosition(Vector2& pos, int* ix, int* iy)
 {
 	// get shorter names for the measurements we use to offset the tiles
 	const float tw = TILE_WIDTH / 2.0f;
 	const float th = TILE_HEIGHT / 3.0f;
 
+	// grab local versions of the vector position
+	float px = pos.getX();
+	float py = pos.getY();
+
 	// invert y since y=0 is at the bottom
 	py *= -1;
 
 	// offset to the start of the map
-	px -= m_mapStartX;
-	py += m_mapStartY;
+	px -= m_mapStart.getX();
+	py += m_mapStart.getY();
 
 	// account for the origin of the tile drawing (see tile.cpp)
 	px -= tw;
@@ -401,23 +412,11 @@ void Game::getTileAtPosition(float px, float py, int* ix, int* iy)
 	*iy = resultY;
 }
 
-void Game::getTileAtMousePosition(int* ix, int* iy)
+Vector2 Game::getTileWorldPosition(int ix, int iy)
 {
-	// first get the mouse's world position
-	float mx, my;
-	getMouseWorldPosition(&mx, &my);
-
-	// then grab the tile's indices
-	getTileAtPosition(mx, my, ix, iy);
-}
-
-void Game::getTileWorldPosition(int ix, int iy, float* ox, float* oy)
-{
-	float xpos = (ix - iy) * TILE_WIDTH / 2.0f + m_mapStartX;
-	float ypos = (ix + iy) * TILE_HEIGHT / 3.0f - m_mapStartY;
-
-	*ox = xpos;
-	*oy = -ypos;
+	float xpos = (ix - iy) * TILE_WIDTH / 2.0f + m_mapStart.getX();
+	float ypos = (ix + iy) * TILE_HEIGHT / 3.0f - m_mapStart.getY();
+	return Vector2(xpos, -ypos);
 }
 
 void Game::drawTileRect(int left, int top, int right, int bottom)
@@ -439,41 +438,29 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		dragMaxY = top;
 	}
 
-	// top-left tile
-	float topLeftX, topLeftY;
-	getTileWorldPosition(dragMinX, dragMinY,
-		&topLeftX, &topLeftY);
-	// top-right tile
-	float topRightX, topRightY;
-	getTileWorldPosition(dragMaxX + 1, dragMinY,
-		&topRightX, &topRightY);
-	// bottom-right tile
-	float bottomRightX, bottomRightY;
-	getTileWorldPosition(dragMaxX + 1, dragMaxY,
-		&bottomRightX, &bottomRightY);
-	// bottom-left tile
-	float bottomLeftX, bottomLeftY;
-	getTileWorldPosition(dragMinX, dragMaxY,
-		&bottomLeftX, &bottomLeftY);
+	Vector2 topLeft = getTileWorldPosition(dragMinX, dragMinY);
+	Vector2 topRight = getTileWorldPosition(dragMaxX + 1, dragMinY);
+	Vector2 bottomRight = getTileWorldPosition(dragMaxX + 1, dragMaxY);
+	Vector2 bottomLeft = getTileWorldPosition(dragMinX, dragMaxY);
 
 	// adjust so the lines line up with the borders of the tile sprites
 	const float xOffset = TILE_WIDTH / 2.0f;
 	const float yOffset = TILE_HEIGHT / 3.0f;
-	topLeftX += xOffset;
-	topLeftY += yOffset;
-	topRightX += xOffset;
-	topRightY += yOffset;
+	topLeft.setX(topLeft.getX() + xOffset);
+	topLeft.setY(topLeft.getY() + yOffset);
+	topRight.setX(topRight.getX() + xOffset);
+	topRight.setY(topRight.getY() + yOffset);
 
 	const float lineThickness = 8.0f;
 	// draw a rectangle out of lines
-	m_2dRenderer->drawLine(topLeftX, topLeftY, topRightX, topRightY,
-		lineThickness);
-	m_2dRenderer->drawLine(topRightX, topRightY, bottomRightX, bottomRightY,
-		lineThickness);
-	m_2dRenderer->drawLine(bottomRightX, bottomRightY, bottomLeftX,
-		bottomLeftY, lineThickness);
-	m_2dRenderer->drawLine(bottomLeftX, bottomLeftY, topLeftX, topLeftY,
-		lineThickness);
+	m_2dRenderer->drawLine(topLeft.getX(), topLeft.getY(), topRight.getX(),
+		topRight.getY(), lineThickness);
+	m_2dRenderer->drawLine(topRight.getX(), topRight.getY(), bottomRight.getX(),
+		bottomRight.getY(), lineThickness);
+	m_2dRenderer->drawLine(bottomRight.getX(), bottomRight.getY(), bottomLeft.getX(),
+		bottomLeft.getY(), lineThickness);
+	m_2dRenderer->drawLine(bottomLeft.getX(), bottomLeft.getY(), topLeft.getX(),
+		topLeft.getY(), lineThickness);
 }
 
 void Game::clearTilePower()
@@ -516,9 +503,9 @@ bool Game::isViewModeEnabled(ViewMode mode)
 	return (m_viewMode & mode);
 }
 
-void Game::spawnSmokeParticle(float x, float y)
+void Game::spawnSmokeParticle(Vector2& pos)
 {
-	auto p = new SmokeParticle(this, x, y);
+	auto p = new SmokeParticle(this, pos);
 	m_particles.push_back(p);
 }
 

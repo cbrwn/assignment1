@@ -1,13 +1,14 @@
 #pragma once
 
 #include <Renderer2D.h>
+#include "vector2.h"
 
 class Game;
 
 class Particle
 {
 public:
-	Particle(Game* game, float x, float y);
+	Particle(Game* game, Vector2& pos);
 
 	virtual void update(float delta) = 0;
 	void draw(aie::Renderer2D* renderer);
@@ -16,8 +17,7 @@ public:
 protected:
 	Game* m_game;
 
-	float m_posX, m_posY;
-	float m_velX, m_velY;
+	Vector2 m_pos, m_vel;
 	float m_opacity;
 	float m_rotation;
 	aie::Texture* m_texture;

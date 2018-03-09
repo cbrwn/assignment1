@@ -17,8 +17,8 @@ void Road::draw(aie::Renderer2D* renderer)
 
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
-	renderer->drawSprite(m_texture, m_worldX, m_worldY - 4 + m_altitude, 
-		0, 0, 0, 0, xOrigin, yOrigin);
+	renderer->drawSprite(m_texture, m_worldPos.getX(), 
+		m_worldPos.getY() - 4 + m_altitude, 0, 0, 0, 0, xOrigin, yOrigin);
 }
 
 // used for sorting

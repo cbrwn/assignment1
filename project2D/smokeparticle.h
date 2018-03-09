@@ -5,7 +5,7 @@
 class SmokeParticle : public Particle
 {
 public:
-	SmokeParticle(Game* game, float x, float y);
+	SmokeParticle(Game* game, Vector2& pos);
 
 	void update(float delta) override;
 private:

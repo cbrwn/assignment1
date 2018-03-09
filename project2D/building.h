@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Renderer2D.h>
+#include "vector2.h"
 
 // when adding a new building type, don't forget to
 //  add it to the factory in buildingmanager.cpp
@@ -35,7 +36,7 @@ public:
 	virtual void update(float delta);
 	virtual void draw(aie::Renderer2D* renderer) = 0;
 
-	void drawEyeball(aie::Renderer2D* renderer, float xPos, float yPos);
+	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos);
 
 	void setPosition(int x, int y);
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
@@ -58,7 +59,8 @@ protected:
 	int				m_posX, m_posY;
 	int				m_sizeX, m_sizeY;
 	// world position of the bulding from the tile number
-	float			m_worldX, m_worldY;
+	//float			m_worldX, m_worldY;
+	Vector2			m_worldPos;
 
 	// used for dropping it into the world
 	float			m_altitude;

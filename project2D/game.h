@@ -4,6 +4,7 @@
 #include "Application.h"
 #include "Renderer2D.h"
 #include "imagemanager.h"
+#include "vector2.h"
 
 #define TILE_WIDTH 132
 #define TILE_HEIGHT 99
@@ -14,6 +15,7 @@
 class Camera;
 class Tile;
 class Particle;
+class Vector2;
 
 class ImageManager;
 class SaveManager;
@@ -64,17 +66,21 @@ public:
 	virtual void draw();
 
 	// mouse-related functions
-	void getMouseWorldPosition(float* x, float* y);
-	bool isMouseInGame();
+	Vector2 getMouseWorldPosition();
+	Vector2 getMousePosition();
+	bool	isMouseInGame();
 
 	// tile-related functions
-	Tile* getTile(int x, int y);
-	Tile* getTileAtPosition(float x, float y);
-	void  getTileAtPosition(float px, float py, int *ix, int *iy);
-	void  getTileAtMousePosition(int *ix, int *iy);
-	void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
-	void  drawTileRect(int left, int top, int right, int bottom);
-	void  clearTilePower();
+	Tile*	getTile(int x, int y);
+	void	getTileAtMousePosition(int *ix, int *iy);
+	Tile*	getTileAtPosition(Vector2& pos);
+	void	getTileAtPosition(Vector2& pos, int* ix, int* iy);
+	Vector2 getTileWorldPosition(int ix, int iy);
+	void	drawTileRect(int left, int top, int right, int bottom);
+	void	clearTilePower();
+	//Tile*	getTileAtPosition(float x, float y);
+	//void	getTileAtPosition(float px, float py, int *ix, int *iy);
+	//void  getTileWorldPosition(int ix, int iy, float* ox, float* oy);
 
 	// money-related functions
 	inline int  getMoney() { return m_money; }
@@ -92,7 +98,8 @@ public:
 	bool isViewModeEnabled(ViewMode mode);
 
 	// particle stuff
-	void spawnSmokeParticle(float x, float y);
+	//void spawnSmokeParticle(float x, float y);
+	void spawnSmokeParticle(Vector2& pos);
 	void doScreenShake(float amt);
 
 	// getters for all of the managers
@@ -109,7 +116,8 @@ protected:
 	Camera*				m_camera;
 
 	// map/world-related stuff
-	float				m_mapStartX, m_mapStartY;
+	//float				m_mapStartX, m_mapStartY;
+	Vector2				m_mapStart;
 	Tile***				m_tiles;
 	BuildingList		m_buildings;
 	ParticleList		m_particles;

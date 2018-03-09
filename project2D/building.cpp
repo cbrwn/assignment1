@@ -17,7 +17,7 @@ Building::Building(Game* game, int x, int y)
 	m_producesPower = false;
 
 	// grab the world position
-	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
+	m_worldPos = m_game->getTileWorldPosition(m_posX + 1, m_posY);
 
 	m_altitude = 10000.0f;
 	m_fallSpeed = 20000.0f;
@@ -41,39 +41,35 @@ void Building::update(float delta)
 			for (int i = m_posX + 1; i > m_posX - m_sizeX; --i)
 			{
 				int y = m_posY + 1;
-				float px1, py1;
-				m_game->getTileWorldPosition(i, y, &px1, &py1);
-				m_game->spawnSmokeParticle(px1, py1);
+				Vector2 v = m_game->getTileWorldPosition(i, y);
+				m_game->spawnSmokeParticle(v);
 			}
 			// and front-right side
 			for (int i = m_posY + 1; i >= m_posY - m_sizeY; --i)
 			{
 				int x = m_posX + 1;
-				float px1, py1;
-				m_game->getTileWorldPosition(x, i, &px1, &py1);
-				m_game->spawnSmokeParticle(px1, py1);
+				Vector2 v = m_game->getTileWorldPosition(x, i);
+				m_game->spawnSmokeParticle(v);
 			}
 		}
 	}
 }
 
-void Building::drawEyeball(aie::Renderer2D* renderer, float xPos, float yPos)
+void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos)
 {
 	// get mouse position
-	float mx, my;
-	m_game->getMouseWorldPosition(&mx, &my);
+	Vector2 mousePos = m_game->getMouseWorldPosition();
 
 	// get angle to mouse
-	float difx = mx - xPos;
-	float dify = my - yPos;
-	float angle = atan2f(dify, difx);
+	mousePos -= pos;
+	float angle = mousePos.angle();
 
 	const float eyeSize = 48.0f;
 	const float pupilSize = eyeSize / 2.0f;
 
 	// white of eye
 	renderer->setRenderColour(1, 1, 1);
-	renderer->drawCircle(xPos, yPos, eyeSize);
+	renderer->drawCircle(pos.getX(), pos.getY(), eyeSize);
 
 	// pupil!
 	// base its distance from the center on the size
@@ -83,7 +79,7 @@ void Building::drawEyeball(aie::Renderer2D* renderer, float xPos, float yPos)
 	float yOff = sinf(angle) * dist;
 
 	renderer->setRenderColour(0, 0, 0);
-	renderer->drawCircle(xPos + xOff, yPos + yOff, pupilSize);
+	renderer->drawCircle(pos.getX() + xOff, pos.getY() + yOff, pupilSize);
 }
 
 void Building::setPosition(int x, int y)
@@ -92,7 +88,7 @@ void Building::setPosition(int x, int y)
 	m_posY = y;
 
 	// update world positions
-	m_game->getTileWorldPosition(m_posX + 1, m_posY, &m_worldX, &m_worldY);
+	m_worldPos = m_game->getTileWorldPosition(m_posX + 1, m_posY);
 }
 
 void Building::getCenter(int * x, int * y)
