@@ -2,6 +2,7 @@
 
 #include "game.h"
 #include "tile.h"
+#include "roadmanager.h"
 
 unsigned int Tile::m_zoneTintColours[ZONETYPE_COUNT];
 
@@ -41,4 +42,19 @@ void Tile::setZoneType(ZoneType type)
 {
 	// handle destroying existing zone-specific stuff here
 	m_zoneType = type;
+}
+
+// returns whether or not the tile is suitable for living
+bool Tile::isLiveable(int xIndex, int yIndex)
+{
+	if (!m_hasPower)
+		return false;
+
+	if (m_zoneType != ZONETYPE_RESIDENTIAL)
+		return false;
+
+	int roadDist;
+	m_game->getRoadManager()->getClosestRoad(xIndex, yIndex, &roadDist);
+
+	return roadDist <= 6;
 }

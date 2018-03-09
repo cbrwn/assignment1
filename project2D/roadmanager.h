@@ -21,6 +21,7 @@ public:
 	void updateRoads();
 
 	Road* getRoadAtPosition(int x, int y);
+	Road* getClosestRoad(int x, int y, int* distOut);
 private:
 	Game* m_game;
 

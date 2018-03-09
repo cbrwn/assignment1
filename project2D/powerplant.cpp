@@ -31,7 +31,7 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 
 	// eyeballs
 	drawEyeball(renderer, Vector2(m_worldPos.getX() + 84.0f, 
-		m_worldPos.getY() + 128.0f + m_altitude));
+		m_worldPos.getY() + 128.0f + m_altitude), 48.0f);
 	drawEyeball(renderer, Vector2(m_worldPos.getX() + 194.0f, 
-		m_worldPos.getY() + 184.0f + m_altitude));
+		m_worldPos.getY() + 184.0f + m_altitude), 48.0f);
 }

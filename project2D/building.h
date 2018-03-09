@@ -12,6 +12,7 @@ enum BuildingType
 	BUILDINGTYPE_POWERPLANT,
 	BUILDINGTYPE_POWERPOLE,
 	BUILDINGTYPE_ROAD,
+	BUILDINGTYPE_HOUSE,
 
 	BUILDINGTYPE_COUNT
 };
@@ -23,7 +24,8 @@ enum BuildStyle
 {
 	BUILDSTYLE_SINGLE = 0,
 	BUILDSTYLE_LINE,
-	BUILDSTYLE_RECT
+	BUILDSTYLE_RECT,
+	BUILDSTYLE_FORBIDDEN // can't build!
 };
 
 class Game;
@@ -36,7 +38,7 @@ public:
 	virtual void update(float delta);
 	virtual void draw(aie::Renderer2D* renderer) = 0;
 
-	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos);
+	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad);
 
 	void setPosition(int x, int y);
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
@@ -64,6 +66,7 @@ protected:
 	// used for dropping it into the world
 	float			m_altitude;
 	float			m_fallSpeed;
+	bool			m_shakesCamera;
 
 	int				m_powerSpreadRange; // how far this building shares power
 	int				m_powerSearchRange; // how far this building looks for power

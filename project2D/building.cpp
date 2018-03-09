@@ -16,6 +16,7 @@ Building::Building(Game* game, int x, int y)
 	m_powerSpreadRange = 2;
 	m_powerSearchRange = 1;
 	m_producesPower = false;
+	m_shakesCamera = true;
 
 	// grab the world position
 	m_worldPos = 
@@ -36,8 +37,9 @@ void Building::update(float delta)
 		if (m_altitude <= 0)
 		{
 			m_altitude = 0;
-			// todo: smoke and screenshake and stuff
-			m_game->doScreenShake((float)m_sizeX * m_sizeY);
+
+			if(m_shakesCamera)
+				m_game->doScreenShake((float)m_sizeX * m_sizeY);
 
 			// smokey particles on the front-left side
 			for (int i = m_posX + 1; i > m_posX - m_sizeX; --i)
@@ -59,7 +61,7 @@ void Building::update(float delta)
 	}
 }
 
-void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos)
+void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad)
 {
 	// get mouse position
 	Vector2 mousePos = m_game->getMouseWorldPosition();
@@ -68,7 +70,7 @@ void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos)
 	mousePos -= pos;
 	float angle = mousePos.angle();
 
-	const float eyeSize = 48.0f;
+	float eyeSize = rad;
 	const float pupilSize = eyeSize / 2.0f;
 
 	// white of eye

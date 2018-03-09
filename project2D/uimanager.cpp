@@ -35,6 +35,10 @@ UiManager::UiManager(Game* game)
 	currentX = selectBoxPadding;
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
 	{
+		// skip house, not buildable
+		if (i == BUILDINGTYPE_HOUSE)
+			continue;
+
 		m_buildingBoxes[i] = { currentX, m_panelY - selectBoxPadding,
 			selectBoxWidth, m_panelY - (selectBoxPadding * 2.0f) };
 		currentX += selectBoxWidth + selectBoxPadding;
@@ -187,6 +191,10 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 	// draw all the boxes
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
 	{
+		// skip house, not buildable
+		if (i == BUILDINGTYPE_HOUSE)
+			continue;
+
 		Rect thisRect = m_buildingBoxes[i];
 
 		float xPos = thisRect.x + thisRect.width / 2.0f;

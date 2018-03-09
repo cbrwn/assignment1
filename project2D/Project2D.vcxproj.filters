@@ -93,6 +93,9 @@
     <ClCompile Include="tilemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="house.cpp">
+      <Filter>Source Files\buildings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="tilemanager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="house.h">
+      <Filter>Header Files\buildings</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

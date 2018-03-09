@@ -166,6 +166,7 @@
     <ClCompile Include="buildingmanager.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="house.cpp" />
     <ClCompile Include="imagemanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="particle.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="buildingmanager.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="house.h" />
     <ClInclude Include="imagemanager.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="powerplant.h" />

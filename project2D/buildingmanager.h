@@ -3,7 +3,8 @@
 #include <vector>
 #include <Renderer2D.h>
 
-#define BUILDING_UPDATE_TIME 1
+#define POWER_UPDATE_TIME 1
+#define HOUSE_UPDATE_TIME 3
 
 class Building;
 class Game;
@@ -58,6 +59,7 @@ private:
 	int				m_dragPosX, m_dragPosY;
 	bool			m_isDragHorizontal;
 
-	float			m_updateTimer;
+	float			m_powerTimer;
+	float			m_houseTimer;
 };
 

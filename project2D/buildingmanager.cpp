@@ -5,9 +5,12 @@
 #include "buildingmanager.h"
 #include "roadmanager.h"
 #include "game.h"
+#include "tile.h"
 #include "tilemanager.h"
+#include "random.h"
 
 #include "building.h"
+#include "house.h"
 #include "powerplant.h"
 #include "powerpole.h"
 #include "road.h"
@@ -16,7 +19,8 @@ BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	: m_game(game), m_buildings(buildings)
 {
 	m_selectedBuilding = 0;
-	m_updateTimer = 0;
+	m_powerTimer = 0;
+	m_houseTimer = 0;
 	m_ghostBuilding = nullptr;
 
 	m_dragging = false;
@@ -210,13 +214,11 @@ void BuildingManager::updateBuildings(float delta)
 
 	// update everything else that needs to be updated once
 	//   every so often
-	m_updateTimer += delta;
-	if (m_updateTimer >= BUILDING_UPDATE_TIME)
+	m_powerTimer += delta;
+	if (m_powerTimer >= POWER_UPDATE_TIME)
 	{
-		m_updateTimer = 0;
 
 		m_game->getTileManager()->clearTilePower();
-
 		bool changedPower = true;
 		while (changedPower)
 		{
@@ -228,6 +230,60 @@ void BuildingManager::updateBuildings(float delta)
 					changedPower = temp;
 			}
 		}
+
+		m_powerTimer = 0;
+	}
+
+	// update houses
+	m_houseTimer += delta;
+	if (m_houseTimer >= HOUSE_UPDATE_TIME)
+	{
+		int newBuildings = 0;
+		// update population stuff
+		for (int y = 0; y < WORLD_HEIGHT; ++y)
+		{
+			for (int x = 0; x < WORLD_WIDTH; ++x)
+			{
+				if (randBetween(0, 100) > 1)
+					continue;
+				// a tile is randomly chosen to update
+				Tile* t = m_game->getTileManager()->getTile(x, y);
+
+				// check the building on the tile
+				Building* b = getBuildingAtIndex(x, y);
+
+				// only want to spawn new houses in this loop
+				if (b || !t->isLiveable(x, y))
+					continue;
+
+				Building* newHouse = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
+				addBuilding(newHouse, false);
+				newBuildings++;
+			}
+		}
+
+		if (newBuildings > 0)
+			sortBuildings();
+
+		// remove invalid houses
+		for (auto b : *m_buildings)
+		{
+			if (randBetween(0, 100) > 25)
+				continue;
+			if (b->getType() != BUILDINGTYPE_HOUSE)
+				continue;
+			int ix, iy;
+			b->getPosition(&ix, &iy);
+
+			Tile* underHouse = m_game->getTileManager()->getTile(ix, iy);
+			if (underHouse->isLiveable(ix, iy))
+				continue;
+
+			// delete this invalid house
+			removeBuilding(b);
+		}
+
+		m_houseTimer = 0;
 	}
 }
 
@@ -277,7 +333,7 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		for (int y = iy - ih; y <= iy; y++)
 		{
 			// grab the world position
-			Vector2 tPos = 
+			Vector2 tPos =
 				m_game->getTileManager()->getTileWorldPosition(x, y);
 			tPos.setX(tPos.getX() + TILE_WIDTH / 2.0f);
 			m_game->spawnSmokeParticle(tPos);
@@ -296,7 +352,7 @@ void BuildingManager::removeBuilding(Building* toRemove)
 			break;
 		}
 	}
-	sortBuildings(0, (int)m_buildings->size() - 1);
+	//sortBuildings(0, (int)m_buildings->size() - 1);
 }
 
 void BuildingManager::sortBuildings()
@@ -325,7 +381,7 @@ int BuildingManager::partitionBuildings(int min, int max)
 	int pivPosX, pivPosY; // first we get the center indices
 	pivot->getCenter(&pivPosX, &pivPosY);
 	// then the world position
-	Vector2 pivPos = 
+	Vector2 pivPos =
 		m_game->getTileManager()->getTileWorldPosition(pivPosX, pivPosY);
 
 	int i = min - 1;
@@ -334,7 +390,7 @@ int BuildingManager::partitionBuildings(int min, int max)
 		// grab the numbers of the item we're comparing
 		int jPosX, jPosY; // first the indices
 		(*m_buildings)[j]->getCenter(&jPosX, &jPosY);
-		Vector2 jPos = 
+		Vector2 jPos =
 			m_game->getTileManager()->getTileWorldPosition(jPosX, jPosY);
 
 		// sort by the Y position of the center
@@ -459,6 +515,9 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		break;
 	case BUILDINGTYPE_ROAD:
 		b = new Road(m_game, xTile, yTile);
+		break;
+	case BUILDINGTYPE_HOUSE:
+		b = new House(m_game, xTile, yTile);
 		break;
 	default:
 		printf("Tried to create a building that doesn't exist! Type: %d\n",

@@ -32,6 +32,8 @@ public:
 	inline bool hasPower() { return m_hasPower; }
 	inline void givePower() { m_hasPower = true; }
 	inline void takePower() { m_hasPower = false; }
+
+	bool isLiveable(int xIndex, int yIndex);
 protected:
 	Game*			m_game;
 	aie::Texture*	m_texture;

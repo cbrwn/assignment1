@@ -137,6 +137,7 @@ void TileManager::getTileAtPosition(Vector2& pos, int* ix, int* iy)
 	px -= tw;
 	py += th;
 
+	// the inverse of the calculations in getTileWorldPosition
 	int resultX = (int)((px / tw + py / th) / 2);
 	int resultY = (int)((py / th - px / tw) / 2);
 

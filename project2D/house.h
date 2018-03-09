@@ -2,10 +2,10 @@
 
 #include "building.h"
 
-class PowerPole : public Building
+class House : public Building
 {
 public:
-	PowerPole(Game* game, int x, int y);
+	House(Game* game, int x, int y);
 
 	virtual void draw(aie::Renderer2D* renderer) override;
 };

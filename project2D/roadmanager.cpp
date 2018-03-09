@@ -120,6 +120,29 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 	return nullptr;
 }
 
+Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
+{
+	Road* closest = nullptr;
+	int closestDist = INT_MAX;
+
+	for (auto r : m_roads)
+	{
+		int rx, ry;
+		r->getPosition(&rx, &ry);
+		int xDist = (int)fabsf((float)x - rx);
+		int yDist = (int)fabsf((float)y - ry);
+
+		if (xDist < closestDist || yDist < closestDist)
+		{
+			closestDist = (int)fminf((float)xDist, (float)yDist);
+			closest = r;
+		}
+	}
+
+	*distOut = closestDist;
+	return closest;
+}
+
 void RoadManager::updateRoadTextures()
 {
 	// update road textures based on neighbouring roads
