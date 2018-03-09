@@ -71,7 +71,9 @@ bool Game::startup()
 	}
 
 	m_placeMode = PlaceMode::PLACEMODE_NONE;
-	setViewMode((ViewMode)(VIEWMODE_ZONE | VIEWMODE_BUILDINGS));
+	setViewMode((ViewMode)(VIEWMODE_ZONE |
+		VIEWMODE_BUILDINGS |
+		VIEWMODE_ROADS));
 
 	m_money = 10000;
 
