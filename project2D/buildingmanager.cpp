@@ -291,7 +291,9 @@ void BuildingManager::updateBuildings(float delta)
 		{
 			if (randBetween(0, 100) > 25)
 				continue;
-			if (b->getType() != BUILDINGTYPE_HOUSE)
+			if (b->getType() != BUILDINGTYPE_HOUSE &&
+				b->getType() != BUILDINGTYPE_FACTORY &&
+				b->getType() != BUILDINGTYPE_SHOP)
 				continue;
 			int ix, iy;
 			b->getPosition(&ix, &iy);
@@ -334,12 +336,6 @@ void BuildingManager::addBuilding(Building* build, bool sort)
 		delete build;
 		return;
 	}
-
-	/*
-	
-
-
-	*/
 
 	m_buildings->push_back(build);
 	if (sort)

@@ -36,7 +36,9 @@ UiManager::UiManager(Game* game)
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
 	{
 		// skip house, not buildable
-		if (i == BUILDINGTYPE_HOUSE)
+		if (i == BUILDINGTYPE_HOUSE
+			|| i == BUILDINGTYPE_SHOP
+			|| i == BUILDINGTYPE_FACTORY)
 		{
 			m_buildingBoxes[i] = { 0,0,-1,-1 };
 			continue;
