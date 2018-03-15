@@ -5,6 +5,14 @@
 #include "tilemanager.h"
 #include "game.h"
 
+char* Building::buildingNames[BUILDINGTYPE_COUNT] = {
+	"None",
+	"Power Plant",
+	"Power Pole",
+	"Road",
+	"House"
+};
+
 Building::Building(Game* game, int x, int y)
 	: m_game(game), m_posX(x), m_posY(y)
 {

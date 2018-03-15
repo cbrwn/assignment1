@@ -55,6 +55,8 @@ public:
 
 	inline BuildingType getType() { return m_type; }
 	inline BuildStyle getBuildStyle() { return m_buildStyle; }
+
+	static char* buildingNames[BUILDINGTYPE_COUNT];
 protected:
 	Game*			m_game;
 

@@ -201,7 +201,6 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 	// draw dragging selection
 	if (m_dragging)
 	{
-
 		renderer->setRenderColour(1, 1, 1);
 		m_game->drawTileRect(m_dragStartX, m_dragStartY, m_dragPosX, m_dragPosY);
 	}
@@ -258,6 +257,7 @@ void BuildingManager::updateBuildings(float delta)
 					continue;
 
 				Building* newHouse = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
+				newHouse->setAltitude((float)randBetween(1000, 5000));
 				addBuilding(newHouse, false);
 				newBuildings++;
 			}
@@ -341,8 +341,11 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		}
 	}
 
+	// roads need to be deleted from the road manager
 	if (toRemove->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->removeRoad(toRemove);
+
+	// remove from list and delete
 	for (BuildingList::iterator it = m_buildings->begin();
 		it != m_buildings->end(); ++it)
 	{
@@ -353,7 +356,6 @@ void BuildingManager::removeBuilding(Building* toRemove)
 			break;
 		}
 	}
-	//sortBuildings(0, (int)m_buildings->size() - 1);
 }
 
 void BuildingManager::sortBuildings()

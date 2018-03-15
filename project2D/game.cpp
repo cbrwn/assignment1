@@ -223,6 +223,7 @@ void Game::draw()
 	// draw tiles
 	Vector2 mousePos = getMouseWorldPosition();
 	Tile* mouseOver = m_tileManager->getTileAtPosition(mousePos);
+	int mouseOverX, mouseOverY;
 	// don't show mouseover stuff if the mouse is over the UI
 	if (!isMouseInGame())
 		mouseOver = nullptr;
@@ -241,7 +242,11 @@ void Game::draw()
 
 			float rg = 1.0f;
 			if (mouseOver == thisTile)
+			{
 				rg = 0.5f;
+				mouseOverX = x;
+				mouseOverY = y;
+			}
 
 			m_2dRenderer->setRenderColour(rg, rg, 1.0f);
 
@@ -318,6 +323,54 @@ void Game::draw()
 
 	getUiManager()->draw(m_2dRenderer);
 
+	// draw mouseover stuff if we need
+	Building* b = nullptr;
+	if (mouseOver)
+		b = m_buildingManager->getBuildingAtIndex(mouseOverX, mouseOverY);
+	if (b)
+	{
+		// draw mouseover stuff
+		// grab the screen position of the mouse
+		Vector2 mouseScreen = getMousePosition();
+
+		// some constants about the mouseover box
+		const int boxOffsetX = 10; // x offset from mouse
+		const int boxOffsetY = 10; // y offset from mouse
+		const int boxPadding = 8;
+
+		aie::Font* titleFont = m_uiFontLarge;
+
+		// grab info to do with the text
+		char* buildingName = Building::buildingNames[b->getType()];
+		float titleWidth = titleFont->getStringWidth(buildingName);
+		float titleHeight = titleFont->getStringHeight(buildingName);
+
+		// and the power icon
+		const int iconHeight = m_powerIcon->getHeight();
+		const int iconWidth = m_powerIcon->getWidth();
+
+		// info about the box itself
+		float boxWidth = titleWidth + (boxPadding * 2.0f);
+		float boxHeight = titleHeight + (boxPadding * 2.0f) + iconHeight;
+		float boxX = mouseScreen.getX() + boxWidth / 2.0f;
+		float boxY = mouseScreen.getY() - boxHeight / 2.0f;
+
+		m_2dRenderer->setRenderColour(0.2f, 0.2f, 0.3f, 0.8f);
+		m_2dRenderer->drawBox(boxX, boxY, boxWidth, boxHeight);
+
+		m_2dRenderer->setRenderColour(1, 1, 1);
+		m_2dRenderer->drawText(titleFont, buildingName,
+			mouseScreen.getX() + boxPadding, mouseScreen.getY() - boxPadding - titleHeight);
+
+		// power icon
+		if (mouseOver->hasPower())
+			m_2dRenderer->setRenderColour(0, 1, 0);
+		else
+			m_2dRenderer->setRenderColour(1, 0, 0);
+		m_2dRenderer->drawSprite(m_powerIcon, mouseScreen.getX() + iconWidth / 2.0f,
+			mouseScreen.getY() - iconHeight - titleHeight);
+	}
+
 	// show fps
 	char fps[32];
 	sprintf_s(fps, 32, "FPS: %i", getFPS());
@@ -376,11 +429,11 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		dragMaxY = top;
 	}
 
-	Vector2 topLeft = 
+	Vector2 topLeft =
 		m_tileManager->getTileWorldPosition(dragMinX, dragMinY);
-	Vector2 topRight = 
+	Vector2 topRight =
 		m_tileManager->getTileWorldPosition(dragMaxX + 1, dragMinY);
-	Vector2 bottomRight = 
+	Vector2 bottomRight =
 		m_tileManager->getTileWorldPosition(dragMaxX + 1, dragMaxY);
 	Vector2 bottomLeft =
 		m_tileManager->getTileWorldPosition(dragMinX, dragMaxY);
