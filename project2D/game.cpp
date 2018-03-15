@@ -377,6 +377,33 @@ void Game::draw()
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
 
+	// show demand graph
+	const float demandStartX = (float)getWindowWidth() - 32;
+	const float demandStartY = (float)getWindowHeight() - 64;
+	const unsigned int demandColours[3] = {
+		0x00ff00ff,
+		0x0000ffff,
+		0xffff00ff
+	};
+	const char demandInitials[3] = {
+		'R','C','I'
+	};
+	for (int i = 0; i < 3; i++)
+	{
+		ZoneType type = (ZoneType)(i + 1);
+		float zoneDemand = m_buildingManager->getDemand(type) - 1.0f;
+		zoneDemand *= 10.0f;
+		m_2dRenderer->setRenderColour(demandColours[i]);
+
+		float boxX = demandStartX + i * 10;
+		float boxY = demandStartY;
+
+		m_2dRenderer->drawBox(boxX, boxY + zoneDemand / 2.0f, 8, zoneDemand);
+		m_2dRenderer->setRenderColour(1, 1, 1);
+		char initial[2] = { demandInitials[i], 0 };
+		m_2dRenderer->drawText(m_uiFont, initial, boxX - 4, boxY - 12.0f);
+	}
+
 	// show screen's mouse position (as opposed to the world mouse position)
 	// just here because recording gifs on my hidpi monitor causes the pointer to
 	//   show up in the wrong place

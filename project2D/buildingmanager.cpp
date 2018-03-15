@@ -261,15 +261,23 @@ void BuildingManager::updateBuildings(float delta)
 
 				Building* newBuilding = nullptr;
 
+				const float minDemand = 1.0f;
+
 				switch (t->getZoneType())
 				{
 				case ZONETYPE_RESIDENTIAL:
+					if (getResidentialDemand() < minDemand)
+						continue;
 					newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
 					break;
 				case ZONETYPE_COMMERCIAL:
+					if (getCommercialDemand() < minDemand)
+						continue;
 					newBuilding = makeBuilding(BUILDINGTYPE_SHOP, x, y);
 					break;
 				case ZONETYPE_INDUSTRIAL:
+					if (getIndustrialDemand() < minDemand)
+						continue;
 					newBuilding = makeBuilding(BUILDINGTYPE_FACTORY, x, y);
 					break;
 				}
@@ -299,7 +307,23 @@ void BuildingManager::updateBuildings(float delta)
 			b->getPosition(&ix, &iy);
 
 			Tile* underHouse = m_game->getTileManager()->getTile(ix, iy);
-			if (underHouse->isLiveable(ix, iy))
+
+			// check if the zone type matches the building
+			bool zoneMatches = false;
+			switch (b->getType())
+			{
+			case BUILDINGTYPE_HOUSE:
+				zoneMatches = underHouse->getZoneType() == ZONETYPE_RESIDENTIAL;
+				break;
+			case BUILDINGTYPE_FACTORY:
+				zoneMatches = underHouse->getZoneType() == ZONETYPE_INDUSTRIAL;
+				break;
+			case BUILDINGTYPE_SHOP:
+				zoneMatches = underHouse->getZoneType() == ZONETYPE_COMMERCIAL;
+				break;
+			}
+
+			if (underHouse->isLiveable(ix, iy) && zoneMatches)
 				continue;
 
 			// delete this invalid house
@@ -402,9 +426,110 @@ void BuildingManager::sortBuildings()
 	});
 
 	high_resolution_clock::time_point end = high_resolution_clock::now();
-	
+
 	auto time = duration_cast<milliseconds>(end - start).count();
 	printf("Building sort took %ldms\n", (long)time);
+}
+
+float BuildingManager::getDemand(ZoneType zone)
+{
+	// send this off so other functions
+	// because I can't declare variables in switch statements :(
+
+	float result = 0.0f;
+
+	switch (zone)
+	{
+	case ZONETYPE_RESIDENTIAL:
+		result = getResidentialDemand();
+		break;
+	case ZONETYPE_COMMERCIAL:
+		result = getCommercialDemand();
+		break;
+	case ZONETYPE_INDUSTRIAL:
+		result = getIndustrialDemand();
+		break;
+	default:
+		return -1.0f;
+		break;
+	}
+
+	// raise the result to a silly power
+	// to make the differences more apparent but still comparatively the same
+	result = pow(result, 100);
+
+	// limit this result
+	const int maxDemand = 5;
+	if (result > maxDemand)
+		result = maxDemand;
+	if (result < -maxDemand)
+		result = -maxDemand;
+
+	return result;
+}
+
+const float factorySpace = 2.0f;
+const float shopSpace = 3.0f;
+
+float BuildingManager::getResidentialDemand()
+{
+	/*
+	residents will not want to move in if:
+	- there aren't enough shops
+	- there aren't enough factories(jobs)
+	*/
+	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
+	int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
+	int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
+
+	// there will always be demand if no houses exist
+	// this is to ensure there's at least enough to get started
+	if (houseCount <= 0)
+		return 1.0f;
+
+	float shopsPerResident = (shopCount / (float)houseCount) * shopSpace;
+	float jobsPerResident = factoryCount / (houseCount / factorySpace);
+
+	return (shopsPerResident + jobsPerResident) / 2.0f;
+}
+float BuildingManager::getCommercialDemand()
+{
+	/*
+	shops will not want to build if:
+	- there aren't enough residents
+	*/
+	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
+	int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
+	if (shopCount <= 0)
+		return 1.0f;
+
+	float residentsPerShop = houseCount / (shopCount * shopSpace);
+	return residentsPerShop;
+}
+float BuildingManager::getIndustrialDemand()
+{
+	/*
+	factories will not want to build if:
+	- there aren't enough workers
+	*/
+	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
+	int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
+	if (factoryCount <= 0)
+		return 1.0f;
+
+	float residentsPerJob = (houseCount / factorySpace) / (float)factoryCount;
+	return residentsPerJob;
+}
+
+int BuildingManager::getBuildingCount(BuildingType type)
+{
+	int result = 0;
+	for (auto b : *m_buildings)
+	{
+		if (b->getType() == type)
+			result++;
+	}
+	return result;
 }
 
 // returns whether or not the currently selected building can be placed at 

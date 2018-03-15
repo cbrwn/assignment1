@@ -4,12 +4,13 @@
 #include <Renderer2D.h>
 
 #define POWER_UPDATE_TIME 1
-#define HOUSE_UPDATE_TIME 3
+#define HOUSE_UPDATE_TIME 0.1f
 
 class Building;
 class Game;
 
 enum BuildingType;
+enum ZoneType;
 
 // shorten the whole vector line
 typedef std::vector<Building*> BuildingList;
@@ -38,6 +39,10 @@ public:
 	// sorty stuff
 	void sortBuildings();
 
+	// demand for zones
+	float getDemand(ZoneType zone);
+	int getBuildingCount(BuildingType type);
+
 	inline int getSelectedBuilding() { return m_selectedBuilding; }
 	inline void setSelectedBuilding(int id) { m_selectedBuilding = id; }
 
@@ -59,5 +64,9 @@ private:
 
 	float			m_powerTimer;
 	float			m_houseTimer;
+
+	float getResidentialDemand();
+	float getCommercialDemand();
+	float getIndustrialDemand();
 };
 
