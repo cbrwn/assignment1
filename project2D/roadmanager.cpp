@@ -131,11 +131,11 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 		r->getPosition(&rx, &ry);
 		int xDist = (int)fabsf((float)x - rx);
 		int yDist = (int)fabsf((float)y - ry);
-
-		if (xDist < closestDist || yDist < closestDist)
+		int totalDist = xDist + yDist;
+		if (totalDist < closestDist)
 		{
-			closestDist = (int)fminf((float)xDist, (float)yDist);
 			closest = r;
+			closestDist = totalDist;
 		}
 	}
 
