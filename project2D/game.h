@@ -122,6 +122,9 @@ protected:
 	SaveManager*		m_saveManager;
 	TileManager*		m_tileManager;
 
+	// temp
+	float m_resDemand, m_comDemand, m_indDemand;
+
 	// gameplay variables
 	PlaceMode m_placeMode;
 	ViewMode m_viewMode;

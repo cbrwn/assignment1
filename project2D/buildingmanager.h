@@ -4,7 +4,7 @@
 #include <Renderer2D.h>
 
 #define POWER_UPDATE_TIME 1
-#define HOUSE_UPDATE_TIME 0.1f
+#define HOUSE_UPDATE_TIME 0.01f
 
 class Building;
 class Game;

@@ -77,6 +77,10 @@ bool Game::startup()
 
 	m_money = 10000;
 
+	m_resDemand = 0.0f;
+	m_comDemand = 0.0f;
+	m_indDemand = 0.0f;
+
 	return true;
 }
 
@@ -117,6 +121,11 @@ void Game::update(float deltaTime)
 {
 	if (deltaTime > 0.33f)
 		deltaTime = 0.33f;
+
+	// smooth demand graph
+	m_resDemand -= (m_resDemand - m_buildingManager->getDemand(ZONETYPE_RESIDENTIAL)) * deltaTime;
+	m_comDemand -= (m_comDemand - m_buildingManager->getDemand(ZONETYPE_COMMERCIAL)) * deltaTime;
+	m_indDemand -= (m_indDemand - m_buildingManager->getDemand(ZONETYPE_INDUSTRIAL)) * deltaTime;
 
 	// update particles
 	for (auto p : m_particles)
@@ -385,14 +394,19 @@ void Game::draw()
 		0x0000ffff,
 		0xffff00ff
 	};
+	float demandValues[3] = {
+		m_resDemand,
+		m_comDemand,
+		m_indDemand
+	};
 	const char demandInitials[3] = {
 		'R','C','I'
 	};
 	for (int i = 0; i < 3; i++)
 	{
 		ZoneType type = (ZoneType)(i + 1);
-		float zoneDemand = m_buildingManager->getDemand(type) - 1.0f;
-		zoneDemand *= 10.0f;
+		float zoneDemand = demandValues[i] -1.0f;
+		zoneDemand *= 9.0f;
 		m_2dRenderer->setRenderColour(demandColours[i]);
 
 		float boxX = demandStartX + i * 10;

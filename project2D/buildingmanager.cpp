@@ -406,10 +406,6 @@ void BuildingManager::removeBuilding(Building* toRemove)
 
 void BuildingManager::sortBuildings()
 {
-	// use this for the clock stuff
-	using namespace std::chrono;
-	high_resolution_clock::time_point start = high_resolution_clock::now();
-
 	TileManager* tm = m_game->getTileManager();
 
 	std::sort(m_buildings->begin(), m_buildings->end(), [tm](Building* a, Building* b)
@@ -424,11 +420,6 @@ void BuildingManager::sortBuildings()
 
 		return aPos.getY() > bPos.getY();
 	});
-
-	high_resolution_clock::time_point end = high_resolution_clock::now();
-
-	auto time = duration_cast<milliseconds>(end - start).count();
-	printf("Building sort took %ldms\n", (long)time);
 }
 
 float BuildingManager::getDemand(ZoneType zone)
