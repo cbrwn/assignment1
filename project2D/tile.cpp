@@ -50,7 +50,7 @@ bool Tile::isLiveable(int xIndex, int yIndex)
 	if (!m_hasPower)
 		return false;
 
-	if (m_zoneType != ZONETYPE_RESIDENTIAL)
+	if (m_zoneType == ZONETYPE_NONE)
 		return false;
 
 	int roadDist;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Input.h>
 #include <algorithm>
+#include <chrono>
 
 #include "buildingmanager.h"
 #include "roadmanager.h"
@@ -160,7 +161,7 @@ void BuildingManager::buildingMode()
 		}
 		if (placed)
 		{
-			sortBuildings(0, (int)m_buildings->size() - 1);
+			sortBuildings();
 			if (m_ghostBuilding->getType() == BUILDINGTYPE_ROAD)
 				m_game->getRoadManager()->updateRoads();
 		}
@@ -256,10 +257,21 @@ void BuildingManager::updateBuildings(float delta)
 				if (b || !t->isLiveable(x, y))
 					continue;
 
-				Building* newHouse = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
-				newHouse->setAltitude((float)randBetween(1000, 5000));
-				addBuilding(newHouse, false);
-				newBuildings++;
+				Building* newBuilding = nullptr;
+
+				switch (t->getZoneType())
+				{
+				case ZONETYPE_RESIDENTIAL:
+					newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
+					break;
+				}
+
+				if (newBuilding)
+				{
+					newBuilding->setAltitude((float)randBetween(1000, 5000));
+					addBuilding(newBuilding, false);
+					newBuildings++;
+				}
 			}
 		}
 
@@ -315,9 +327,15 @@ void BuildingManager::addBuilding(Building* build, bool sort)
 		return;
 	}
 
+	/*
+	
+
+
+	*/
+
 	m_buildings->push_back(build);
 	if (sort)
-		sortBuildings(0, (int)m_buildings->size() - 1);
+		sortBuildings();
 	if (build->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->addRoad(build, sort);
 }
@@ -360,10 +378,32 @@ void BuildingManager::removeBuilding(Building* toRemove)
 
 void BuildingManager::sortBuildings()
 {
-	sortBuildings(0, (int)m_buildings->size() - 1);
+	// use this for the clock stuff
+	using namespace std::chrono;
+	high_resolution_clock::time_point start = high_resolution_clock::now();
+
+	TileManager* tm = m_game->getTileManager();
+
+	std::sort(m_buildings->begin(), m_buildings->end(), [tm](Building* a, Building* b)
+	{
+		int aCenterX, aCenterY;
+		a->getCenter(&aCenterX, &aCenterY);
+		Vector2 aPos = tm->getTileWorldPosition(aCenterX, aCenterY);
+
+		int bCenterX, bCenterY;
+		b->getCenter(&bCenterX, &bCenterY);
+		Vector2 bPos = tm->getTileWorldPosition(bCenterX, bCenterY);
+
+		return aPos.getY() > bPos.getY();
+	});
+
+	high_resolution_clock::time_point end = high_resolution_clock::now();
+	
+	auto time = duration_cast<milliseconds>(end - start).count();
+	printf("Building sort took %ldms\n", (long)time);
 }
 
-void BuildingManager::sortBuildings(int min, int max)
+/*void BuildingManager::sortBuildings(int min, int max)
 {
 	if (min < max)
 	{
@@ -410,7 +450,7 @@ int BuildingManager::partitionBuildings(int min, int max)
 	(*m_buildings)[max] = (*m_buildings)[i + 1];
 	(*m_buildings)[i + 1] = pivot;
 	return i + 1;
-}
+}*/
 
 // returns whether or not the currently selected building can be placed at 
 //   its position

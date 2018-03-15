@@ -378,6 +378,8 @@ void Game::draw()
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
 
 	// show screen's mouse position (as opposed to the world mouse position)
+	// just here because recording gifs on my hidpi monitor causes the pointer to
+	//   show up in the wrong place
 	m_2dRenderer->setRenderColour(1, 1, 1);
 	m_2dRenderer->drawCircle((float)smx, (float)smy, 4);
 
