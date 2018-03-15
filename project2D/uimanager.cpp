@@ -37,7 +37,10 @@ UiManager::UiManager(Game* game)
 	{
 		// skip house, not buildable
 		if (i == BUILDINGTYPE_HOUSE)
+		{
+			m_buildingBoxes[i] = { 0,0,-1,-1 };
 			continue;
+		}
 
 		m_buildingBoxes[i] = { currentX, m_panelY - selectBoxPadding,
 			selectBoxWidth, m_panelY - (selectBoxPadding * 2.0f) };
@@ -191,8 +194,8 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 	// draw all the boxes
 	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
 	{
-		// skip house, not buildable
-		if (i == BUILDINGTYPE_HOUSE)
+		// skip boxes for buildings that aren't buildable
+		if (m_buildingBoxes[i].width < 0)
 			continue;
 
 		Rect thisRect = m_buildingBoxes[i];

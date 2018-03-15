@@ -10,7 +10,9 @@ char* Building::buildingNames[BUILDINGTYPE_COUNT] = {
 	"Power Plant",
 	"Power Pole",
 	"Road",
-	"House"
+	"House",
+	"Shop",
+	"Factory"
 };
 
 Building::Building(Game* game, int x, int y)

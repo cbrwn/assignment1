@@ -11,10 +11,12 @@
 #include "random.h"
 
 #include "building.h"
+#include "factory.h"
 #include "house.h"
 #include "powerplant.h"
 #include "powerpole.h"
 #include "road.h"
+#include "shop.h"
 
 BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	: m_game(game), m_buildings(buildings)
@@ -264,6 +266,12 @@ void BuildingManager::updateBuildings(float delta)
 				case ZONETYPE_RESIDENTIAL:
 					newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
 					break;
+				case ZONETYPE_COMMERCIAL:
+					newBuilding = makeBuilding(BUILDINGTYPE_SHOP, x, y);
+					break;
+				case ZONETYPE_INDUSTRIAL:
+					newBuilding = makeBuilding(BUILDINGTYPE_FACTORY, x, y);
+					break;
 				}
 
 				if (newBuilding)
@@ -403,55 +411,6 @@ void BuildingManager::sortBuildings()
 	printf("Building sort took %ldms\n", (long)time);
 }
 
-/*void BuildingManager::sortBuildings(int min, int max)
-{
-	if (min < max)
-	{
-		int p = partitionBuildings(min, max);
-		// then sort either side of the partition index
-		sortBuildings(min, p - 1);
-		sortBuildings(p + 1, max);
-	}
-}
-
-// based on pseudocode from the Lomuto partition scheme:
-// https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
-int BuildingManager::partitionBuildings(int min, int max)
-{
-	// use last element as pivot
-	Building* pivot = (*m_buildings)[max];
-	// grab the numbers we'll be sorting by
-	int pivPosX, pivPosY; // first we get the center indices
-	pivot->getCenter(&pivPosX, &pivPosY);
-	// then the world position
-	Vector2 pivPos =
-		m_game->getTileManager()->getTileWorldPosition(pivPosX, pivPosY);
-
-	int i = min - 1;
-	for (int j = min; j < max; ++j)
-	{
-		// grab the numbers of the item we're comparing
-		int jPosX, jPosY; // first the indices
-		(*m_buildings)[j]->getCenter(&jPosX, &jPosY);
-		Vector2 jPos =
-			m_game->getTileManager()->getTileWorldPosition(jPosX, jPosY);
-
-		// sort by the Y position of the center
-		if (jPos.getY() > pivPos.getY())
-		{
-			i++;
-			// swaparoo
-			Building* jBuild = (*m_buildings)[j];
-			(*m_buildings)[j] = (*m_buildings)[i];
-			(*m_buildings)[i] = jBuild;
-		}
-	}
-	// put the pivot in its place
-	(*m_buildings)[max] = (*m_buildings)[i + 1];
-	(*m_buildings)[i + 1] = pivot;
-	return i + 1;
-}*/
-
 // returns whether or not the currently selected building can be placed at 
 //   its position
 bool BuildingManager::canPlaceBuilding()
@@ -561,6 +520,12 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 		break;
 	case BUILDINGTYPE_HOUSE:
 		b = new House(m_game, xTile, yTile);
+		break;
+	case BUILDINGTYPE_SHOP:
+		b = new Shop(m_game, xTile, yTile);
+		break;
+	case BUILDINGTYPE_FACTORY:
+		b = new Factory(m_game, xTile, yTile);
 		break;
 	default:
 		printf("Tried to create a building that doesn't exist! Type: %d\n",
