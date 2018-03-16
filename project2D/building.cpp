@@ -133,6 +133,9 @@ bool Building::updatePower()
 		{
 			for (int x = minX; x <= maxX; ++x)
 			{
+				if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
+					continue;
+
 				Tile* thisTile = m_game->getTileManager()->getTile(x, y);
 				if (!thisTile)
 					continue;
@@ -165,6 +168,9 @@ bool Building::updatePower()
 	{
 		for (int x = minX; x <= maxX; ++x)
 		{
+			if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
+				continue;
+
 			Tile* thisTile = m_game->getTileManager()->getTile(x, y);
 			if (!thisTile)
 				continue;

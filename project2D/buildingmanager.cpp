@@ -27,6 +27,10 @@ BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	m_houseTimer = 0;
 	m_ghostBuilding = nullptr;
 
+	m_houseCount = 0;
+	m_shopCount = 0;
+	m_factoryCount = 0;
+
 	m_dragging = false;
 }
 
@@ -265,8 +269,6 @@ void BuildingManager::updateBuildings(float delta)
 
 		int newBuildings = 0;
 
-		auto tmr = std::chrono::high_resolution_clock::now();
-
 		// grab a list of all tiles which could use buildings
 		std::vector<Tile*> zonedTiles;
 
@@ -280,16 +282,21 @@ void BuildingManager::updateBuildings(float delta)
 				zonedTiles.push_back(t);
 			}
 		}
-		std::random_shuffle(zonedTiles.begin(), zonedTiles.end());
+
+		// shuffle the tile list
+		for (int i = (int)zonedTiles.size() - 1; i > 0; --i)
+		{
+			int newIndex = rand() % (i + 1);
+			Tile* t = zonedTiles[newIndex];
+			zonedTiles[newIndex] = zonedTiles[i];
+			zonedTiles[i] = t;
+		}
+
 		int tileAmt = (int)zonedTiles.size();
 
 
 		int processed = 0;
 		int toProcess = (tileAmt / 10) + 1;
-
-			float resDemand = getResidentialDemand();
-		float comDemand = getCommercialDemand();
-		float indDemand = getIndustrialDemand();
 
 		for (auto t : zonedTiles)
 		{
@@ -307,6 +314,10 @@ void BuildingManager::updateBuildings(float delta)
 
 			Building* newBuilding = nullptr;
 
+			float resDemand = getResidentialDemand();
+			float comDemand = getCommercialDemand();
+			float indDemand = getIndustrialDemand();
+
 			const float minDemand = 1.0f;
 
 			switch (t->getZoneType())
@@ -314,19 +325,19 @@ void BuildingManager::updateBuildings(float delta)
 			case ZONETYPE_RESIDENTIAL:
 				if (resDemand < minDemand)
 					continue;
-				newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, 
+				newBuilding = makeBuilding(BUILDINGTYPE_HOUSE,
 					xIndex, yIndex);
 				break;
 			case ZONETYPE_COMMERCIAL:
 				if (comDemand < minDemand)
 					continue;
-				newBuilding = makeBuilding(BUILDINGTYPE_SHOP, 
+				newBuilding = makeBuilding(BUILDINGTYPE_SHOP,
 					xIndex, yIndex);
 				break;
 			case ZONETYPE_INDUSTRIAL:
 				if (indDemand < minDemand)
 					continue;
-				newBuilding = makeBuilding(BUILDINGTYPE_FACTORY, 
+				newBuilding = makeBuilding(BUILDINGTYPE_FACTORY,
 					xIndex, yIndex);
 				break;
 			}
@@ -339,10 +350,6 @@ void BuildingManager::updateBuildings(float delta)
 				processed++;
 			}
 		}
-		auto t2 = std::chrono::high_resolution_clock::now();
-		auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - tmr);
-
-		printf("building processing: %lld\n", d.count());
 
 		if (newBuildings > 0)
 			sortBuildings();
@@ -430,6 +437,19 @@ void BuildingManager::addBuilding(Building* build, bool sort)
 		sortBuildings();
 	if (build->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->addRoad(build, sort);
+
+	switch (build->getType())
+	{
+	case BUILDINGTYPE_HOUSE:
+		m_houseCount++;
+		break;
+	case BUILDINGTYPE_SHOP:
+		m_shopCount++;
+		break;
+	case BUILDINGTYPE_FACTORY:
+		m_factoryCount++;
+		break;
+	}
 }
 
 // called when the player places a building
@@ -449,7 +469,7 @@ void BuildingManager::placeBuilding(Building* build, bool sort)
 	}
 
 	addBuilding(build, sort);
-	m_game->addMoney(-build->getPrice());
+	//m_game->addMoney(-build->getPrice());
 
 	char ptext[16];
 	sprintf_s(ptext, 16, "-$%d", build->getPrice());
@@ -482,13 +502,30 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		m_game->getRoadManager()->removeRoad(toRemove);
 
 	// remove from list and delete
+	bool wasDeleted = false;
 	for (BuildingList::iterator it = m_buildings->begin();
 		it != m_buildings->end(); ++it)
 	{
 		if (*it == toRemove)
 		{
+			// keep track of houses, shops and factories before we delete!
+
+			switch (toRemove->getType())
+			{
+			case BUILDINGTYPE_HOUSE:
+				m_houseCount--;
+				break;
+			case BUILDINGTYPE_SHOP:
+				m_shopCount--;
+				break;
+			case BUILDINGTYPE_FACTORY:
+				m_factoryCount--;
+				break;
+			}
+
 			delete *it;
 			m_buildings->erase(it);
+			wasDeleted = true;
 			break;
 		}
 	}
@@ -559,17 +596,13 @@ float BuildingManager::getResidentialDemand()
 	- there aren't enough shops
 	- there aren't enough factories(jobs)
 	*/
-	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
-	int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
-	int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
-
 	// there will always be demand if no houses exist
 	// this is to ensure there's at least enough to get started
-	if (houseCount <= 0)
+	if (m_houseCount <= 0)
 		return 10.0f;
 
-	float shopsPerResident = (shopCount / (float)houseCount) * shopSpace;
-	float jobsPerResident = factoryCount / (houseCount / factorySpace);
+	float shopsPerResident = (m_shopCount / (float)m_houseCount) * shopSpace;
+	float jobsPerResident = m_factoryCount / (m_houseCount / factorySpace);
 
 	return (shopsPerResident + jobsPerResident) / 2.0f;
 }
@@ -579,12 +612,10 @@ float BuildingManager::getCommercialDemand()
 	shops will not want to build if:
 	- there aren't enough residents
 	*/
-	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
-	int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
-	if (shopCount <= 0)
+	if (m_shopCount <= 0)
 		return 10.0f;
 
-	float residentsPerShop = houseCount / (shopCount * shopSpace);
+	float residentsPerShop = m_houseCount / (m_shopCount * shopSpace);
 	return residentsPerShop;
 }
 float BuildingManager::getIndustrialDemand()
@@ -593,12 +624,10 @@ float BuildingManager::getIndustrialDemand()
 	factories will not want to build if:
 	- there aren't enough workers
 	*/
-	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
-	int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
-	if (factoryCount <= 0)
+	if (m_factoryCount <= 0)
 		return 10.0f;
 
-	float residentsPerJob = (houseCount / factorySpace) / (float)factoryCount;
+	float residentsPerJob = (m_houseCount / factorySpace) / (float)m_factoryCount;
 	return residentsPerJob;
 }
 

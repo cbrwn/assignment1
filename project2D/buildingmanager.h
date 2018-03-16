@@ -66,6 +66,7 @@ private:
 	float			m_powerTimer;
 	float			m_houseTimer;
 
+	int m_houseCount, m_shopCount, m_factoryCount;
 	float getResidentialDemand();
 	float getCommercialDemand();
 	float getIndustrialDemand();
