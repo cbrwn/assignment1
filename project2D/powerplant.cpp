@@ -14,6 +14,8 @@ PowerPlant::PowerPlant(Game* game, int x, int y)
 	m_powerSpreadRange = 3;
 	m_producesPower = true;
 
+	m_price = 1000;
+
 	m_texture = game->getImageManager()->getTexture("buildings/powerplant");
 }
 

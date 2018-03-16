@@ -19,6 +19,16 @@ UiManager::UiManager(Game* game)
 	m_zonePanelDestY = -50;
 	m_zonePanelY = m_zonePanelDestY;
 
+	m_demandGraphPos.setX((float)m_game->getWindowWidth() - 32.0f);
+	m_demandGraphPos.setY((float)m_game->getWindowHeight() - 64.0f);
+	m_mouseOverGraph = false;
+
+	m_resDemand = 0.0f;
+	m_comDemand = 0.0f;
+	m_indDemand = 0.0f;
+
+	m_moneyFlashTime = 0.0f;
+
 	// make all the rects for selection boxes
 	const float selectBoxWidth = 86.0f;
 	const float selectBoxPadding = 16.0f;
@@ -94,6 +104,9 @@ void UiManager::update(float delta)
 		delta * smoothSpeed;
 	m_zonePanelY -= (m_zonePanelY - m_zonePanelDestY) * delta * smoothSpeed;
 
+	if (m_moneyFlashTime > 0.0f)
+		m_moneyFlashTime -= delta;
+
 	// do input
 	aie::Input* input = aie::Input::getInstance();
 	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
@@ -130,8 +143,28 @@ void UiManager::update(float delta)
 		}
 	}
 
+	// check to see if mouse is over the demand graph
+	// so we can show the mouseover box to explain it
+	Rect demandGraphRect = {
+		m_demandGraphPos.getX() - 10.0f,
+		m_demandGraphPos.getY() - 10.0f,
+		39.0f, // bad hardcoded size of the demand graph
+		24.0f
+	};
+	m_mouseOverGraph = isMouseInRect(demandGraphRect, 0.0f);
+
 	// make sure the selector box is always at the top of the screen
 	m_selectorBox.y = m_game->getWindowHeight() - m_selectorBox.height / 2.0f;
+
+	// smooth the demand values
+	const float demandSmoothSpeed = 10.0f;
+	BuildingManager* bm = m_game->getBuildingManager();
+	m_resDemand -= (m_resDemand - bm->getDemand(ZONETYPE_RESIDENTIAL)) 
+		* delta * demandSmoothSpeed;
+	m_comDemand -= (m_comDemand - bm->getDemand(ZONETYPE_COMMERCIAL))
+		* delta * demandSmoothSpeed;;
+	m_indDemand -= (m_indDemand - bm->getDemand(ZONETYPE_INDUSTRIAL))
+		* delta * demandSmoothSpeed;;
 }
 
 void UiManager::draw(aie::Renderer2D* renderer)
@@ -141,6 +174,8 @@ void UiManager::draw(aie::Renderer2D* renderer)
 		drawBuildingPanel(renderer);
 	if (m_zonePanelY >= 0.0f)
 		drawZonePanel(renderer);
+
+	drawDemandGraph(renderer);
 
 	// draw selector box
 	renderer->setRenderColour(m_panelColour);
@@ -157,6 +192,23 @@ void UiManager::draw(aie::Renderer2D* renderer)
 		buildingIconX, m_selectorBox.y);
 	float zoneIconX = m_selectorBox.x + (m_selectorBox.width / 4.0f);
 	renderer->drawSprite(m_zoneSelectorIcon, zoneIconX, m_selectorBox.y);
+
+	if (m_mouseOverGraph)
+		drawDemandMouseover(renderer);
+
+	// show money
+	aie::Font* moneyFont = m_game->m_uiFontLarge;
+	char mny[32];
+	sprintf_s(mny, 32, "$%d", m_game->getMoney());
+
+	float moneyWidth = moneyFont->getStringWidth(mny);
+	if(m_moneyFlashTime > 0 && (int)(m_moneyFlashTime*10) % 2 == 0)
+		renderer->setRenderColour(0.8f, 0, 0);
+	else
+		renderer->setRenderColour(0, 0.4f, 0);
+	renderer->drawText(moneyFont, mny,
+		m_game->getWindowWidth() - moneyWidth - 2, 
+		m_game->getWindowHeight() - 18.0f);
 }
 
 void UiManager::setShownPanel(int panel)
@@ -177,6 +229,12 @@ bool UiManager::isMouseOverUi()
 	int mx, my;
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
 	return (my < m_zonePanelY || my < m_buildingPanelY);
+}
+
+void UiManager::flashMoney()
+{
+	if(m_moneyFlashTime <= 0.0f)
+		m_moneyFlashTime = 1.0f;
 }
 
 void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
@@ -270,6 +328,84 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 		renderer->drawText(m_game->m_uiFont, m_zoneNames[i],
 			xPos - stringWidth / 2.0f, yPos - thisRect.height / 2.5f);
 	}
+}
+
+void UiManager::drawDemandGraph(aie::Renderer2D* renderer)
+{
+	const float columnWidth = 10.0f;
+	const float barWidth = 0.8f * columnWidth;
+
+	// stick these values in arrays to make drawing super easy
+	const unsigned int demandColours[3] = {
+		0x00ff00ff,
+		0x0000ffff,
+		0xffff00ff
+	};
+	float demandValues[3] = {
+		m_resDemand,
+		m_comDemand,
+		m_indDemand
+	};
+	const char demandInitials[3] = {
+		'R','C','I'
+	};
+
+	// box to put behind graph
+	float boxWidth = columnWidth * 3.0f + barWidth/2.0f;
+	float boxHeight = 56.0f;
+	renderer->setRenderColour(0.4f, 0.4f, 0.4f);
+	renderer->drawBox(m_demandGraphPos.getX() + boxWidth/2.0f - barWidth + 1, 
+		m_demandGraphPos.getY() + boxHeight/2.0f - 16.0f,
+		boxWidth, boxHeight);
+
+	for (int i = 0; i < 3; i++)
+	{
+		ZoneType type = (ZoneType)(i + 1);
+		float zoneDemand = demandValues[i] - 1.0f;
+		zoneDemand *= 9.0f;
+
+		float boxX = m_demandGraphPos.getX() + i * columnWidth;
+		float boxY = m_demandGraphPos.getY();
+
+		renderer->setRenderColour(demandColours[i]);
+		renderer->drawBox(boxX, boxY + zoneDemand / 2.0f, barWidth, zoneDemand);
+		
+		// move the I a little to the right so it looks centered since it's
+		//   so thin
+		if (demandInitials[i] == 'I')
+			boxX += 2.0f;
+
+		renderer->setRenderColour(1, 1, 1);
+		// turn the initial to a null-terminated string
+		char initial[2] = { demandInitials[i], 0 };
+		renderer->drawText(m_game->m_uiFont, initial, boxX - 4, boxY - 12.0f);
+	}
+}
+
+void UiManager::drawDemandMouseover(aie::Renderer2D* renderer)
+{
+	const char text[32] = "Demand for each type of zone";
+
+	// grab all the values we'll use to draw the box
+	const float textWidth = m_game->m_uiFont->getStringWidth(text);
+	const float textHeight = m_game->m_uiFont->getStringHeight(text);
+
+	const float boxPadding = 4.0f;
+	const float boxWidth = textWidth + boxPadding * 2.0f;
+	const float boxHeight = textHeight + boxPadding * 2.0f;
+
+	const float boxX = m_demandGraphPos.getX() - boxWidth/2.0f + 28.0f;
+	const float boxY = m_demandGraphPos.getY() + boxHeight/2.0f - 38.0f;
+
+	const float textX = boxX - textWidth / 2.0f;
+	const float textY = boxY - textHeight / 4.0f;
+
+	// now we can draw everything!
+	renderer->setRenderColour(0.3f, 0.3f, 0.3f, 0.8f);
+	renderer->drawBox(boxX, boxY, boxWidth, boxHeight);
+
+	renderer->setRenderColour(1, 1, 1);
+	renderer->drawText(m_game->m_uiFont, text, textX, textY);
 }
 
 // toggles the panel clicked on using the selector box

@@ -17,9 +17,9 @@
 
 #include "tile.h"
 #include "particle.h"
+#include "pollutionparticle.h"
 #include "smokeparticle.h"
-
-#include "road.h"
+#include "textparticle.h"
 
 Game::Game()
 {
@@ -49,7 +49,7 @@ bool Game::startup()
 	m_saveManager = new SaveManager(this);
 	m_tileManager = new TileManager(this, &m_tiles);
 
-	//m_camera->setScale(1.3f);
+	m_camera->setScale(1.0f);
 
 	m_font = new aie::Font("./font/consolas.ttf", 32);
 	m_uiFont = new aie::Font("./font/roboto.ttf", 16);
@@ -75,11 +75,7 @@ bool Game::startup()
 		VIEWMODE_BUILDINGS |
 		VIEWMODE_ROADS));
 
-	m_money = 10000;
-
-	m_resDemand = 0.0f;
-	m_comDemand = 0.0f;
-	m_indDemand = 0.0f;
+	m_money = 2000;
 
 	return true;
 }
@@ -122,32 +118,22 @@ void Game::update(float deltaTime)
 	if (deltaTime > 0.33f)
 		deltaTime = 0.33f;
 
-	// smooth demand graph
-	m_resDemand -= (m_resDemand - m_buildingManager->getDemand(ZONETYPE_RESIDENTIAL)) * deltaTime;
-	m_comDemand -= (m_comDemand - m_buildingManager->getDemand(ZONETYPE_COMMERCIAL)) * deltaTime;
-	m_indDemand -= (m_indDemand - m_buildingManager->getDemand(ZONETYPE_INDUSTRIAL)) * deltaTime;
-
 	// update particles
 	for (auto p : m_particles)
 		p->update(deltaTime);
 
 	// delete any particles that need it
-	bool didDelete = true;
-	while (didDelete)
+	for (ParticleList::iterator it = m_particles.begin();
+		it != m_particles.end();)
 	{
-		didDelete = false;
-		for (ParticleList::iterator it = m_particles.begin();
-			it != m_particles.end(); ++it)
+		Particle* thisParticle = *it;
+		if (thisParticle && thisParticle->getOpacity() <= 0)
 		{
-			Particle* thisParticle = *it;
-			if (thisParticle && thisParticle->getOpacity() <= 0)
-			{
-				delete *it;
-				m_particles.erase(it);
-				didDelete = true;
-				break;
-			}
+			delete *it;
+			it = m_particles.erase(it);
+			continue;
 		}
+		it++;
 	}
 
 	aie::Input* input = aie::Input::getInstance();
@@ -322,14 +308,6 @@ void Game::draw()
 	// hud stuff
 	//===========
 
-	// show money
-	char mny[32];
-	sprintf_s(mny, 32, "$%d", m_money);
-	float moneyWidth = m_uiFontLarge->getStringWidth(mny);
-	m_2dRenderer->setRenderColour(0, 0.4f, 0);
-	m_2dRenderer->drawText(m_uiFontLarge, mny,
-		getWindowWidth() - moneyWidth - 2, (float)getWindowHeight() - 18);
-
 	getUiManager()->draw(m_2dRenderer);
 
 	// draw mouseover stuff if we need
@@ -385,38 +363,6 @@ void Game::draw()
 	sprintf_s(fps, 32, "FPS: %i", getFPS());
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
-
-	// show demand graph
-	const float demandStartX = (float)getWindowWidth() - 32;
-	const float demandStartY = (float)getWindowHeight() - 64;
-	const unsigned int demandColours[3] = {
-		0x00ff00ff,
-		0x0000ffff,
-		0xffff00ff
-	};
-	float demandValues[3] = {
-		m_resDemand,
-		m_comDemand,
-		m_indDemand
-	};
-	const char demandInitials[3] = {
-		'R','C','I'
-	};
-	for (int i = 0; i < 3; i++)
-	{
-		ZoneType type = (ZoneType)(i + 1);
-		float zoneDemand = demandValues[i] -1.0f;
-		zoneDemand *= 9.0f;
-		m_2dRenderer->setRenderColour(demandColours[i]);
-
-		float boxX = demandStartX + i * 10;
-		float boxY = demandStartY;
-
-		m_2dRenderer->drawBox(boxX, boxY + zoneDemand / 2.0f, 8, zoneDemand);
-		m_2dRenderer->setRenderColour(1, 1, 1);
-		char initial[2] = { demandInitials[i], 0 };
-		m_2dRenderer->drawText(m_uiFont, initial, boxX - 4, boxY - 12.0f);
-	}
 
 	// show screen's mouse position (as opposed to the world mouse position)
 	// just here because recording gifs on my hidpi monitor causes the pointer to
@@ -525,6 +471,18 @@ void Game::toggleViewMode(ViewMode mode)
 void Game::spawnSmokeParticle(Vector2& pos)
 {
 	auto p = new SmokeParticle(this, pos);
+	m_particles.push_back(p);
+}
+
+void Game::spawnPollutionParticle(Vector2& pos)
+{
+	auto p = new PollutionParticle(this, pos);
+	m_particles.push_back(p);
+}
+
+void Game::spawnTextParticle(Vector2& pos, std::string text)
+{
+	auto p = new TextParticle(this, pos, text);
 	m_particles.push_back(p);
 }
 

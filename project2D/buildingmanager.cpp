@@ -9,6 +9,7 @@
 #include "tile.h"
 #include "tilemanager.h"
 #include "random.h"
+#include "uimanager.h"
 
 #include "building.h"
 #include "factory.h"
@@ -153,7 +154,7 @@ void BuildingManager::buildingMode()
 				Building* newBuilding =
 					makeBuilding(m_ghostBuilding->getType(), x, y);
 				newBuilding->setAltitude(altitude);
-				addBuilding(newBuilding, false);
+				placeBuilding(newBuilding, false);
 
 				altitude += 500.0f;
 
@@ -176,7 +177,7 @@ void BuildingManager::buildingMode()
 		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_SINGLE)
 	{
 		// place building!
-		addBuilding(makeBuilding((BuildingType)m_selectedBuilding,
+		placeBuilding(makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY));
 		// cancel building mode if shift isn't held
 		// so player can place multiple buildings easily by holding shift
@@ -241,6 +242,11 @@ void BuildingManager::updateBuildings(float delta)
 	m_houseTimer -= delta;
 	if (m_houseTimer <= 0)
 	{
+		// get demand values for use in the loop
+		float resDemand = getResidentialDemand();
+		float comDemand = getCommercialDemand();
+		float indDemand = getIndustrialDemand();
+
 		int newBuildings = 0;
 		// update population stuff
 		for (int y = 0; y < WORLD_HEIGHT; ++y)
@@ -266,17 +272,17 @@ void BuildingManager::updateBuildings(float delta)
 				switch (t->getZoneType())
 				{
 				case ZONETYPE_RESIDENTIAL:
-					if (getResidentialDemand() < minDemand)
+					if (resDemand < minDemand)
 						continue;
 					newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
 					break;
 				case ZONETYPE_COMMERCIAL:
-					if (getCommercialDemand() < minDemand)
+					if (comDemand < minDemand)
 						continue;
 					newBuilding = makeBuilding(BUILDINGTYPE_SHOP, x, y);
 					break;
 				case ZONETYPE_INDUSTRIAL:
-					if (getIndustrialDemand() < minDemand)
+					if (indDemand < minDemand)
 						continue;
 					newBuilding = makeBuilding(BUILDINGTYPE_FACTORY, x, y);
 					break;
@@ -315,11 +321,11 @@ void BuildingManager::updateBuildings(float delta)
 			case BUILDINGTYPE_HOUSE:
 				zoneMatches = underHouse->getZoneType() == ZONETYPE_RESIDENTIAL;
 				break;
-			case BUILDINGTYPE_FACTORY:
-				zoneMatches = underHouse->getZoneType() == ZONETYPE_INDUSTRIAL;
-				break;
 			case BUILDINGTYPE_SHOP:
 				zoneMatches = underHouse->getZoneType() == ZONETYPE_COMMERCIAL;
+				break;
+			case BUILDINGTYPE_FACTORY:
+				zoneMatches = underHouse->getZoneType() == ZONETYPE_INDUSTRIAL;
 				break;
 			}
 
@@ -329,6 +335,17 @@ void BuildingManager::updateBuildings(float delta)
 			// delete this invalid house
 			removeBuilding(b);
 		}
+
+		// make money from buildings
+		int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
+		int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
+		
+		const float moneyPerFactory = 5.0f;
+		const float moneyPerShop = 1.0f;
+
+		float newMoney = moneyPerFactory * factoryCount;
+		newMoney += moneyPerShop * shopCount;
+		m_game->addMoney((int)newMoney);
 
 		m_houseTimer = HOUSE_UPDATE_TIME + (randBetween(-1.0f, 1.0f) * HOUSE_UPDATE_TIME * 0.5f);
 	}
@@ -366,6 +383,32 @@ void BuildingManager::addBuilding(Building* build, bool sort)
 		sortBuildings();
 	if (build->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->addRoad(build, sort);
+}
+
+// called when the player places a building
+void BuildingManager::placeBuilding(Building* build, bool sort)
+{
+	int buildingPrice = build->getPrice();
+	if (m_game->getMoney() < buildingPrice)
+	{
+		// oh no you're too poor
+		// so we'll turn the money red so you know how poor you are
+		m_game->getUiManager()->flashMoney();
+
+		// and then get rid of your building
+		delete build;
+		// you disgusting poor person
+		return;
+	}
+
+	addBuilding(build, sort);
+	m_game->addMoney(-build->getPrice());
+
+	char ptext[16];
+	sprintf_s(ptext, 16, "-$%d", build->getPrice());
+
+	Vector2 spawnPos = build->getWorldPosition();
+	m_game->spawnTextParticle(spawnPos, ptext);
 }
 
 void BuildingManager::removeBuilding(Building* toRemove)
@@ -530,6 +573,15 @@ bool BuildingManager::canPlaceBuilding()
 	if (!m_ghostBuilding)
 		return false;
 
+	// check its price
+	int thisPrice = m_ghostBuilding->getPrice();
+	int currentMoney = m_game->getMoney();
+	if (currentMoney < thisPrice)
+	{
+		m_game->getUiManager()->flashMoney();
+		return false;
+	}
+
 	// grab building's position
 	int buildingRight, buildingBottom;
 	m_ghostBuilding->getPosition(&buildingRight, &buildingBottom);
@@ -647,5 +699,6 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 
 	if (ghost)
 		b->setAltitude(0);
+
 	return b;
 }

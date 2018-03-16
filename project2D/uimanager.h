@@ -28,6 +28,7 @@ public:
 	void setShownPanel(int panel);
 
 	bool isMouseOverUi();
+	void flashMoney();
 private:
 	Game* m_game;
 
@@ -43,6 +44,15 @@ private:
 	float m_buildingPanelY, m_buildingPanelDestY;
 	float m_zonePanelY, m_zonePanelDestY;
 
+	// demand graph position
+	Vector2 m_demandGraphPos;
+	bool m_mouseOverGraph;
+	// local values of zone type demand so we can smooth them
+	float m_resDemand, m_comDemand, m_indDemand;
+
+	// used to turn money red to bring attention to it
+	float m_moneyFlashTime;
+
 	Rect m_zoneBoxes[ZONETYPE_COUNT];
 	Rect m_buildingBoxes[BUILDINGTYPE_COUNT];
 
@@ -57,6 +67,9 @@ private:
 
 	void drawBuildingPanel(aie::Renderer2D* renderer);
 	void drawZonePanel(aie::Renderer2D* renderer);
+
+	void drawDemandGraph(aie::Renderer2D* renderer);
+	void drawDemandMouseover(aie::Renderer2D* renderer);
 
 	void selectorBoxClicked(int panel);
 

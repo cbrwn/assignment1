@@ -28,6 +28,9 @@ Building::Building(Game* game, int x, int y)
 	m_producesPower = false;
 	m_shakesCamera = true;
 
+	// default price is too expensive to buy
+	m_price = INT_MAX;
+
 	// grab the world position
 	m_worldPos = 
 		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);

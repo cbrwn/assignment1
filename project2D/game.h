@@ -56,6 +56,13 @@ public:
 	Game();
 	virtual ~Game();
 
+	// we don't expect Game to be copied/moved
+	Game(const Game& game)       = default;
+	Game(Game&& game)            = default;
+	Game& operator=(Game& game)  = default;
+	Game& operator=(Game&& game) = default;
+
+
 	aie::Font* m_uiFont;
 	aie::Font* m_uiFontLarge;
 
@@ -91,6 +98,8 @@ public:
 
 	// particle stuff
 	void spawnSmokeParticle(Vector2& pos);
+	void spawnPollutionParticle(Vector2& pos);
+	void spawnTextParticle(Vector2& pos, std::string text);
 	void doScreenShake(float amt);
 
 	// getters for all of the managers
@@ -121,9 +130,6 @@ protected:
 	RoadManager*		m_roadManager;
 	SaveManager*		m_saveManager;
 	TileManager*		m_tileManager;
-
-	// temp
-	float m_resDemand, m_comDemand, m_indDemand;
 
 	// gameplay variables
 	PlaceMode m_placeMode;

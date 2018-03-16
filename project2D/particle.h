@@ -11,7 +11,7 @@ public:
 	Particle(Game* game, Vector2& pos);
 
 	virtual void update(float delta) = 0;
-	void draw(aie::Renderer2D* renderer);
+	virtual void draw(aie::Renderer2D* renderer);
 
 	inline float getOpacity() { return m_opacity; }
 protected:

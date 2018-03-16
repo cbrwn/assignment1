@@ -171,6 +171,7 @@
     <ClCompile Include="imagemanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="particle.cpp" />
+    <ClCompile Include="pollutionparticle.cpp" />
     <ClCompile Include="powerplant.cpp" />
     <ClCompile Include="powerpole.cpp" />
     <ClCompile Include="random.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="savemanager.cpp" />
     <ClCompile Include="shop.cpp" />
     <ClCompile Include="smokeparticle.cpp" />
+    <ClCompile Include="textparticle.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="uimanager.cpp" />
     <ClCompile Include="vector2.cpp" />
@@ -193,6 +195,7 @@
     <ClInclude Include="house.h" />
     <ClInclude Include="imagemanager.h" />
     <ClInclude Include="particle.h" />
+    <ClInclude Include="pollutionparticle.h" />
     <ClInclude Include="powerplant.h" />
     <ClInclude Include="powerpole.h" />
     <ClInclude Include="random.h" />
@@ -201,6 +204,7 @@
     <ClInclude Include="savemanager.h" />
     <ClInclude Include="shop.h" />
     <ClInclude Include="smokeparticle.h" />
+    <ClInclude Include="textparticle.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="uimanager.h" />
     <ClInclude Include="vector2.h" />

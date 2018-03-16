@@ -102,6 +102,12 @@
     <ClCompile Include="factory.cpp">
       <Filter>Source Files\buildings</Filter>
     </ClCompile>
+    <ClCompile Include="pollutionparticle.cpp">
+      <Filter>Source Files\particles</Filter>
+    </ClCompile>
+    <ClCompile Include="textparticle.cpp">
+      <Filter>Source Files\particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -163,6 +169,12 @@
     </ClInclude>
     <ClInclude Include="factory.h">
       <Filter>Header Files\buildings</Filter>
+    </ClInclude>
+    <ClInclude Include="pollutionparticle.h">
+      <Filter>Header Files\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="textparticle.h">
+      <Filter>Header Files\particles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

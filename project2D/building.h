@@ -48,6 +48,7 @@ public:
 	void getCenter(int* x, int* y);
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
 	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
+	inline Vector2 getWorldPosition() { return m_worldPos; }
 
 	// silly dropping stuff
 	inline void setAltitude(float alt) { m_altitude = alt; }
@@ -57,6 +58,8 @@ public:
 
 	inline BuildingType getType() { return m_type; }
 	inline BuildStyle getBuildStyle() { return m_buildStyle; }
+
+	inline int getPrice() { return m_price; }
 
 	static char* buildingNames[BUILDINGTYPE_COUNT];
 protected:
@@ -76,6 +79,7 @@ protected:
 	int				m_powerSearchRange; // how far this building looks for power
 	bool			m_producesPower;
 	bool			m_hasPower;
+	int				m_price;
 
 	BuildingType	m_type;
 	BuildStyle		m_buildStyle;

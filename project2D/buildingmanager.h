@@ -4,7 +4,7 @@
 #include <Renderer2D.h>
 
 #define POWER_UPDATE_TIME 1
-#define HOUSE_UPDATE_TIME 0.01f
+#define HOUSE_UPDATE_TIME 3
 
 class Building;
 class Game;
@@ -34,6 +34,7 @@ public:
 	void updateBuildings(float delta);
 	void drawBuildings(aie::Renderer2D* renderer);
 	void addBuilding(Building* build, bool sort = true);
+	void placeBuilding(Building* build, bool sort = true);
 	void removeBuilding(Building* toRemove);
 
 	// sorty stuff

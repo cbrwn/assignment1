@@ -13,6 +13,8 @@ PowerPole::PowerPole(Game* game, int x, int y)
 	m_powerSearchRange = 3;
 	m_powerSpreadRange = 3;
 
+	m_price = 5;
+
 	m_texture = m_game->getImageManager()->getTexture("buildings/powerpole");
 }
 

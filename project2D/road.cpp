@@ -7,6 +7,8 @@ Road::Road(Game* game, int x, int y)
 {
 	m_texture = m_game->getImageManager()->getTexture("buildings/road_right");
 
+	m_price = 10;
+
 	m_type = BUILDINGTYPE_ROAD;
 	m_buildStyle = BUILDSTYLE_LINE;
 }
