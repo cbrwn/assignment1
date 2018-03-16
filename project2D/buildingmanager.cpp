@@ -193,6 +193,25 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 {
 	if (m_ghostBuilding)
 	{
+		// draw the range of the power grabbygrab
+		if (m_ghostBuilding->getPowerSearch() > 0)
+		{
+			int sizeX, sizeY;
+			m_ghostBuilding->getSize(&sizeX, &sizeY);
+			sizeX--; sizeY--;
+			int posX, posY;
+			m_ghostBuilding->getPosition(&posX, &posY);
+
+			// grab the bounds of the rectangle we're going to show
+			int left = posX - sizeX - m_ghostBuilding->getPowerSearch();
+			int right = posX + m_ghostBuilding->getPowerSearch();
+			int top = posY - sizeY - m_ghostBuilding->getPowerSearch();
+			int bottom = posY + m_ghostBuilding->getPowerSearch();
+
+			renderer->setRenderColour(1, 1, 0, 0.2f);
+			m_game->drawTileRect(left, top, right, bottom);
+		}
+
 		const float alpha = 0.4f;
 		// tint green if we can place
 		if (canPlaceBuilding())
@@ -243,59 +262,87 @@ void BuildingManager::updateBuildings(float delta)
 	if (m_houseTimer <= 0)
 	{
 		// get demand values for use in the loop
-		float resDemand = getResidentialDemand();
-		float comDemand = getCommercialDemand();
-		float indDemand = getIndustrialDemand();
 
 		int newBuildings = 0;
-		// update population stuff
+
+		auto tmr = std::chrono::high_resolution_clock::now();
+
+		// grab a list of all tiles which could use buildings
+		std::vector<Tile*> zonedTiles;
+
 		for (int y = 0; y < WORLD_HEIGHT; ++y)
 		{
 			for (int x = 0; x < WORLD_WIDTH; ++x)
 			{
-				if (randBetween(0, 100) > 1)
-					continue;
-				// a tile is randomly chosen to update
 				Tile* t = m_game->getTileManager()->getTile(x, y);
-
-				// check the building on the tile
-				Building* b = getBuildingAtIndex(x, y);
-
-				// only want to spawn new houses in this loop
-				if (b || !t->isLiveable(x, y))
+				if (t->getZoneType() == ZONETYPE_NONE)
 					continue;
-
-				Building* newBuilding = nullptr;
-
-				const float minDemand = 1.0f;
-
-				switch (t->getZoneType())
-				{
-				case ZONETYPE_RESIDENTIAL:
-					if (resDemand < minDemand)
-						continue;
-					newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, x, y);
-					break;
-				case ZONETYPE_COMMERCIAL:
-					if (comDemand < minDemand)
-						continue;
-					newBuilding = makeBuilding(BUILDINGTYPE_SHOP, x, y);
-					break;
-				case ZONETYPE_INDUSTRIAL:
-					if (indDemand < minDemand)
-						continue;
-					newBuilding = makeBuilding(BUILDINGTYPE_FACTORY, x, y);
-					break;
-				}
-
-				if (newBuilding)
-				{
-					newBuilding->setAltitude((float)randBetween(1000, 5000));
-					addBuilding(newBuilding, false);
-					newBuildings++;
-				}
+				zonedTiles.push_back(t);
 			}
 		}
+		std::random_shuffle(zonedTiles.begin(), zonedTiles.end());
+		int tileAmt = (int)zonedTiles.size();
+
+
+		int processed = 0;
+		int toProcess = (tileAmt / 10) + 1;
+
+			float resDemand = getResidentialDemand();
+		float comDemand = getCommercialDemand();
+		float indDemand = getIndustrialDemand();
+
+		for (auto t : zonedTiles)
+		{
+			if (processed >= toProcess)
+				break;
+
+			int xIndex, yIndex;
+			t->getIndices(&xIndex, &yIndex);
+
+			if (getBuildingAtIndex(xIndex, yIndex))
+				continue;
+
+			if (!t->isLiveable())
+				continue;
+
+			Building* newBuilding = nullptr;
+
+			const float minDemand = 1.0f;
+
+			switch (t->getZoneType())
+			{
+			case ZONETYPE_RESIDENTIAL:
+				if (resDemand < minDemand)
+					continue;
+				newBuilding = makeBuilding(BUILDINGTYPE_HOUSE, 
+					xIndex, yIndex);
+				break;
+			case ZONETYPE_COMMERCIAL:
+				if (comDemand < minDemand)
+					continue;
+				newBuilding = makeBuilding(BUILDINGTYPE_SHOP, 
+					xIndex, yIndex);
+				break;
+			case ZONETYPE_INDUSTRIAL:
+				if (indDemand < minDemand)
+					continue;
+				newBuilding = makeBuilding(BUILDINGTYPE_FACTORY, 
+					xIndex, yIndex);
+				break;
+			}
+
+			if (newBuilding)
+			{
+				newBuilding->setAltitude((float)randBetween(1000, 5000));
+				addBuilding(newBuilding, false);
+				newBuildings++;
+				processed++;
+			}
+		}
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - tmr);
+
+		printf("building processing: %lld\n", d.count());
 
 		if (newBuildings > 0)
 			sortBuildings();
@@ -329,7 +376,7 @@ void BuildingManager::updateBuildings(float delta)
 				break;
 			}
 
-			if (underHouse->isLiveable(ix, iy) && zoneMatches)
+			if (underHouse->isLiveable() && zoneMatches)
 				continue;
 
 			// delete this invalid house
@@ -339,7 +386,7 @@ void BuildingManager::updateBuildings(float delta)
 		// make money from buildings
 		int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
 		int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
-		
+
 		const float moneyPerFactory = 5.0f;
 		const float moneyPerShop = 1.0f;
 
@@ -347,7 +394,7 @@ void BuildingManager::updateBuildings(float delta)
 		newMoney += moneyPerShop * shopCount;
 		m_game->addMoney((int)newMoney);
 
-		m_houseTimer = HOUSE_UPDATE_TIME + (randBetween(-1.0f, 1.0f) * HOUSE_UPDATE_TIME * 0.5f);
+		m_houseTimer = HOUSE_UPDATE_TIME;// +(randBetween(-1.0f, 1.0f) * HOUSE_UPDATE_TIME * 0.5f);
 	}
 }
 
@@ -519,7 +566,7 @@ float BuildingManager::getResidentialDemand()
 	// there will always be demand if no houses exist
 	// this is to ensure there's at least enough to get started
 	if (houseCount <= 0)
-		return 1.0f;
+		return 10.0f;
 
 	float shopsPerResident = (shopCount / (float)houseCount) * shopSpace;
 	float jobsPerResident = factoryCount / (houseCount / factorySpace);
@@ -535,7 +582,7 @@ float BuildingManager::getCommercialDemand()
 	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
 	int shopCount = getBuildingCount(BUILDINGTYPE_SHOP);
 	if (shopCount <= 0)
-		return 1.0f;
+		return 10.0f;
 
 	float residentsPerShop = houseCount / (shopCount * shopSpace);
 	return residentsPerShop;
@@ -549,7 +596,7 @@ float BuildingManager::getIndustrialDemand()
 	int houseCount = getBuildingCount(BUILDINGTYPE_HOUSE);
 	int factoryCount = getBuildingCount(BUILDINGTYPE_FACTORY);
 	if (factoryCount <= 0)
-		return 1.0f;
+		return 10.0f;
 
 	float residentsPerJob = (houseCount / factorySpace) / (float)factoryCount;
 	return residentsPerJob;

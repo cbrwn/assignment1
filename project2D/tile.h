@@ -22,6 +22,9 @@ public:
 	virtual void draw(aie::Renderer2D* renderer, float dx, float dy,
 		bool zoneTint);
 	virtual void update();
+	
+	void setIndices(int x, int y);
+	void getIndices(int* x, int* y);
 
 	aie::Texture* getTexture();
 	void setTexture(aie::Texture* tex);
@@ -33,10 +36,12 @@ public:
 	inline void givePower() { m_hasPower = true; }
 	inline void takePower() { m_hasPower = false; }
 
-	bool isLiveable(int xIndex, int yIndex);
+	bool isLiveable();
 protected:
 	Game*			m_game;
 	aie::Texture*	m_texture;
+
+	int m_xIndex, m_yIndex;
 
 	ZoneType		m_zoneType;
 	bool			m_hasPower;

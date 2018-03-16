@@ -234,6 +234,7 @@ void Game::draw()
 			if (thisTile == nullptr)
 				continue;
 
+			thisTile->setIndices(x, y);
 
 			float rg = 1.0f;
 			if (mouseOver == thisTile)

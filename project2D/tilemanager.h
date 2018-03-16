@@ -16,7 +16,8 @@ public:
 
 	void drawZoneSelection(aie::Renderer2D* renderer);
 
-	Tile*	getTile(int x, int y);
+	//Tile*	getTile(int x, int y);
+	inline Tile* getTile(int x, int y) { return (*m_tiles)[y][x]; }
 	void	getTileAtMousePosition(int *ix, int *iy);
 	Tile*	getTileAtPosition(Vector2& pos);
 	void	getTileAtPosition(Vector2& pos, int* ix, int* iy);

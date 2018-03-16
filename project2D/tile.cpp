@@ -28,6 +28,18 @@ void Tile::draw(aie::Renderer2D * renderer, float dx, float dy, bool zoneTint)
 
 void Tile::update() { }
 
+void Tile::setIndices(int x, int y)
+{
+	m_xIndex = x;
+	m_yIndex = y;
+}
+
+void Tile::getIndices(int * x, int * y)
+{
+	*x = m_xIndex;
+	*y = m_yIndex;
+}
+
 aie::Texture* Tile::getTexture()
 {
 	return m_texture;
@@ -45,7 +57,7 @@ void Tile::setZoneType(ZoneType type)
 }
 
 // returns whether or not the tile is suitable for living
-bool Tile::isLiveable(int xIndex, int yIndex)
+bool Tile::isLiveable()
 {
 	if (!m_hasPower)
 		return false;
@@ -54,7 +66,7 @@ bool Tile::isLiveable(int xIndex, int yIndex)
 		return false;
 
 	int roadDist;
-	m_game->getRoadManager()->getClosestRoad(xIndex, yIndex, &roadDist);
+	m_game->getRoadManager()->getClosestRoad(m_xIndex, m_yIndex, &roadDist);
 
 	return roadDist <= 6;
 }

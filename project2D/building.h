@@ -55,6 +55,8 @@ public:
 	inline void setFallSpeed(float spd) { m_fallSpeed = spd; }
 
 	bool updatePower();
+	inline int getPowerSpread() { return m_powerSpreadRange; }
+	inline int getPowerSearch() { return m_powerSearchRange; }
 
 	inline BuildingType getType() { return m_type; }
 	inline BuildStyle getBuildStyle() { return m_buildStyle; }

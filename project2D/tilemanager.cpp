@@ -89,13 +89,6 @@ void TileManager::drawZoneSelection(aie::Renderer2D* renderer)
 	}
 }
 
-Tile* TileManager::getTile(int x, int y)
-{
-	if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
-		return nullptr;
-	return (*m_tiles)[y][x];
-}
-
 void TileManager::getTileAtMousePosition(int* ix, int* iy)
 {
 	// first get the mouse's world position
