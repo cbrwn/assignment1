@@ -9,9 +9,10 @@ unsigned int Tile::m_zoneTintColours[ZONETYPE_COUNT];
 Tile::Tile(Game* game, aie::Texture* tex) :
 	m_game(game), m_texture(tex)
 {
+	m_building = nullptr;
 	m_zoneType = ZONETYPE_NONE;
 	m_hasPower = false;
-	m_building = nullptr;
+	m_pollution = 0;
 
 	// set the tints for each zone type
 	m_zoneTintColours[ZONETYPE_NONE] = 0xffffffff;
@@ -20,7 +21,7 @@ Tile::Tile(Game* game, aie::Texture* tex) :
 	m_zoneTintColours[ZONETYPE_INDUSTRIAL] = 0xffbb00ff;
 }
 
-void Tile::draw(aie::Renderer2D * renderer, float dx, float dy, bool zoneTint)
+void Tile::draw(aie::Renderer2D* renderer, float dx, float dy, bool zoneTint)
 {
 	if (zoneTint)
 		renderer->setRenderColour(m_zoneTintColours[getZoneType()]);
@@ -35,7 +36,7 @@ void Tile::setIndices(int x, int y)
 	m_yIndex = y;
 }
 
-void Tile::getIndices(int * x, int * y)
+void Tile::getIndices(int* x, int* y)
 {
 	*x = m_xIndex;
 	*y = m_yIndex;
@@ -53,7 +54,6 @@ void Tile::setTexture(aie::Texture* tex)
 
 void Tile::setZoneType(ZoneType type)
 {
-	// handle destroying existing zone-specific stuff here
 	m_zoneType = type;
 }
 

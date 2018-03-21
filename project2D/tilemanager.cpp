@@ -151,6 +151,11 @@ Vector2 TileManager::getTileWorldPosition(int ix, int iy)
 	return Vector2(xpos, -ypos);
 }
 
+bool TileManager::isIndexInBounds(int x, int y)
+{
+	return x >= 0 && y >= 0 && x < WORLD_WIDTH && y < WORLD_HEIGHT;
+}
+
 void TileManager::clearTilePower()
 {
 	for (int y = 0; y < WORLD_HEIGHT; ++y)

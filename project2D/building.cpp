@@ -28,11 +28,13 @@ Building::Building(Game* game, int x, int y)
 	m_producesPower = false;
 	m_shakesCamera = true;
 
+	m_tileAffectRange = 0;
+
 	// default price is too expensive to buy
 	m_price = INT_MAX;
 
 	// grab the world position
-	m_worldPos = 
+	m_worldPos =
 		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);
 
 	m_altitude = 10000.0f;
@@ -51,14 +53,14 @@ void Building::update(float delta)
 		{
 			m_altitude = 0;
 
-			if(m_shakesCamera)
+			if (m_shakesCamera)
 				m_game->doScreenShake((float)m_sizeX * m_sizeY);
 
 			// smokey particles on the front-left side
 			for (int i = m_posX + 1; i > m_posX - m_sizeX; --i)
 			{
 				int y = m_posY + 1;
-				Vector2 v = 
+				Vector2 v =
 					m_game->getTileManager()->getTileWorldPosition(i, y);
 				m_game->spawnSmokeParticle(v);
 			}
@@ -66,13 +68,56 @@ void Building::update(float delta)
 			for (int i = m_posY + 1; i >= m_posY - m_sizeY; --i)
 			{
 				int x = m_posX + 1;
-				Vector2 v = 
+				Vector2 v =
 					m_game->getTileManager()->getTileWorldPosition(x, i);
 				m_game->spawnSmokeParticle(v);
 			}
 		}
 	}
 }
+
+void Building::created()
+{
+	affectOrUnaffectTiles(true);
+}
+
+void Building::destroyed()
+{
+	affectOrUnaffectTiles(false);
+}
+
+// this exists so we don't have to copy/paste the tile selecting code
+//   in both created() and destroyed()
+void Building::affectOrUnaffectTiles(bool affect)
+{
+	// grab versions of the size minus one because buildings with a size of
+	//   don't extend beyond their position
+	int aSizeX = m_sizeX - 1;
+	int aSizeY = m_sizeY - 1;
+
+	int minX = m_posX - aSizeX - m_tileAffectRange;
+	int minY = m_posY - aSizeY - m_tileAffectRange;
+	int maxX = m_posX + m_tileAffectRange;
+	int maxY = m_posY + m_tileAffectRange;
+
+	for (int y = minY; y <= maxY; ++y)
+	{
+		for (int x = minX; x <= maxX; ++x)
+		{
+			if (!m_game->getTileManager()->isIndexInBounds(x, y))
+				continue;
+			Tile* t = m_game->getTileManager()->getTile(x, y);
+			if (affect)
+				this->affectTile(t);
+			else
+				this->unaffectTile(t);
+		}
+	}
+}
+
+// do nothing by default
+void Building::affectTile(Tile* t) {}
+void Building::unaffectTile(Tile* t) {}
 
 void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad)
 {
@@ -107,13 +152,13 @@ void Building::setPosition(int x, int y)
 	m_posY = y;
 
 	// update world positions
-	m_worldPos = 
+	m_worldPos =
 		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);
 }
 
-void Building::getCenter(int * x, int * y)
+void Building::getCenter(int* x, int* y)
 {
-	*x = m_posX - (m_sizeX - 1) / 2; 
+	*x = m_posX - (m_sizeX - 1) / 2;
 	*y = m_posY - (m_sizeY - 1) / 2;
 }
 

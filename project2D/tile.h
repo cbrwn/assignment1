@@ -36,6 +36,10 @@ public:
 	inline bool hasPower() { return m_hasPower; }
 	inline void setPower(bool p) { m_hasPower = p; }
 
+	inline int getPollution() { return m_pollution; }
+	inline void setPollution(int p) { m_pollution = p; }
+	inline void addPollution(int p) { m_pollution += p; }
+
 	// each tile should keep track of the building that's on it
 	inline Building* getBuilding() { return m_building; }
 	inline void setBuilding(Building* b) { m_building = b; }
@@ -47,9 +51,10 @@ protected:
 
 	int m_xIndex, m_yIndex;
 
+	Building*		m_building;
 	ZoneType		m_zoneType;
 	bool			m_hasPower;
-	Building*		m_building;
+	int				m_pollution;
 private:
 	static unsigned int m_zoneTintColours[ZONETYPE_COUNT];
 };

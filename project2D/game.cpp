@@ -357,6 +357,13 @@ void Game::draw()
 			m_2dRenderer->setRenderColour(1, 0, 0);
 		m_2dRenderer->drawSprite(m_powerIcon, mouseScreen.getX() + iconWidth / 2.0f,
 			mouseScreen.getY() - iconHeight - titleHeight);
+
+		// temp pollution value
+		char polValue[32];
+		sprintf_s(polValue, 32, "%d", m_tileManager->getTile(mouseOverX, mouseOverY)->getPollution());
+		m_2dRenderer->setRenderColour(1, 1, 1);
+		m_2dRenderer->drawText(titleFont, polValue,
+			mouseScreen.getX() + iconWidth, mouseScreen.getY() - iconHeight - titleHeight - 10);
 	}
 
 	// show fps

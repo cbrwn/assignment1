@@ -31,6 +31,7 @@ enum BuildStyle
 };
 
 class Game;
+class Tile;
 
 class Building
 {
@@ -39,6 +40,11 @@ public:
 
 	virtual void update(float delta);
 	virtual void draw(aie::Renderer2D* renderer) = 0;
+
+	// these will be called after the contructor/destructor 
+	//   when added to the world
+	virtual void created();
+	virtual void destroyed();
 
 	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad);
 
@@ -81,9 +87,19 @@ protected:
 	int				m_powerSearchRange; // how far this building looks for power
 	bool			m_producesPower;
 	bool			m_hasPower;
+
+	// how long of a reach does affectTile have
+	int				m_tileAffectRange;
+
 	int				m_price;
 
 	BuildingType	m_type;
 	BuildStyle		m_buildStyle;
 	aie::Texture*	m_texture;
+
+	// these are used to more efficiently affect surrounding tiles' values
+	//   when created/destroyed
+	void affectOrUnaffectTiles(bool affect);
+	virtual void affectTile(Tile* t);
+	virtual void unaffectTile(Tile* t);
 };

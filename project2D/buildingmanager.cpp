@@ -724,6 +724,9 @@ bool BuildingManager::canPlaceBuilding()
 
 Building* BuildingManager::getBuildingAtIndex(int ix, int iy)
 {
+	if (ix < 0 || iy < 0 || ix >= WORLD_WIDTH || iy >= WORLD_HEIGHT)
+		return nullptr;
+
 	Tile* t = m_game->getTileManager()->getTile(ix, iy);
 	if (!t)
 		return nullptr;
