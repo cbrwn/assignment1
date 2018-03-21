@@ -160,7 +160,7 @@ void TileManager::clearTilePower()
 			Tile* t = getTile(x, y);
 			if (!t || !t->hasPower())
 				continue;
-			t->takePower();
+			t->setPower(false);
 		}
 	}
 }

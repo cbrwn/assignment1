@@ -575,9 +575,6 @@ void BuildingManager::sortBuildings()
 
 float BuildingManager::getDemand(ZoneType zone)
 {
-	// send this off so other functions
-	// because I can't declare variables in switch statements :(
-
 	float result = 0.0f;
 
 	switch (zone)

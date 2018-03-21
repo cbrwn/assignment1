@@ -177,7 +177,7 @@ bool Building::updatePower()
 			if (!thisTile->hasPower())
 			{
 				gavePower = true;
-				thisTile->givePower();
+				thisTile->setPower(true);
 			}
 		}
 	}

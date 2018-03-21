@@ -34,8 +34,7 @@ public:
 	void setZoneType(ZoneType type);
 
 	inline bool hasPower() { return m_hasPower; }
-	inline void givePower() { m_hasPower = true; }
-	inline void takePower() { m_hasPower = false; }
+	inline void setPower(bool p) { m_hasPower = p; }
 
 	// each tile should keep track of the building that's on it
 	inline Building* getBuilding() { return m_building; }
