@@ -11,6 +11,7 @@ Tile::Tile(Game* game, aie::Texture* tex) :
 {
 	m_zoneType = ZONETYPE_NONE;
 	m_hasPower = false;
+	m_building = nullptr;
 
 	// set the tints for each zone type
 	m_zoneTintColours[ZONETYPE_NONE] = 0xffffffff;

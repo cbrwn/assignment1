@@ -183,10 +183,6 @@ void BuildingManager::buildingMode()
 		// place building!
 		placeBuilding(makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY));
-		// cancel building mode if shift isn't held
-		// so player can place multiple buildings easily by holding shift
-		if (!input->isKeyDown(aie::INPUT_KEY_LEFT_SHIFT))
-			m_game->setPlaceMode(PlaceMode::PLACEMODE_NONE);
 	}
 }
 
@@ -265,8 +261,6 @@ void BuildingManager::updateBuildings(float delta)
 	m_houseTimer -= delta;
 	if (m_houseTimer <= 0)
 	{
-		// get demand values for use in the loop
-
 		int newBuildings = 0;
 
 		// grab a list of all tiles which could use buildings
@@ -450,6 +444,21 @@ void BuildingManager::addBuilding(Building* build, bool sort)
 		m_factoryCount++;
 		break;
 	}
+
+	// let the tiles under the building know which building is on them
+	int sizeX, sizeY;
+	build->getSize(&sizeX, &sizeY);
+	for (int y = posY; y > posY - sizeY; --y)
+	{
+		for (int x = posX; x > posX - sizeX; --x)
+		{
+			Tile* t = m_game->getTileManager()->getTile(x, y);
+			if (!t)
+				continue;
+
+			t->setBuilding(build);
+		}
+	}
 }
 
 // called when the player places a building
@@ -500,6 +509,21 @@ void BuildingManager::removeBuilding(Building* toRemove)
 	// roads need to be deleted from the road manager
 	if (toRemove->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->removeRoad(toRemove);
+
+
+
+	// let the tiles under the building know the building is gone
+	for (int y = iy; y > iy - ih; --y)
+	{
+		for (int x = ix; x > ix - iw; --x)
+		{
+			Tile* t = m_game->getTileManager()->getTile(x, y);
+			if (!t)
+				continue;
+
+			t->setBuilding(nullptr);
+		}
+	}
 
 	// remove from list and delete
 	bool wasDeleted = false;
@@ -703,27 +727,11 @@ bool BuildingManager::canPlaceBuilding()
 
 Building* BuildingManager::getBuildingAtIndex(int ix, int iy)
 {
-	// now test against every other building
-	for (auto b : *m_buildings)
-	{
-		// grab bounds of this building
-		int right, bottom;
-		b->getPosition(&right, &bottom);
-		int width, height;
-		b->getSize(&width, &height);
-		// subtract 1 from size because a building with the size 1x1
-		// will appear to be 2x2
-		int left = right - (width - 1);
-		int top = bottom - (height - 1);
+	Tile* t = m_game->getTileManager()->getTile(ix, iy);
+	if (!t)
+		return nullptr;
 
-		// check if they're intersecting
-		if (!(ix > right || ix < left ||
-			iy > bottom || iy < top))
-		{
-			return b;
-		}
-	}
-	return nullptr;
+	return t->getBuilding();
 }
 
 void BuildingManager::clearBuildings()

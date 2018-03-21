@@ -2,6 +2,7 @@
 
 #include <Texture.h>
 
+class Building;
 class Game;
 
 enum ZoneType
@@ -36,6 +37,10 @@ public:
 	inline void givePower() { m_hasPower = true; }
 	inline void takePower() { m_hasPower = false; }
 
+	// each tile should keep track of the building that's on it
+	inline Building* getBuilding() { return m_building; }
+	inline void setBuilding(Building* b) { m_building = b; }
+
 	bool isLiveable();
 protected:
 	Game*			m_game;
@@ -45,6 +50,7 @@ protected:
 
 	ZoneType		m_zoneType;
 	bool			m_hasPower;
+	Building*		m_building;
 private:
 	static unsigned int m_zoneTintColours[ZONETYPE_COUNT];
 };
