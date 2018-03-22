@@ -481,7 +481,8 @@ void Game::toggleViewMode(ViewMode mode)
 void Game::doScreenShake(float amt)
 {
 	m_camera->setShakeAmount(amt);
-	m_camera->setCurrentScale(m_camera->getScale() - amt/10.0f);
+	if(m_camera->getScale() >= amt/9.0f)
+		m_camera->setCurrentScale(m_camera->getTargetScale() - amt/10.0f);
 }
 
 // -------------------------------

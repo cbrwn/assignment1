@@ -25,6 +25,7 @@ public:
 	float getX();
 	float getY();
 	float getScale();
+	float getTargetScale();
 	void  getPosition(float* x, float* y);
 
 	void  setSpeed(float spd);

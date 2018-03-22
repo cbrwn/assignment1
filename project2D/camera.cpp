@@ -137,6 +137,7 @@ float Camera::getY() { return m_actualY; }
 void Camera::setScale(float s) { m_targetScale = s; }
 void Camera::setCurrentScale(float s) { m_actualScale = s; }
 float Camera::getScale() { return m_actualScale; }
+float Camera::getTargetScale() { return m_targetScale; }
 
 void	Camera::setSpeed(float spd) { m_smoothSpeed = spd; }
 float	Camera::getSpeed() { return m_smoothSpeed; }
