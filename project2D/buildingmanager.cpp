@@ -1,5 +1,5 @@
 #include <iostream>
-#include <Input.h>
+#include "Input.h"
 #include <algorithm>
 #include <chrono>
 
@@ -678,46 +678,32 @@ bool BuildingManager::canPlaceBuilding()
 	}
 
 	// grab building's position
-	int buildingRight, buildingBottom;
-	m_ghostBuilding->getPosition(&buildingRight, &buildingBottom);
+	int buildingX, buildingY;
+	m_ghostBuilding->getPosition(&buildingX, &buildingY);
+	// and size
+	int buildingWidth, buildingHeight;
+	m_ghostBuilding->getSize(&buildingWidth, &buildingHeight);
+	// subtract one because the size includes the root tile
+	buildingWidth--; buildingHeight--;
 
-	// the root position is outside of the world bounds
-	if (buildingRight < 0 || buildingRight >= WORLD_WIDTH ||
-		buildingBottom < 0 || buildingBottom >= WORLD_HEIGHT)
+	// check if the root position is outside of the world bounds
+	if (buildingX < 0 || buildingX >= WORLD_WIDTH ||
+		buildingY < 0 || buildingY >= WORLD_HEIGHT)
 		return false;
-
-	// get extremities(?) of this building
-	int ghostSizeX, ghostSizeY;
-	m_ghostBuilding->getSize(&ghostSizeX, &ghostSizeY);
-
-	int buildingLeft = buildingRight - (ghostSizeX - 1);
-	int buildingTop = buildingBottom - (ghostSizeY - 1);
-	// some part of the building is outside of the world bounds
+	// and also if the size is too big to fit on the map
+	int buildingLeft = buildingX - buildingWidth;
+	int buildingTop = buildingY - buildingHeight;
 	if (buildingLeft < 0 || buildingLeft >= WORLD_WIDTH ||
 		buildingTop < 0 || buildingTop >= WORLD_HEIGHT)
 		return false;
 
-	// now test against every other building
-	for (int i = 0; i < m_buildings->getCount(); ++i)
+	// check if there are buildings in  the way
+	for (int y = buildingTop; y <= buildingY; ++y)
 	{
-		Building* b = (*m_buildings)[i];
-		if (!b)
-			continue;
-		// grab bounds of this building
-		int right, bottom;
-		b->getPosition(&right, &bottom);
-		int width, height;
-		b->getSize(&width, &height);
-		// subtract 1 from size because a building with the size 1x1
-		// will appear to be 2x2
-		int left = right - (width - 1);
-		int top = bottom - (height - 1);
-
-		// check if they're intersecting
-		if (!(buildingLeft > right || buildingRight < left ||
-			buildingTop > bottom || buildingBottom < top))
+		for (int x = buildingLeft; x <= buildingX; ++x)
 		{
-			return false;
+			if (getBuildingAtIndex(x, y))
+				return false;
 		}
 	}
 	return true;
@@ -741,7 +727,10 @@ void BuildingManager::clearBuildings()
 	{
 		Building* b = (*m_buildings)[i];
 		if (b)
+		{
+			b->destroyed();
 			delete b;
+		}
 	}
 	m_buildings->clear();
 }

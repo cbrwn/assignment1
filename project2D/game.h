@@ -51,7 +51,7 @@ enum ViewMode
 	VIEWMODE_ROADS		= 0b00001000
 };
 
-// typedef vectors so they're shorter to type
+// typedef these so it's easier to type
 typedef DArray<Building*> BuildingList;
 typedef DArray<Particle*> ParticleList;
 
@@ -67,7 +67,7 @@ public:
 	Game& operator=(Game& game)  = default;
 	Game& operator=(Game&& game) = default;
 
-
+	// these shouldn't be public
 	aie::Font* m_uiFont;
 	aie::Font* m_uiFontLarge;
 
@@ -84,7 +84,7 @@ public:
 	Vector2 getMousePosition();
 	bool	isMouseInGame();
 
-	void	drawTileRect(int left, int top, int right, int bottom);
+	void drawTileRect(int left, int top, int right, int bottom);
 
 	// money-related functions
 	inline int  getMoney() { return m_money; }
@@ -117,7 +117,6 @@ public:
 
 protected:
 	aie::Renderer2D*	m_2dRenderer;
-	aie::Font*			m_font;
 	Camera*				m_camera;
 
 	// map/world-related stuff
@@ -126,9 +125,10 @@ protected:
 	BuildingList*		m_buildings;
 	ParticleList*		m_particles;
 
+	// icon shown in power viewmode
 	aie::Texture*		m_powerIcon;
 
-	// I like managers
+	// I'm so sorry
 	ImageManager*		m_imageManager;
 	UiManager*			m_uiManager;
 	BuildingManager*	m_buildingManager;
@@ -137,7 +137,7 @@ protected:
 	TileManager*		m_tileManager;
 
 	// gameplay variables
-	PlaceMode m_placeMode;
-	ViewMode m_viewMode;
-	int m_money;
+	PlaceMode			m_placeMode;
+	ViewMode			m_viewMode;
+	int					m_money;
 };

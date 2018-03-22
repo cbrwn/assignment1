@@ -1,5 +1,5 @@
-#include <Input.h>
-#include <Font.h>
+#include "Input.h"
+#include "Font.h"
 
 #include "game.h"
 #include "imagemanager.h"

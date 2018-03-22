@@ -20,6 +20,7 @@ PowerPlant::PowerPlant(Game* game, int x, int y)
 	m_texture = game->getImageManager()->getTexture("buildings/powerplant");
 	
 	// eyes and mouth stuff
+	m_drawFace = false;
 	m_blinking = false;
 	m_mouthOpen = false;
 	m_blinkTimer = 0;
@@ -64,6 +65,9 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	renderer->drawSprite(m_texture, m_worldPos.getX(),
 		m_worldPos.getY() - 4 + m_altitude, 0, 0, 0, 0, xOrigin, yOrigin);
 
+	if (!m_drawFace)
+		return;
+
 	// eyeballs
 	if (!m_blinking)
 	{
@@ -78,4 +82,10 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	renderer->setRenderColour(1, 1, 1);
 	renderer->drawSprite(mtex, m_worldPos.getX() + 161.0f, 
 		m_worldPos.getY() + 120.0f + m_altitude);
+}
+
+void PowerPlant::created()
+{
+	// show the face only when placed so it doesn't show up on the preview
+	m_drawFace = true;
 }

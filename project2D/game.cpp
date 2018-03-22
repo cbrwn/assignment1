@@ -1,35 +1,30 @@
+// standard includes
 #include <ctime>
-#include <functional>
 
-#include <Texture.h>
-#include <Font.h>
-#include <Input.h>
+// bootstrap includes
+#include "Texture.h"
+#include "Font.h"
+#include "Input.h"
 
+// too many of my includes
+#include "building.h"
+#include "buildingmanager.h"
 #include "camera.h"
 #include "darray.h"
 #include "game.h"
 #include "imagemanager.h"
-#include "uimanager.h"
-#include "building.h"
-#include "buildingmanager.h"
-#include "roadmanager.h"
-#include "savemanager.h"
-#include "tilemanager.h"
-
-#include "tile.h"
 #include "particle.h"
 #include "pollutionparticle.h"
+#include "roadmanager.h"
+#include "savemanager.h"
 #include "smokeparticle.h"
 #include "textparticle.h"
+#include "tile.h"
+#include "tilemanager.h"
+#include "uimanager.h"
 
-Game::Game()
-{
-}
-
-Game::~Game()
-{
-
-}
+Game::Game() { }
+Game::~Game() { }
 
 bool Game::startup()
 {
@@ -44,26 +39,23 @@ bool Game::startup()
 
 	m_2dRenderer = new aie::Renderer2D();
 	m_camera = new Camera(this);
+
+	// I need a managers for all these managers
 	m_imageManager = new ImageManager();
 	m_uiManager = new UiManager(this);
-
 	m_buildingManager = new BuildingManager(this, m_buildings);
 	m_roadManager = new RoadManager(this);
 	m_saveManager = new SaveManager(this);
 	m_tileManager = new TileManager(this, &m_tiles);
 
-	m_camera->setScale(1.0f);
-
-	m_font = new aie::Font("./font/consolas.ttf", 32);
 	m_uiFont = new aie::Font("./font/roboto.ttf", 16);
 	m_uiFontLarge = new aie::Font("./font/roboto.ttf", 24);
 
+	// power icon used for the power viewmode
 	m_powerIcon = m_imageManager->getTexture("icons/power");
 
 	m_mapStart = Vector2(1200, 800);
-
 	m_tiles = new Tile**[WORLD_HEIGHT];
-
 	// initialize tiles to grass tiles
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
@@ -74,6 +66,7 @@ bool Game::startup()
 	}
 
 	m_placeMode = PlaceMode::PLACEMODE_NONE;
+	// default view mode shows zones, buildings and roads
 	setViewMode((ViewMode)(VIEWMODE_ZONE |
 		VIEWMODE_BUILDINGS |
 		VIEWMODE_ROADS));
@@ -85,28 +78,21 @@ bool Game::startup()
 
 void Game::shutdown()
 {
-	delete m_font;
 	delete m_uiFont;
 	delete m_uiFontLarge;
 	delete m_2dRenderer;
 	delete m_camera;
 
-	delete m_imageManager;
-	delete m_uiManager;
-
 	m_buildingManager->clearBuildings();
-
 	delete m_buildingManager;
 	delete m_roadManager;
 	delete m_saveManager;
 	delete m_tileManager;
+	delete m_imageManager;
+	delete m_uiManager;
 
 	for (int i = m_particles->getCount() - 1; i >= 0; --i)
-	{
 		delete (*m_particles)[i];
-		m_particles->remove(i);
-	}
-
 	delete m_particles;
 	delete m_buildings;
 
@@ -117,13 +103,16 @@ void Game::shutdown()
 			if (m_tiles[y][x] != nullptr)
 				delete m_tiles[y][x];
 		}
-		delete m_tiles[y];
+		// delete this column
+		delete[] m_tiles[y];
 	}
+	// delete the array of columns
 	delete[] m_tiles;
 }
 
 void Game::update(float deltaTime)
 {
+	// cap delta so it's doesn't super break if lag happens
 	if (deltaTime > 0.33f)
 		deltaTime = 0.33f;
 
@@ -176,8 +165,6 @@ void Game::update(float deltaTime)
 		}
 	}
 
-	getBuildingManager()->updateBuildings(deltaTime);
-
 	if (input->wasKeyPressed(aie::INPUT_KEY_P))
 		toggleViewMode(VIEWMODE_POWER);
 	if (input->wasKeyPressed(aie::INPUT_KEY_O))
@@ -189,7 +176,9 @@ void Game::update(float deltaTime)
 
 	m_camera->update(deltaTime);
 	getUiManager()->update(deltaTime);
+	getBuildingManager()->updateBuildings(deltaTime);
 
+	// temporary save/load keys
 	if (input->wasKeyPressed(aie::INPUT_KEY_F))
 	{
 		if (getSaveManager()->saveData())
@@ -239,21 +228,23 @@ void Game::draw()
 			Tile* thisTile = m_tiles[y][x];
 			if (thisTile == nullptr)
 				continue;
-
+			// make sure the tile knows where it is in the array
 			thisTile->setIndices(x, y);
 
 			float rg = 1.0f;
 			if (mouseOver == thisTile)
 			{
+				// set the tint colour
 				rg = 0.5f;
+				// and keep track of the mouseover location
 				mouseOverX = x;
 				mouseOverY = y;
 			}
-
+			// set the colour to a tint or full colour
 			m_2dRenderer->setRenderColour(rg, rg, 1.0f);
 
 			Vector2 tilePos = m_tileManager->getTileWorldPosition(x, y);
-
+			// I'm not sure why I subtracted 20 here but let's go with it
 			tilePos.setY(tilePos.getY() - 20.0f);
 
 			// account for the difference in height in the texture
@@ -308,6 +299,7 @@ void Game::draw()
 	// start drawing ui
 	m_2dRenderer->begin();
 
+	// grab the screen coordinates of the mouse
 	int smx, smy;
 	aie::Input::getInstance()->getMouseXY(&smx, &smy);
 
@@ -388,6 +380,7 @@ void Game::draw()
 	m_2dRenderer->end();
 }
 
+// grabs the position of the mouse in world space
 Vector2 Game::getMouseWorldPosition()
 {
 	int mx, my;
@@ -401,6 +394,7 @@ Vector2 Game::getMouseWorldPosition()
 	return Vector2(ax, ay);
 }
 
+// grabs the position of the mouse in screen space
 Vector2 Game::getMousePosition()
 {
 	int mx, my;
@@ -408,16 +402,16 @@ Vector2 Game::getMousePosition()
 	return Vector2((float)mx, (float)my);
 }
 
+
+// whether or not the mouse should interact with the game
 bool Game::isMouseInGame()
 {
 	return !m_uiManager->isMouseOverUi();
 }
 
+// draws a rectangle around tiles
 void Game::drawTileRect(int left, int top, int right, int bottom)
 {
-	// grab the world positions of the tiles
-	// -------------------------------------
-
 	// swap the start/end if the rectangle is backwards
 	int dragMinX = left; int dragMinY = top;
 	int dragMaxX = right; int dragMaxY = bottom;
@@ -432,6 +426,7 @@ void Game::drawTileRect(int left, int top, int right, int bottom)
 		dragMaxY = top;
 	}
 
+	// grab the world positions of the bounds
 	Vector2 topLeft =
 		m_tileManager->getTileWorldPosition(dragMinX, dragMinY);
 	Vector2 topRight =
@@ -482,6 +477,16 @@ void Game::toggleViewMode(ViewMode mode)
 	}
 }
 
+// sets the camera's shakiness
+void Game::doScreenShake(float amt)
+{
+	m_camera->setShakeAmount(amt);
+	m_camera->setCurrentScale(m_camera->getScale() - amt/10.0f);
+}
+
+// -------------------------------
+//   particle spawning functions:
+
 void Game::spawnSmokeParticle(Vector2& pos)
 {
 	if (m_particles->getCount() >= MAX_PARTICLES)
@@ -504,10 +509,4 @@ void Game::spawnTextParticle(Vector2& pos, std::string text)
 		return;
 	auto p = new TextParticle(this, pos, text);
 	m_particles->add(p);
-}
-
-// adds amt to the current shake amount
-void Game::doScreenShake(float amt)
-{
-	m_camera->setShakeAmount(amt);
 }

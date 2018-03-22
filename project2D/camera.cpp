@@ -1,4 +1,4 @@
-#include <Input.h>
+#include "Input.h"
 
 #include "camera.h"
 #include "game.h"
@@ -135,6 +135,7 @@ float Camera::getX() { return m_actualX; }
 float Camera::getY() { return m_actualY; }
 
 void Camera::setScale(float s) { m_targetScale = s; }
+void Camera::setCurrentScale(float s) { m_actualScale = s; }
 float Camera::getScale() { return m_actualScale; }
 
 void	Camera::setSpeed(float spd) { m_smoothSpeed = spd; }

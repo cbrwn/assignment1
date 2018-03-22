@@ -199,14 +199,14 @@ bool Building::updatePower()
 	if (!m_hasPower)
 		return false;
 
-	// we want to return true if this changed the state of the power
-	bool gavePower = false;
-
 	// make values larger for spreading power
 	maxX = m_posX + m_powerSpreadRange;
 	maxY = m_posY + m_powerSpreadRange;
 	minX = m_posX - (m_sizeX - 1) - m_powerSpreadRange;
 	minY = m_posY - (m_sizeY - 1) - m_powerSpreadRange;
+
+	// we want to return true if this changed the state of the power
+	bool gavePower = false;
 
 	// pass power on to the next few tiles
 	for (int y = minY; y <= maxY; ++y)

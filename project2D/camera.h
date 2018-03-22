@@ -17,6 +17,8 @@ public:
 	void setX(float x);
 	void setY(float y);
 	void setScale(float s);
+	// sets the CURRENT scale, not the target scale
+	void setCurrentScale(float s);
 
 	// these will get the actual values, not the destinations which are set 
 	// above
