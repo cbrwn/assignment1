@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClInclude Include="building.h" />
     <ClInclude Include="buildingmanager.h" />
+    <ClInclude Include="darray.h" />
     <ClInclude Include="factory.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="camera.h" />

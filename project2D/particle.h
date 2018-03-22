@@ -9,6 +9,7 @@ class Particle
 {
 public:
 	Particle(Game* game, Vector2& pos);
+	virtual ~Particle() = default;
 
 	virtual void update(float delta) = 0;
 	virtual void draw(aie::Renderer2D* renderer);

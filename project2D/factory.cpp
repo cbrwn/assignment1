@@ -2,6 +2,7 @@
 #include "game.h"
 #include "imagemanager.h"
 #include "random.h"
+#include "tile.h"
 
 Factory::Factory(Game* game, int x, int y)
 	: Building(game, x, y)
@@ -13,6 +14,8 @@ Factory::Factory(Game* game, int x, int y)
 	m_powerSearchRange = 1;
 	m_powerSpreadRange = 0;
 	m_shakesCamera = false;
+
+	m_tileAffectRange = 7;
 
 	m_texture = m_game->getImageManager()->getTexture("buildings/factory");
 	m_pollutionTexture = m_game->getImageManager()->getTexture("pollution");
@@ -42,4 +45,14 @@ void Factory::draw(aie::Renderer2D* renderer)
 	const float yOrigin = 0.0f;
 	renderer->drawSprite(m_texture, m_worldPos.getX(),
 		m_worldPos.getY() + m_altitude - 3, 0, 0, 0, 0, xOrigin, yOrigin);
+}
+
+void Factory::affectTile(Tile* t)
+{
+	t->addPollution(FACTORY_POLLUTION_AMT);
+}
+
+void Factory::unaffectTile(Tile* t)
+{
+	t->addPollution(-FACTORY_POLLUTION_AMT);
 }

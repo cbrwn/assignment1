@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <string>
 #include "Application.h"
 #include "Renderer2D.h"
 #include "vector2.h"
@@ -10,6 +10,11 @@
 
 #define WORLD_WIDTH 64
 #define WORLD_HEIGHT 64
+
+#define MAX_PARTICLES 4096
+
+template <class T>
+class DArray;
 
 class Camera;
 class Tile;
@@ -47,8 +52,8 @@ enum ViewMode
 };
 
 // typedef vectors so they're shorter to type
-typedef std::vector<Building*> BuildingList;
-typedef std::vector<Particle*> ParticleList;
+typedef DArray<Building*> BuildingList;
+typedef DArray<Particle*> ParticleList;
 
 class Game : public aie::Application
 {
@@ -118,8 +123,8 @@ protected:
 	// map/world-related stuff
 	Vector2				m_mapStart;
 	Tile***				m_tiles;
-	BuildingList		m_buildings;
-	ParticleList		m_particles;
+	BuildingList*		m_buildings;
+	ParticleList*		m_particles;
 
 	aie::Texture*		m_powerIcon;
 

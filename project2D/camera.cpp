@@ -25,14 +25,14 @@ void Camera::update(float delta)
 {
 	// arrow key control
 	aie::Input* input = aie::Input::getInstance();
-	if (input->isKeyDown(aie::INPUT_KEY_LEFT))
+	/*if (input->isKeyDown(aie::INPUT_KEY_LEFT))
 		m_targetX -= m_arrowSpeed * delta;
 	if (input->isKeyDown(aie::INPUT_KEY_RIGHT))
 		m_targetX += m_arrowSpeed * delta;
 	if (input->isKeyDown(aie::INPUT_KEY_UP))
 		m_targetY += m_arrowSpeed * delta;
 	if (input->isKeyDown(aie::INPUT_KEY_DOWN))
-		m_targetY -= m_arrowSpeed * delta;
+		m_targetY -= m_arrowSpeed * delta;*/
 
 	// dragging control
 	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_RIGHT))

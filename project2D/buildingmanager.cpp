@@ -232,8 +232,8 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 void BuildingManager::updateBuildings(float delta)
 {
 	// the regular update function deals with per-frame stuff
-	for (auto b : *m_buildings)
-		b->update(delta);
+	for(int i = 0; i < m_buildings->getCount(); ++i)
+		(*m_buildings)[i]->update(delta);
 
 	// update everything else that needs to be updated once
 	//   every so often
@@ -246,8 +246,9 @@ void BuildingManager::updateBuildings(float delta)
 		while (changedPower)
 		{
 			changedPower = false;
-			for (auto b : *m_buildings)
+			for (int i = 0; i < m_buildings->getCount(); ++i)
 			{
+				Building* b = (*m_buildings)[i];
 				bool temp = b->updatePower();
 				if (!changedPower)
 					changedPower = temp;
@@ -349,8 +350,9 @@ void BuildingManager::updateBuildings(float delta)
 			sortBuildings();
 
 		// remove invalid houses
-		for (auto b : *m_buildings)
+		for (int i = 0; i < m_buildings->getCount(); ++i)
 		{
+			Building* b = (*m_buildings)[i];
 			if (randBetween(0, 100) > 25)
 				continue;
 			if (b->getType() != BUILDINGTYPE_HOUSE &&
@@ -401,8 +403,9 @@ void BuildingManager::updateBuildings(float delta)
 
 void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
 {
-	for (auto b : *m_buildings)
+	for (int i = 0; i < m_buildings->getCount(); ++i)
 	{
+		Building* b = (*m_buildings)[i];
 		// if building view is off, we want to skip everything except roads
 		if (!m_game->isViewModeEnabled(VIEWMODE_BUILDINGS)
 			&& b->getType() != BUILDINGTYPE_ROAD)
@@ -426,11 +429,13 @@ void BuildingManager::addBuilding(Building* build, bool sort)
 		return;
 	}
 
-	m_buildings->push_back(build);
+	m_buildings->add(build);
 	if (sort)
 		sortBuildings();
 	if (build->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->addRoad(build, sort);
+
+	build->created();
 
 	switch (build->getType())
 	{
@@ -510,7 +515,7 @@ void BuildingManager::removeBuilding(Building* toRemove)
 	if (toRemove->getType() == BUILDINGTYPE_ROAD)
 		m_game->getRoadManager()->removeRoad(toRemove);
 
-
+	toRemove->destroyed();
 
 	// let the tiles under the building know the building is gone
 	for (int y = iy; y > iy - ih; --y)
@@ -525,41 +530,33 @@ void BuildingManager::removeBuilding(Building* toRemove)
 		}
 	}
 
-	// remove from list and delete
-	bool wasDeleted = false;
-	for (BuildingList::iterator it = m_buildings->begin();
-		it != m_buildings->end(); ++it)
+	// and actually delete it :)
+	delete toRemove;
+
+	// keep track of houses, shops and factories before we delete!
+	switch (toRemove->getType())
 	{
-		if (*it == toRemove)
-		{
-			// keep track of houses, shops and factories before we delete!
-
-			switch (toRemove->getType())
-			{
-			case BUILDINGTYPE_HOUSE:
-				m_houseCount--;
-				break;
-			case BUILDINGTYPE_SHOP:
-				m_shopCount--;
-				break;
-			case BUILDINGTYPE_FACTORY:
-				m_factoryCount--;
-				break;
-			}
-
-			delete *it;
-			m_buildings->erase(it);
-			wasDeleted = true;
-			break;
-		}
+	case BUILDINGTYPE_HOUSE:
+		m_houseCount--;
+		break;
+	case BUILDINGTYPE_SHOP:
+		m_shopCount--;
+		break;
+	case BUILDINGTYPE_FACTORY:
+		m_factoryCount--;
+		break;
 	}
+
+	m_buildings->remove(toRemove);
 }
 
 void BuildingManager::sortBuildings()
 {
 	TileManager* tm = m_game->getTileManager();
 
-	std::sort(m_buildings->begin(), m_buildings->end(), [tm](Building* a, Building* b)
+	Building** ar = m_buildings->_getArray();
+
+	std::sort(ar, ar + m_buildings->getCount(), [tm](Building* a, Building* b)
 	{
 		int aCenterX, aCenterY;
 		a->getCenter(&aCenterX, &aCenterY);
@@ -655,8 +652,9 @@ float BuildingManager::getIndustrialDemand()
 int BuildingManager::getBuildingCount(BuildingType type)
 {
 	int result = 0;
-	for (auto b : *m_buildings)
+	for (int i = 0; i < m_buildings->getCount(); ++i)
 	{
+		Building* b = (*m_buildings)[i];
 		if (b->getType() == type)
 			result++;
 	}
@@ -700,8 +698,11 @@ bool BuildingManager::canPlaceBuilding()
 		return false;
 
 	// now test against every other building
-	for (auto b : *m_buildings)
+	for (int i = 0; i < m_buildings->getCount(); ++i)
 	{
+		Building* b = (*m_buildings)[i];
+		if (!b)
+			continue;
 		// grab bounds of this building
 		int right, bottom;
 		b->getPosition(&right, &bottom);
@@ -736,9 +737,12 @@ Building* BuildingManager::getBuildingAtIndex(int ix, int iy)
 
 void BuildingManager::clearBuildings()
 {
-	for (auto b : *m_buildings)
+	for (int i = 0; i < m_buildings->getCount(); ++i)
+	{
+		Building* b = (*m_buildings)[i];
 		if (b)
 			delete b;
+	}
 	m_buildings->clear();
 }
 

@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "darray.h"
 #include "game.h"
 #include "imagemanager.h"
 #include "roadmanager.h"
@@ -10,6 +11,12 @@
 RoadManager::RoadManager(Game* game)
 {
 	m_game = game;
+	m_roads = new RoadList;
+}
+
+RoadManager::~RoadManager()
+{
+	delete m_roads;
 }
 
 void RoadManager::addRoad(Building* newRoad, bool sort)
@@ -17,7 +24,7 @@ void RoadManager::addRoad(Building* newRoad, bool sort)
 	if (newRoad->getType() != BUILDINGTYPE_ROAD)
 		return;
 
-	m_roads.push_back((Road*)newRoad);
+	m_roads->add((Road*)newRoad);
 
 	if (!sort)
 		return;
@@ -43,7 +50,7 @@ void RoadManager::addRoad(Building* newRoad, bool sort)
 void RoadManager::updateRoads()
 {
 	// sort
-	int roadCount = (int)m_roads.size();
+	int roadCount = m_roads->getCount();
 	quickSortRoads(0, roadCount - 1);
 	updateRoadTextures();
 }
@@ -51,21 +58,14 @@ void RoadManager::updateRoads()
 void RoadManager::removeRoad(Building* road)
 {
 	// remove our copy of this road pointer
-	for (RoadList::iterator it = m_roads.begin(); it != m_roads.end(); ++it)
-	{
-		if (road == *it)
-		{
-			m_roads.erase(it);
-			break;
-		}
-	}
+	m_roads->remove((Road*)road);
 
 	updateRoadTextures();
 }
 
 void RoadManager::clearRoads()
 {
-	m_roads.clear();
+	m_roads->clear();
 }
 
 // binary search for road at the given position
@@ -77,7 +77,7 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 		return false;
 
 	// no roads to search for!
-	if ((int)m_roads.size() < 1)
+	if (m_roads->getCount() < 1)
 		return false;
 
 	// roads are sorted by (y*width)+x, like how they would be laid out in
@@ -86,12 +86,12 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 
 	// binary search time
 	int min = -1;
-	int max = (int)m_roads.size();
+	int max = m_roads->getCount();
 	int mid = max / 2;
 
 	// grab the index of the mid road
 	int midX, midY;
-	m_roads[mid]->getPosition(&midX, &midY);
+	(*m_roads)[mid]->getPosition(&midX, &midY);
 	int midIndex = (midY*WORLD_WIDTH) + midX;
 	while (midIndex != targetIndex)
 	{
@@ -107,14 +107,14 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 			break;
 
 		// update the road index
-		Road* midRoad = m_roads[mid];
+		Road* midRoad = (*m_roads)[mid];
 		midRoad->getPosition(&midX, &midY);
 		midIndex = (midY*WORLD_WIDTH) + midX;
 	}
 
 	// road was found! return it
 	if (midIndex == targetIndex)
-		return m_roads[mid];
+		return (*m_roads)[mid];
 
 	// wasn't found
 	return nullptr;
@@ -125,8 +125,9 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 	Road* closest = nullptr;
 	int closestDist = INT_MAX;
 
-	for (auto r : m_roads)
+	for (int i = 0; i < m_roads->getCount(); i++)
 	{
+		Road* r = (*m_roads)[i];
 		int rx, ry;
 		r->getPosition(&rx, &ry);
 		int xDist = (int)fabsf((float)x - rx);
@@ -146,8 +147,9 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 void RoadManager::updateRoadTextures()
 {
 	// update road textures based on neighbouring roads
-	for (auto r : m_roads)
+	for (int i = 0; i < m_roads->getCount(); i++)
 	{
+		Road* r = (*m_roads)[i];
 		// grab the road positions
 		int ix, iy;
 		r->getPosition(&ix, &iy);
@@ -217,24 +219,24 @@ void RoadManager::quickSortRoads(int min, int max)
 int RoadManager::partitionRoads(int min, int max)
 {
 	// use last road as the pivot
-	Road* pivot = m_roads[max];
+	Road* pivot = (*m_roads)[max];
 	int pivIndex = pivot->getOneDimensionalIndex();
 
 	int i = min - 1;
 	for (int j = min; j < max; ++j)
 	{
-		int thisIndex = m_roads[j]->getOneDimensionalIndex();
+		int thisIndex = (*m_roads)[j]->getOneDimensionalIndex();
 		if (thisIndex < pivIndex)
 		{
 			i++;
 			// swap
-			Road* iRoad = m_roads[i];
-			m_roads[i] = m_roads[j];
-			m_roads[j] = iRoad;
+			Road* iRoad = (*m_roads)[i];
+			(*m_roads)[i] = (*m_roads)[j];
+			(*m_roads)[j] = iRoad;
 		}
 	}
 	// put the pivot in its place
-	m_roads[max] = m_roads[i + 1];
-	m_roads[i + 1] = pivot;
+	(*m_roads)[max] = (*m_roads)[i + 1];
+	(*m_roads)[i + 1] = pivot;
 	return i + 1;
 }

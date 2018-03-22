@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include "darray.h"
 #include <Renderer2D.h>
 
 #define POWER_UPDATE_TIME 1
@@ -13,7 +13,7 @@ enum BuildingType;
 enum ZoneType;
 
 // shorten the whole vector line
-typedef std::vector<Building*> BuildingList;
+typedef DArray<Building*> BuildingList;
 
 class BuildingManager
 {

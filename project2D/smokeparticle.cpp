@@ -12,6 +12,10 @@ SmokeParticle::SmokeParticle(Game* game, Vector2& pos)
 	m_vel.setX(randBetween(-100.0f, 100.0f));
 	m_vel.setY(randBetween(40.0f, 200.0f));
 
+	// add some opacity so there's some variance in 
+	//   how long it takes to disappear
+	m_opacity += randBetween(0.0f, 0.8f);
+
 	// and random rotation
 	m_rotateDirection = randBetween(-3.0f, 3.0f);
 }

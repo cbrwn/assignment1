@@ -6,6 +6,7 @@
 #include <Input.h>
 
 #include "camera.h"
+#include "darray.h"
 #include "game.h"
 #include "imagemanager.h"
 #include "uimanager.h"
@@ -35,16 +36,18 @@ bool Game::startup()
 	srand((unsigned int)time(NULL));
 	this->setVSync(true);
 
-
 	// sky blue background
 	setBackgroundColour(0.12f, 0.63f, 1.0f);
+
+	m_buildings = new BuildingList;
+	m_particles = new ParticleList;
 
 	m_2dRenderer = new aie::Renderer2D();
 	m_camera = new Camera(this);
 	m_imageManager = new ImageManager();
 	m_uiManager = new UiManager(this);
 
-	m_buildingManager = new BuildingManager(this, &m_buildings);
+	m_buildingManager = new BuildingManager(this, m_buildings);
 	m_roadManager = new RoadManager(this);
 	m_saveManager = new SaveManager(this);
 	m_tileManager = new TileManager(this, &m_tiles);
@@ -98,8 +101,14 @@ void Game::shutdown()
 	delete m_saveManager;
 	delete m_tileManager;
 
-	for (auto p : m_particles)
-		delete p;
+	for (int i = m_particles->getCount() - 1; i >= 0; --i)
+	{
+		delete (*m_particles)[i];
+		m_particles->remove(i);
+	}
+
+	delete m_particles;
+	delete m_buildings;
 
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
@@ -119,21 +128,18 @@ void Game::update(float deltaTime)
 		deltaTime = 0.33f;
 
 	// update particles
-	for (auto p : m_particles)
-		p->update(deltaTime);
+	for (int i = 0; i < m_particles->getCount(); ++i)
+		(*m_particles)[i]->update(deltaTime);
 
 	// delete any particles that need it
-	for (ParticleList::iterator it = m_particles.begin();
-		it != m_particles.end();)
+	for (int i = m_particles->getCount() - 1; i >= 0; --i)
 	{
-		Particle* thisParticle = *it;
-		if (thisParticle && thisParticle->getOpacity() <= 0)
+		Particle* p = (*m_particles)[i];
+		if (p->getOpacity() <= 0.0f)
 		{
-			delete *it;
-			it = m_particles.erase(it);
-			continue;
+			delete p;
+			m_particles->remove(i);
 		}
-		it++;
 	}
 
 	aie::Input* input = aie::Input::getInstance();
@@ -276,8 +282,8 @@ void Game::draw()
 	getBuildingManager()->drawBuildings(m_2dRenderer);
 
 	// draw particles
-	for (auto p : m_particles)
-		p->draw(m_2dRenderer);
+	for (int i = 0; i < m_particles->getCount(); ++i)
+		(*m_particles)[i]->draw(m_2dRenderer);
 
 	// draw overlay stuff from place mode
 	switch (m_placeMode)
@@ -478,20 +484,26 @@ void Game::toggleViewMode(ViewMode mode)
 
 void Game::spawnSmokeParticle(Vector2& pos)
 {
+	if (m_particles->getCount() >= MAX_PARTICLES)
+		return;
 	auto p = new SmokeParticle(this, pos);
-	m_particles.push_back(p);
+	m_particles->add(p);
 }
 
 void Game::spawnPollutionParticle(Vector2& pos)
 {
+	if (m_particles->getCount() >= MAX_PARTICLES)
+		return;
 	auto p = new PollutionParticle(this, pos);
-	m_particles.push_back(p);
+	m_particles->add(p);
 }
 
 void Game::spawnTextParticle(Vector2& pos, std::string text)
 {
+	if (m_particles->getCount() >= MAX_PARTICLES)
+		return;
 	auto p = new TextParticle(this, pos, text);
-	m_particles.push_back(p);
+	m_particles->add(p);
 }
 
 // adds amt to the current shake amount

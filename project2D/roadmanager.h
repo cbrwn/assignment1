@@ -1,18 +1,20 @@
 #pragma once
 
-#include <vector>
+template <class T>
+class DArray;
 
 class Building;
 class Game;
 class Road;
 
 // typedef vector for shorter typings
-typedef std::vector<Road*> RoadList;
+typedef DArray<Road*> RoadList;
 
 class RoadManager
 {
 public:
 	RoadManager(Game* game);
+	~RoadManager();
 
 	void addRoad(Building* newRoad, bool sort = true);
 	void removeRoad(Building* road);
@@ -25,7 +27,7 @@ public:
 private:
 	Game* m_game;
 
-	RoadList m_roads;
+	RoadList* m_roads;
 
 	void updateRoadTextures();
 

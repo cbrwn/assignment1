@@ -123,7 +123,7 @@ bool SaveManager::saveData()
 
 	int worldWidth = WORLD_WIDTH;
 	int worldHeight = WORLD_HEIGHT;
-	int buildingCount = (int)buildings->size();
+	int buildingCount = (int)buildings->getCount();
 
 	// start writing!
 
