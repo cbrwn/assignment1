@@ -1,4 +1,5 @@
 #include "shop.h"
+
 #include "game.h"
 #include "imagemanager.h"
 

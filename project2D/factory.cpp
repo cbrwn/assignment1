@@ -1,8 +1,9 @@
 #include "factory.h"
+
 #include "game.h"
-#include "imagemanager.h"
-#include "random.h"
 #include "tile.h"
+#include "random.h"
+#include "imagemanager.h"
 
 Factory::Factory(Game* game, int x, int y)
 	: Building(game, x, y)

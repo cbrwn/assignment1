@@ -1,7 +1,7 @@
 #include "Input.h"
 
-#include "camera.h"
 #include "game.h"
+#include "camera.h"
 #include "random.h"
 
 Camera::Camera(Game* game) : m_game(game)

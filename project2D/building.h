@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer2D.h"
+
 #include "vector2.h"
 
 // when adding a new building type, don't forget to

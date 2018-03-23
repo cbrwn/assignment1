@@ -1,9 +1,9 @@
 #include "building.h"
-#include "buildingmanager.h"
-#include "powerpole.h"
+
+#include "game.h"
 #include "tile.h"
 #include "tilemanager.h"
-#include "game.h"
+#include "buildingmanager.h"
 
 char* Building::buildingNames[BUILDINGTYPE_COUNT] = {
 	"None",

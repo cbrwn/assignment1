@@ -2,8 +2,8 @@
 
 #include "Renderer2D.h"
 
-#include "building.h"
-#include "tile.h"
+#include "tile.h" // for ZONETYPE_COUNT enum
+#include "building.h" // for BUILDINGTYPE_COUNT enum
 
 #define UI_PANEL_BUILDINGS 1
 #define UI_PANEL_ZONES 2

@@ -1,27 +1,30 @@
+// all files follow this include layout:
+
+// header related to this file
+#include "game.h"
+
 // standard includes
 #include <ctime>
 
 // bootstrap includes
-#include "Texture.h"
 #include "Font.h"
 #include "Input.h"
+#include "Texture.h"
 
-// too many of my includes
-#include "building.h"
-#include "buildingmanager.h"
+// all other includes sorted by filename length
+#include "tile.h"
 #include "camera.h"
 #include "darray.h"
-#include "game.h"
-#include "imagemanager.h"
-#include "particle.h"
-#include "pollutionparticle.h"
+#include "building.h"
+#include "uimanager.h"
 #include "roadmanager.h"
 #include "savemanager.h"
-#include "smokeparticle.h"
-#include "textparticle.h"
-#include "tile.h"
 #include "tilemanager.h"
-#include "uimanager.h"
+#include "imagemanager.h"
+#include "textparticle.h"
+#include "smokeparticle.h"
+#include "buildingmanager.h"
+#include "pollutionparticle.h"
 
 Game::Game() {}
 Game::~Game() {}

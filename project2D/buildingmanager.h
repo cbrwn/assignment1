@@ -1,10 +1,12 @@
 #pragma once
 
-#include "darray.h"
 #include "Renderer2D.h"
 
 #define POWER_UPDATE_TIME 1
 #define HOUSE_UPDATE_TIME 2
+
+template <class T>
+class DArray;
 
 class Building;
 class Game;

@@ -1,9 +1,10 @@
+#include "tilemanager.h"
+
 #include "Input.h"
 
 #include "game.h"
-#include "imagemanager.h"
 #include "tile.h"
-#include "tilemanager.h"
+#include "imagemanager.h"
 
 TileManager::TileManager(Game* game, Tile**** tiles)
 	: m_game(game), m_tiles(tiles)

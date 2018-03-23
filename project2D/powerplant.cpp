@@ -1,10 +1,8 @@
-#include "buildingmanager.h"
 #include "powerplant.h"
-#include "powerpole.h"
-#include "tile.h"
+
 #include "game.h"
-#include "imagemanager.h"
 #include "random.h"
+#include "imagemanager.h"
 
 PowerPlant::PowerPlant(Game* game, int x, int y)
 	: Building(game, x, y)

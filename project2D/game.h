@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
-#include "Application.h"
+
 #include "Renderer2D.h"
+#include "Application.h"
+
 #include "vector2.h"
 
 #define TILE_WIDTH 132

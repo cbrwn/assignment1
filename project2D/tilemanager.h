@@ -2,6 +2,8 @@
 
 #include "Renderer2D.h"
 
+#include "vector2.h"
+
 enum ZoneType;
 
 class Game;

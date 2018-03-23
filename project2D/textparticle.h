@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "particle.h"
 
 class TextParticle : public Particle

@@ -1,9 +1,7 @@
-#include <string>
-
 #include "textparticle.h"
+
 #include "game.h"
 #include "imagemanager.h"
-#include "random.h"
 
 TextParticle::TextParticle(Game* game, Vector2& pos, std::string txt)
 	: Particle(game, pos), m_text(txt)

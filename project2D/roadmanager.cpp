@@ -1,10 +1,11 @@
+#include "roadmanager.h"
+
 #include <iostream>
 
-#include "darray.h"
 #include "game.h"
-#include "imagemanager.h"
-#include "roadmanager.h"
 #include "road.h"
+#include "darray.h"
+#include "imagemanager.h"
 
 RoadManager::RoadManager(Game* game)
 {

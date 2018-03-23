@@ -1,13 +1,12 @@
-#include "Input.h"
+#include "uimanager.h"
+
 #include "Font.h"
+#include "Input.h"
 
 #include "game.h"
-#include "imagemanager.h"
-#include "uimanager.h"
-#include "buildingmanager.h"
 #include "tilemanager.h"
-
-#include "tile.h"
+#include "imagemanager.h"
+#include "buildingmanager.h"
 
 UiManager::UiManager(Game* game)
 	: m_game(game), m_panelColour(0x444444ff), m_panelY(120.0f)

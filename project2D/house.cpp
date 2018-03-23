@@ -1,4 +1,5 @@
 #include "house.h"
+
 #include "game.h"
 #include "imagemanager.h"
 

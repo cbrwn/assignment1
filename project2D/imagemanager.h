@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+
 #include "Texture.h"
 
 class ImageManager

@@ -1,23 +1,27 @@
-#include <iostream>
-#include "Input.h"
-#include <algorithm>
-#include <chrono>
-
 #include "buildingmanager.h"
-#include "roadmanager.h"
+
+#include <chrono>
+#include <iostream>
+#include <algorithm>
+
+#include "Input.h"
+
 #include "game.h"
 #include "tile.h"
-#include "tilemanager.h"
+#include "darray.h"
 #include "random.h"
-#include "uimanager.h"
-
 #include "building.h"
-#include "factory.h"
-#include "house.h"
-#include "powerplant.h"
-#include "powerpole.h"
+#include "uimanager.h"
+#include "roadmanager.h"
+#include "tilemanager.h"
+
+// building types
 #include "road.h"
 #include "shop.h"
+#include "house.h"
+#include "factory.h"
+#include "powerpole.h"
+#include "powerplant.h"
 
 BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	: m_game(game), m_buildings(buildings)
