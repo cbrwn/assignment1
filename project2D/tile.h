@@ -23,7 +23,7 @@ public:
 	virtual void draw(aie::Renderer2D* renderer, float dx, float dy,
 		bool zoneTint);
 	virtual void update();
-	
+
 	void setIndices(int x, int y);
 	void getIndices(int* x, int* y);
 

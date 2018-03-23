@@ -232,7 +232,7 @@ void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
 void BuildingManager::updateBuildings(float delta)
 {
 	// the regular update function deals with per-frame stuff
-	for(int i = 0; i < m_buildings->getCount(); ++i)
+	for (int i = 0; i < m_buildings->getCount(); ++i)
 		(*m_buildings)[i]->update(delta);
 
 	// update everything else that needs to be updated once

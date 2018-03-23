@@ -45,10 +45,10 @@ enum PlaceMode
 //  like toggling the ability to see zones
 enum ViewMode
 {
-	VIEWMODE_ZONE		= 0b00000001,
-	VIEWMODE_BUILDINGS	= 0b00000010,
-	VIEWMODE_POWER		= 0b00000100,
-	VIEWMODE_ROADS		= 0b00001000
+	VIEWMODE_ZONE = 0b00000001,
+	VIEWMODE_BUILDINGS = 0b00000010,
+	VIEWMODE_POWER = 0b00000100,
+	VIEWMODE_ROADS = 0b00001000
 };
 
 // typedef these so it's easier to type

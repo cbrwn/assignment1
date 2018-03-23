@@ -50,7 +50,7 @@ void Camera::update(float delta)
 			m_dragStartMX = wx; m_dragStartMY = wy;
 			m_dragStartCX = m_actualX; m_dragStartCY = m_actualY;
 		}
-		if(m_dragging)
+		if (m_dragging)
 		{
 			// move the camera with the mouse
 			setX(m_dragStartCX + (m_dragStartMX - wx)*4.0f);

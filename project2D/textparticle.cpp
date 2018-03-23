@@ -27,6 +27,6 @@ void TextParticle::update(float delta)
 void TextParticle::draw(aie::Renderer2D* renderer)
 {
 	renderer->setRenderColour(0.5f, 0.0f, 0.0f, m_opacity);
-	renderer->drawText(m_game->m_uiFontLarge, m_text.c_str(), 
+	renderer->drawText(m_game->m_uiFontLarge, m_text.c_str(),
 		m_pos.getX(), m_pos.getY());
 }

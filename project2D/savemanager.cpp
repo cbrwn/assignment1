@@ -322,8 +322,8 @@ bool SaveManager::loadBuildings()
 	int buildingStart = m_headerSize + (worldWidth * worldHeight);
 	file.seekg(buildingStart);
 
-	printf("Loading %d buildings!\n", buildingCount); 
-	
+	printf("Loading %d buildings!\n", buildingCount);
+
 	readBuildings(&file, buildingCount);
 
 	return true;
@@ -345,8 +345,8 @@ bool SaveManager::loadTiles()
 	getWorldSize(&worldWidth, &worldHeight, &file);
 
 	// skip to the start of tile data (just after header)
-	file.seekg(m_headerSize, std::ios::beg); 
-	
+	file.seekg(m_headerSize, std::ios::beg);
+
 	// grab tiles!
 	readTiles(&file, worldWidth, worldHeight);
 

@@ -23,13 +23,13 @@ void TileManager::updateZoneEditing()
 	}
 
 	// zone creation
-	if (!m_dragging 
+	if (!m_dragging
 		&& input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
 		&& m_game->isMouseInGame())
 	{
 		getTileAtMousePosition(&m_dragStartX, &m_dragStartY);
 		// only start dragging if we're within the bounds of the world
-		if(m_dragStartX >= 0 && m_dragStartY >= 0)
+		if (m_dragStartX >= 0 && m_dragStartY >= 0)
 			m_dragging = true;
 	}
 
@@ -85,7 +85,7 @@ void TileManager::drawZoneSelection(aie::Renderer2D* renderer)
 	if (m_dragging)
 	{
 		renderer->setRenderColour(1, 1, 1);
-		m_game->drawTileRect(m_dragStartX, m_dragStartY, m_dragEndX, 
+		m_game->drawTileRect(m_dragStartX, m_dragStartY, m_dragEndX,
 			m_dragEndY);
 	}
 }

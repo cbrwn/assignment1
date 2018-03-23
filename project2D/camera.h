@@ -37,7 +37,7 @@ public:
 	inline void setShakeAmount(float amt) { m_shakeAmount = amt; }
 	inline float getShakeAmount() { return m_shakeAmount; }
 private:
-	Game* m_game;
+	Game * m_game;
 
 	// destination positions
 	float m_targetX, m_targetY;

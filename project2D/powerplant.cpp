@@ -18,7 +18,7 @@ PowerPlant::PowerPlant(Game* game, int x, int y)
 	m_price = 1000;
 
 	m_texture = game->getImageManager()->getTexture("buildings/powerplant");
-	
+
 	// eyes and mouth stuff
 	m_drawFace = false;
 	m_blinking = false;
@@ -50,7 +50,7 @@ void PowerPlant::update(float delta)
 	Vector2 thisPos = m_worldPos + Vector2(0, 256);
 	float dist = mousePos.distanceToSquared((thisPos));
 
-	m_mouthOpen = dist < 350*350;
+	m_mouthOpen = dist < 350 * 350;
 }
 
 void PowerPlant::draw(aie::Renderer2D* renderer)
@@ -80,7 +80,7 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	// draw mouth
 	aie::Texture* mtex = m_mouthOpen ? m_openMouth : m_closedMouth;
 	renderer->setRenderColour(1, 1, 1);
-	renderer->drawSprite(mtex, m_worldPos.getX() + 161.0f, 
+	renderer->drawSprite(mtex, m_worldPos.getX() + 161.0f,
 		m_worldPos.getY() + 120.0f + m_altitude);
 }
 

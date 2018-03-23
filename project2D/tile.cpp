@@ -28,7 +28,7 @@ void Tile::draw(aie::Renderer2D* renderer, float dx, float dy, bool zoneTint)
 	renderer->drawSprite(m_texture, dx, dy, 0, 0, 0, 0, 0, 0.5f);
 }
 
-void Tile::update() { }
+void Tile::update() {}
 
 void Tile::setIndices(int x, int y)
 {

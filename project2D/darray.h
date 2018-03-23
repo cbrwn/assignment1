@@ -33,7 +33,7 @@ public:
 		if (m_itemCount >= m_size - 1)
 		{
 			m_size *= 2;
-		
+
 			// make a whole new array with the new size
 			T* resized = new T[m_size];
 			// and copy all the stuff over
@@ -44,7 +44,7 @@ public:
 			delete[] m_items;
 			// and make it point to the new one
 			m_items = resized;
-			
+
 			// apparently realloc doesn't like to work :(
 			//m_items = (T*)realloc(m_items, m_size);
 		}
@@ -94,7 +94,7 @@ public:
 	// use subscript operator to get array elements, not this!
 	inline T* _getArray() { return m_items; }
 private:
-	T*		m_items;
+	T * m_items;
 	int		m_size;
 	int		m_itemCount;
 }; // exactly 100 lines looks nice

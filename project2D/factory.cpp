@@ -30,7 +30,7 @@ void Factory::update(float delta)
 	if (m_smokePuffTime <= 0.0f)
 	{
 		Vector2 pos = m_worldPos;
-		pos += Vector2(TILE_WIDTH/2.0f - 32.0f, TILE_HEIGHT);
+		pos += Vector2(TILE_WIDTH / 2.0f - 32.0f, TILE_HEIGHT);
 		m_game->spawnPollutionParticle(pos);
 		m_smokePuffTime = randBetween(3.0f, 12.0f);
 	}

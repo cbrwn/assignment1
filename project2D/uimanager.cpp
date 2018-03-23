@@ -159,7 +159,7 @@ void UiManager::update(float delta)
 	// smooth the demand values
 	const float demandSmoothSpeed = 10.0f;
 	BuildingManager* bm = m_game->getBuildingManager();
-	m_resDemand -= (m_resDemand - bm->getDemand(ZONETYPE_RESIDENTIAL)) 
+	m_resDemand -= (m_resDemand - bm->getDemand(ZONETYPE_RESIDENTIAL))
 		* delta * demandSmoothSpeed;
 	m_comDemand -= (m_comDemand - bm->getDemand(ZONETYPE_COMMERCIAL))
 		* delta * demandSmoothSpeed;;
@@ -188,7 +188,7 @@ void UiManager::draw(aie::Renderer2D* renderer)
 	// selector icons
 	renderer->setRenderColour(1, 1, 1);
 	float buildingIconX = m_selectorBox.x - (m_selectorBox.width / 4.0f);
-	renderer->drawSprite(m_buildingSelectorIcon, 
+	renderer->drawSprite(m_buildingSelectorIcon,
 		buildingIconX, m_selectorBox.y);
 	float zoneIconX = m_selectorBox.x + (m_selectorBox.width / 4.0f);
 	renderer->drawSprite(m_zoneSelectorIcon, zoneIconX, m_selectorBox.y);
@@ -202,12 +202,12 @@ void UiManager::draw(aie::Renderer2D* renderer)
 	sprintf_s(mny, 32, "$%d", m_game->getMoney());
 
 	float moneyWidth = moneyFont->getStringWidth(mny);
-	if(m_moneyFlashTime > 0 && (int)(m_moneyFlashTime*10) % 2 == 0)
+	if (m_moneyFlashTime > 0 && (int)(m_moneyFlashTime * 10) % 2 == 0)
 		renderer->setRenderColour(0.8f, 0, 0);
 	else
 		renderer->setRenderColour(0, 0.4f, 0);
 	renderer->drawText(moneyFont, mny,
-		m_game->getWindowWidth() - moneyWidth - 2, 
+		m_game->getWindowWidth() - moneyWidth - 2,
 		m_game->getWindowHeight() - 18.0f);
 }
 
@@ -233,7 +233,7 @@ bool UiManager::isMouseOverUi()
 
 void UiManager::flashMoney()
 {
-	if(m_moneyFlashTime <= 0.0f)
+	if (m_moneyFlashTime <= 0.0f)
 		m_moneyFlashTime = 1.0f;
 }
 
@@ -351,11 +351,11 @@ void UiManager::drawDemandGraph(aie::Renderer2D* renderer)
 	};
 
 	// box to put behind graph
-	float boxWidth = columnWidth * 3.0f + barWidth/2.0f;
+	float boxWidth = columnWidth * 3.0f + barWidth / 2.0f;
 	float boxHeight = 56.0f;
 	renderer->setRenderColour(0.4f, 0.4f, 0.4f);
-	renderer->drawBox(m_demandGraphPos.getX() + boxWidth/2.0f - barWidth + 1, 
-		m_demandGraphPos.getY() + boxHeight/2.0f - 16.0f,
+	renderer->drawBox(m_demandGraphPos.getX() + boxWidth / 2.0f - barWidth + 1,
+		m_demandGraphPos.getY() + boxHeight / 2.0f - 16.0f,
 		boxWidth, boxHeight);
 
 	for (int i = 0; i < 3; i++)
@@ -369,7 +369,7 @@ void UiManager::drawDemandGraph(aie::Renderer2D* renderer)
 
 		renderer->setRenderColour(demandColours[i]);
 		renderer->drawBox(boxX, boxY + zoneDemand / 2.0f, barWidth, zoneDemand);
-		
+
 		// move the I a little to the right so it looks centered since it's
 		//   so thin
 		if (demandInitials[i] == 'I')
@@ -394,8 +394,8 @@ void UiManager::drawDemandMouseover(aie::Renderer2D* renderer)
 	const float boxWidth = textWidth + boxPadding * 2.0f;
 	const float boxHeight = textHeight + boxPadding * 2.0f;
 
-	const float boxX = m_demandGraphPos.getX() - boxWidth/2.0f + 28.0f;
-	const float boxY = m_demandGraphPos.getY() + boxHeight/2.0f - 38.0f;
+	const float boxX = m_demandGraphPos.getX() - boxWidth / 2.0f + 28.0f;
+	const float boxY = m_demandGraphPos.getY() + boxHeight / 2.0f - 38.0f;
 
 	const float textX = boxX - textWidth / 2.0f;
 	const float textY = boxY - textHeight / 4.0f;
