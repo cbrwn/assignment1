@@ -55,14 +55,17 @@ bool Game::startup()
 	m_powerIcon = m_imageManager->getTexture("icons/power");
 
 	m_mapStart = Vector2(1200, 800);
+
 	m_tiles = new Tile**[WORLD_HEIGHT];
 	// initialize tiles to grass tiles
 	for (int y = 0; y < WORLD_HEIGHT; y++)
 	{
 		m_tiles[y] = new Tile*[WORLD_WIDTH];
 		for (int x = 0; x < WORLD_WIDTH; x++)
+		{
 			m_tiles[y][x] = new Tile(this,
 				m_imageManager->getTexture("tiles/grass_flat"));
+		}
 	}
 
 	m_placeMode = PlaceMode::PLACEMODE_NONE;
@@ -194,6 +197,18 @@ void Game::update(float deltaTime)
 		else
 			printf("Something went wrong when loading!\n");
 	}
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_J))
+		m_saveManager->loadBuildings();
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_K))
+		m_saveManager->saveBuildings();
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_G))
+		m_saveManager->loadTiles();
+
+	if (input->wasKeyPressed(aie::INPUT_KEY_H))
+		m_saveManager->saveTiles();
 }
 
 void Game::draw()

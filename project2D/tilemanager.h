@@ -24,6 +24,8 @@ public:
 	bool	isIndexInBounds(int x, int y);
 	void	clearTilePower();
 
+	void clearTiles(int width, int height);
+
 	inline void setSelectedType(ZoneType type) { m_selectedType = type; }
 	inline ZoneType getSelectedType() { return m_selectedType; }
 private:

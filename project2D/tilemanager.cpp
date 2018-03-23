@@ -1,6 +1,7 @@
 #include "Input.h"
 
 #include "game.h"
+#include "imagemanager.h"
 #include "tile.h"
 #include "tilemanager.h"
 
@@ -167,5 +168,33 @@ void TileManager::clearTilePower()
 				continue;
 			t->setPower(false);
 		}
+	}
+}
+
+// deletes all tiles and the array, then reallocates it
+void TileManager::clearTiles(int width, int height)
+{
+	for (int y = 0; y < WORLD_HEIGHT; y++)
+	{
+		for (int x = 0; x < WORLD_WIDTH; x++)
+		{
+			if ((*m_tiles)[y][x] != nullptr)
+				delete (*m_tiles)[y][x];
+		}
+		// delete this column
+		delete[](*m_tiles)[y];
+	}
+	// delete the array of columns
+	delete[](*m_tiles);
+
+	// reallocate
+	(*m_tiles) = new Tile**[height];
+	// initialize tiles to grass tiles
+	for (int y = 0; y < height; y++)
+	{
+		(*m_tiles)[y] = new Tile*[width];
+		for (int x = 0; x < width; x++)
+			(*m_tiles)[y][x] = new Tile(m_game,
+				m_game->getImageManager()->getTexture("tiles/grass_flat"));
 	}
 }
