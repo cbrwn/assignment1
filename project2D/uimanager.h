@@ -19,7 +19,7 @@ struct Rect
 class UiManager
 {
 public:
-	UiManager(Game* game);
+	explicit UiManager(Game* game);
 	~UiManager();
 
 	void update(float delta);

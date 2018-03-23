@@ -11,6 +11,11 @@ TileManager::TileManager(Game* game, Tile**** tiles)
 {
 	m_selectedType = ZONETYPE_NONE;
 	m_dragging = false;
+
+	m_dragStartX = 0;
+	m_dragStartY = 0;
+	m_dragEndX = 0;
+	m_dragEndY = 0;
 }
 
 void TileManager::updateZoneEditing()
@@ -56,9 +61,9 @@ void TileManager::updateZoneEditing()
 				dragMaxY = m_dragStartY;
 			}
 
-			for (int y = dragMinY; y <= dragMaxY; y++)
+			for (int y = dragMinY; y <= dragMaxY; ++y)
 			{
-				for (int x = dragMinX; x <= dragMaxX; x++)
+				for (int x = dragMinX; x <= dragMaxX; ++x)
 				{
 					Tile* t = (*m_tiles)[y][x];
 					if (!t)
@@ -175,9 +180,9 @@ void TileManager::clearTilePower()
 // deletes all tiles and the array, then reallocates it
 void TileManager::clearTiles(int width, int height)
 {
-	for (int y = 0; y < WORLD_HEIGHT; y++)
+	for (int y = 0; y < WORLD_HEIGHT; ++y)
 	{
-		for (int x = 0; x < WORLD_WIDTH; x++)
+		for (int x = 0; x < WORLD_WIDTH; ++x)
 		{
 			if ((*m_tiles)[y][x] != nullptr)
 				delete (*m_tiles)[y][x];
@@ -191,10 +196,10 @@ void TileManager::clearTiles(int width, int height)
 	// reallocate
 	(*m_tiles) = new Tile**[height];
 	// initialize tiles to grass tiles
-	for (int y = 0; y < height; y++)
+	for (int y = 0; y < height; ++y)
 	{
 		(*m_tiles)[y] = new Tile*[width];
-		for (int x = 0; x < width; x++)
+		for (int x = 0; x < width; ++x)
 			(*m_tiles)[y][x] = new Tile(m_game,
 				m_game->getImageManager()->getTexture("tiles/grass_flat"));
 	}

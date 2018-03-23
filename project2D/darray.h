@@ -19,7 +19,23 @@ public:
 	}
 	~DArray() { delete[] m_items; }
 
-	// todo: copy/move constructors when i'm not so lazy
+	// copy constructors
+	DArray(const DArray& da)
+	{
+		for (int i = 0; i < da.getCount(); ++i)
+			this->add(da[i]);
+	}
+
+	DArray& operator=(DArray& da)
+	{
+		for (int i = 0; i < da.getCount(); ++i)
+			this->add(da[i]);
+		return *this;
+	}
+
+	// I'm not sure how move constructors work so leave them as default
+	DArray(DArray&& da) = default;
+	DArray& operator=(DArray&& da) = default;
 
 	T& operator[](int index) { return m_items[index]; }
 

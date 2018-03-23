@@ -13,8 +13,14 @@ typedef DArray<Road*> RoadList;
 class RoadManager
 {
 public:
-	RoadManager(Game* game);
+	explicit RoadManager(Game* game);
 	~RoadManager();
+
+	// we don't expect Game to be copied/moved
+	RoadManager(const RoadManager& rm) = default;
+	RoadManager(RoadManager&& rm) = default;
+	RoadManager& operator=(RoadManager& rm) = default;
+	RoadManager& operator=(RoadManager&& rm) = default;
 
 	void addRoad(Building* newRoad, bool sort = true);
 	void removeRoad(Building* road);

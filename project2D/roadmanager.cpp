@@ -124,7 +124,7 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 	Road* closest = nullptr;
 	int closestDist = INT_MAX;
 
-	for (int i = 0; i < m_roads->getCount(); i++)
+	for (int i = 0; i < m_roads->getCount(); ++i)
 	{
 		Road* r = (*m_roads)[i];
 		int rx, ry;
@@ -146,7 +146,7 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 void RoadManager::updateRoadTextures()
 {
 	// update road textures based on neighbouring roads
-	for (int i = 0; i < m_roads->getCount(); i++)
+	for (int i = 0; i < m_roads->getCount(); ++i)
 	{
 		Road* r = (*m_roads)[i];
 		// grab the road positions

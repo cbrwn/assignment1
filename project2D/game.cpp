@@ -61,10 +61,10 @@ bool Game::startup()
 
 	m_tiles = new Tile**[WORLD_HEIGHT];
 	// initialize tiles to grass tiles
-	for (int y = 0; y < WORLD_HEIGHT; y++)
+	for (int y = 0; y < WORLD_HEIGHT; ++y)
 	{
 		m_tiles[y] = new Tile*[WORLD_WIDTH];
-		for (int x = 0; x < WORLD_WIDTH; x++)
+		for (int x = 0; x < WORLD_WIDTH; ++x)
 		{
 			m_tiles[y][x] = new Tile(this,
 				m_imageManager->getTexture("tiles/grass_flat"));
@@ -97,14 +97,14 @@ void Game::shutdown()
 	delete m_imageManager;
 	delete m_uiManager;
 
-	for (int i = m_particles->getCount() - 1; i >= 0; --i)
+	for (int i = 0; i < m_particles->getCount(); ++i)
 		delete (*m_particles)[i];
 	delete m_particles;
 	delete m_buildings;
 
-	for (int y = 0; y < WORLD_HEIGHT; y++)
+	for (int y = 0; y < WORLD_HEIGHT; ++y)
 	{
-		for (int x = 0; x < WORLD_WIDTH; x++)
+		for (int x = 0; x < WORLD_WIDTH; ++x)
 		{
 			if (m_tiles[y][x] != nullptr)
 				delete m_tiles[y][x];
@@ -171,6 +171,7 @@ void Game::update(float deltaTime)
 		}
 	}
 
+	// switching between view modes
 	if (input->wasKeyPressed(aie::INPUT_KEY_P))
 		toggleViewMode(VIEWMODE_POWER);
 	if (input->wasKeyPressed(aie::INPUT_KEY_O))
@@ -201,15 +202,13 @@ void Game::update(float deltaTime)
 			printf("Something went wrong when loading!\n");
 	}
 
+	// keys just to demonstrate these functions
 	if (input->wasKeyPressed(aie::INPUT_KEY_J))
 		m_saveManager->loadBuildings();
-
 	if (input->wasKeyPressed(aie::INPUT_KEY_K))
 		m_saveManager->saveBuildings();
-
 	if (input->wasKeyPressed(aie::INPUT_KEY_G))
 		m_saveManager->loadTiles();
-
 	if (input->wasKeyPressed(aie::INPUT_KEY_H))
 		m_saveManager->saveTiles();
 }
@@ -239,9 +238,9 @@ void Game::draw()
 	// only show zone tint when it's relevant
 	bool tintTiles = getPlaceMode() == PLACEMODE_ZONE
 		|| isViewModeEnabled(VIEWMODE_ZONE);
-	for (int y = 0; y < WORLD_HEIGHT; y++)
+	for (int y = 0; y < WORLD_HEIGHT; ++y)
 	{
-		for (int x = 0; x < WORLD_WIDTH; x++)
+		for (int x = 0; x < WORLD_WIDTH; ++x)
 		{
 			Tile* thisTile = m_tiles[y][x];
 			if (thisTile == nullptr)
@@ -338,8 +337,6 @@ void Game::draw()
 		Vector2 mouseScreen = getMousePosition();
 
 		// some constants about the mouseover box
-		const int boxOffsetX = 10; // x offset from mouse
-		const int boxOffsetY = 10; // y offset from mouse
 		const int boxPadding = 8;
 
 		aie::Font* titleFont = m_uiFontLarge;
@@ -384,7 +381,7 @@ void Game::draw()
 
 	// show fps
 	char fps[32];
-	sprintf_s(fps, 32, "FPS: %i", getFPS());
+	sprintf_s(fps, 32, "FPS: %u", getFPS());
 	m_2dRenderer->setRenderColour(0, 0, 0);
 	m_2dRenderer->drawText(m_uiFont, fps, 2, 6);
 

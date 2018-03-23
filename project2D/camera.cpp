@@ -19,6 +19,11 @@ Camera::Camera(Game* game) : m_game(game)
 
 	m_dragging = false;
 	m_lastScroll = 0.0f;
+
+	m_dragStartCX = 0;
+	m_dragStartCY = 0;
+	m_dragStartMX = 0;
+	m_dragStartMY = 0;
 }
 
 void Camera::update(float delta)

@@ -33,6 +33,7 @@ void PowerPlant::update(float delta)
 
 	m_blinkTimer -= delta;
 
+	// how long a blink should last in seconds
 	const float blinkLength = 0.1f;
 
 	if (m_blinkTimer <= 0)
@@ -44,10 +45,14 @@ void PowerPlant::update(float delta)
 			m_blinkTimer = randBetween(1.0f, 10.0f);
 	}
 
+	// open the mouth if the mouse is close to us
+
 	Vector2 mousePos = m_game->getMouseWorldPosition();
+	// add 256 to our Y so it's not the distance to the bottom of building
 	Vector2 thisPos = m_worldPos + Vector2(0, 256);
 	float dist = mousePos.distanceToSquared((thisPos));
 
+	// square 350 because w're getting the distance squared
 	m_mouthOpen = dist < 350 * 350;
 }
 
@@ -60,8 +65,12 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	// (where it would be touching the ground)
 	const float xOrigin = 0.5f;
 	const float yOrigin = 0.0f;
+
+	// move the sprite up slightly so it lines up with the ground
+	const float yOffset = -4;
+
 	renderer->drawSprite(m_texture, m_worldPos.getX(),
-		m_worldPos.getY() - 4 + m_altitude, 0, 0, 0, 0, xOrigin, yOrigin);
+		m_worldPos.getY() - yOffset + m_altitude, 0, 0, 0, 0, xOrigin, yOrigin);
 
 	if (!m_drawFace)
 		return;
@@ -69,17 +78,23 @@ void PowerPlant::draw(aie::Renderer2D* renderer)
 	// eyeballs
 	if (!m_blinking)
 	{
-		drawEyeball(renderer, Vector2(m_worldPos.getX() + 84.0f,
-			m_worldPos.getY() + 148.0f + m_altitude), 48.0f);
-		drawEyeball(renderer, Vector2(m_worldPos.getX() + 194.0f,
-			m_worldPos.getY() + 204.0f + m_altitude), 48.0f);
+		const Vector2 leftEyeOffset(84.0f, 148.0f);
+		const Vector2 rightEyeOffset(194.0f, 204.0);
+		const float eyeSize = 48.0f;
+
+		drawEyeball(renderer, Vector2(m_worldPos.getX() + leftEyeOffset.getX(),
+			m_worldPos.getY() + leftEyeOffset.getY() + m_altitude), eyeSize);
+		drawEyeball(renderer, Vector2(m_worldPos.getX() + rightEyeOffset.getX(),
+			m_worldPos.getY() + rightEyeOffset.getY() + m_altitude), eyeSize);
 	}
 
 	// draw mouth
+	const Vector2 mouthOffset(161.0f, 120.0f);
+
 	aie::Texture* mtex = m_mouthOpen ? m_openMouth : m_closedMouth;
 	renderer->setRenderColour(1, 1, 1);
-	renderer->drawSprite(mtex, m_worldPos.getX() + 161.0f,
-		m_worldPos.getY() + 120.0f + m_altitude);
+	renderer->drawSprite(mtex, m_worldPos.getX() + mouthOffset.getX(),
+		m_worldPos.getY() + mouthOffset.getY() + m_altitude);
 }
 
 void PowerPlant::created()

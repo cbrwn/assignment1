@@ -3,6 +3,7 @@
 #include "game.h"
 #include "tile.h"
 #include "tilemanager.h"
+#include "imagemanager.h"
 #include "buildingmanager.h"
 
 char* Building::buildingNames[BUILDINGTYPE_COUNT] = {
@@ -19,6 +20,8 @@ Building::Building(Game* game, int x, int y)
 	: m_game(game), m_posX(x), m_posY(y)
 {
 	// default values
+	m_texture = m_game->getImageManager()->getTexture("buildings/house");
+	m_type = BUILDINGTYPE_NONE;
 	m_sizeX = 1;
 	m_sizeY = 1;
 	m_buildStyle = BuildStyle::BUILDSTYLE_SINGLE;
@@ -90,7 +93,7 @@ void Building::destroyed()
 //   in both created() and destroyed()
 void Building::affectOrUnaffectTiles(bool affect)
 {
-	// grab versions of the size minus one because buildings with a size of
+	// grab versions of the size minus one because buildings with a size of 1
 	//   don't extend beyond their position
 	int aSizeX = m_sizeX - 1;
 	int aSizeY = m_sizeY - 1;
@@ -162,8 +165,11 @@ void Building::getCenter(int* x, int* y)
 	*y = m_posY - (m_sizeY - 1) / 2;
 }
 
+// checks if this building should have power and also spreads it if needed
 bool Building::updatePower()
 {
+	TileManager* tMan = m_game->getTileManager();
+
 	// check if a tile of ours has power
 	int maxX = m_posX + m_powerSearchRange;
 	int maxY = m_posY + m_powerSearchRange;
@@ -181,7 +187,7 @@ bool Building::updatePower()
 				if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
 					continue;
 
-				Tile* thisTile = m_game->getTileManager()->getTile(x, y);
+				Tile* thisTile = tMan->getTile(x, y);
 				if (!thisTile)
 					continue;
 				if (thisTile->hasPower())
@@ -213,10 +219,10 @@ bool Building::updatePower()
 	{
 		for (int x = minX; x <= maxX; ++x)
 		{
-			if (x < 0 || y < 0 || x >= WORLD_WIDTH || y >= WORLD_HEIGHT)
+			if (tMan->isIndexInBounds(x, y))
 				continue;
 
-			Tile* thisTile = m_game->getTileManager()->getTile(x, y);
+			Tile* thisTile = tMan->getTile(x, y);
 			if (!thisTile)
 				continue;
 			if (!thisTile->hasPower())

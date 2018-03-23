@@ -3,7 +3,7 @@
 #include "game.h"
 #include "imagemanager.h"
 
-TextParticle::TextParticle(Game* game, Vector2& pos, std::string txt)
+TextParticle::TextParticle(Game* game, Vector2& pos, const std::string& txt)
 	: Particle(game, pos), m_text(txt)
 {
 	m_texture = nullptr;

@@ -498,14 +498,17 @@ void BuildingManager::placeBuilding(Building* build, bool sort)
 
 void BuildingManager::removeBuilding(Building* toRemove)
 {
+	if (!toRemove)
+		return;
+
 	int ix, iy;
 	int iw, ih;
 	toRemove->getPosition(&ix, &iy);
 	toRemove->getSize(&iw, &ih);
 	// make smokey particles on each tile it occupied
-	for (int x = ix - iw; x <= ix; x++)
+	for (int x = ix - iw; x <= ix; ++x)
 	{
-		for (int y = iy - ih; y <= iy; y++)
+		for (int y = iy - ih; y <= iy; ++x)
 		{
 			// grab the world position
 			Vector2 tPos =

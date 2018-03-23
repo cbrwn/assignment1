@@ -16,5 +16,4 @@ public:
 	void unaffectTile(Tile* t) override;
 private:
 	float m_smokePuffTime;
-	aie::Texture* m_pollutionTexture;
 };

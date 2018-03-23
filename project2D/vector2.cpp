@@ -3,8 +3,8 @@
 #include <cmath>
 
 Vector2::Vector2()
+	: m_x(0), m_y(0)
 {
-	Vector2::Vector2(0, 0);
 }
 
 Vector2::Vector2(float x, float y)
@@ -64,6 +64,13 @@ Vector2 Vector2::operator-(Vector2& vec)
 Vector2 Vector2::operator*(float mul)
 {
 	return Vector2(m_x * mul, m_y * mul);
+}
+
+
+Vector2::Vector2(const Vector2& vec)
+{
+	m_x = vec.getX();
+	m_y = vec.getY();
 }
 
 Vector2& Vector2::operator=(Vector2& vec)

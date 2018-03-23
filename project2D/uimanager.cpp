@@ -33,7 +33,7 @@ UiManager::UiManager(Game* game)
 	const float selectBoxPadding = 16.0f;
 	// zone boxes
 	float currentX = selectBoxPadding;
-	for (int i = 0; i < ZONETYPE_COUNT; i++)
+	for (int i = 0; i < ZONETYPE_COUNT; ++i)
 	{
 		m_zoneBoxes[i] = { currentX, m_panelY - selectBoxPadding,
 			selectBoxWidth, m_panelY - (selectBoxPadding * 2.0f) };
@@ -42,7 +42,7 @@ UiManager::UiManager(Game* game)
 
 	// building boxes
 	currentX = selectBoxPadding;
-	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
+	for (int i = 0; i < BUILDINGTYPE_COUNT; ++i)
 	{
 		// skip house, not buildable
 		if (i == BUILDINGTYPE_HOUSE
@@ -116,7 +116,7 @@ void UiManager::update(float delta)
 
 		// check for zone panel clickage when it's visible
 		if (m_zonePanelY >= 0.0f)
-			for (int i = 0; i < ZONETYPE_COUNT; i++)
+			for (int i = 0; i < ZONETYPE_COUNT; ++i)
 				if (isMouseInRect(m_zoneBoxes[i], m_zonePanelY))
 				{
 					m_game->getTileManager()->setSelectedType((ZoneType)i);
@@ -125,7 +125,7 @@ void UiManager::update(float delta)
 
 		// and also building panel clickage
 		if (m_buildingPanelY >= 0.0f)
-			for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
+			for (int i = 0; i < BUILDINGTYPE_COUNT; ++i)
 				if (isMouseInRect(m_buildingBoxes[i], m_buildingPanelY))
 				{
 					m_game->getBuildingManager()->setSelectedBuilding(i);
@@ -251,7 +251,7 @@ void UiManager::drawBuildingPanel(aie::Renderer2D* renderer)
 		m_buildingPanelY - 8);
 
 	// draw all the boxes
-	for (int i = 0; i < BUILDINGTYPE_COUNT; i++)
+	for (int i = 0; i < BUILDINGTYPE_COUNT; ++i)
 	{
 		// skip boxes for buildings that aren't buildable
 		if (m_buildingBoxes[i].width < 0)
@@ -294,7 +294,7 @@ void UiManager::drawZonePanel(aie::Renderer2D* renderer)
 	renderer->drawText(m_game->m_uiFontLarge, "Zones", 8, m_zonePanelY - 8);
 
 	// draw all the boxes
-	for (int i = 0; i < ZONETYPE_COUNT; i++)
+	for (int i = 0; i < ZONETYPE_COUNT; ++i)
 	{
 		Rect thisRect = m_zoneBoxes[i];
 
@@ -357,9 +357,8 @@ void UiManager::drawDemandGraph(aie::Renderer2D* renderer)
 		m_demandGraphPos.getY() + boxHeight / 2.0f - 16.0f,
 		boxWidth, boxHeight);
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; ++i)
 	{
-		ZoneType type = (ZoneType)(i + 1);
 		float zoneDemand = demandValues[i] - 1.0f;
 		zoneDemand *= 9.0f;
 

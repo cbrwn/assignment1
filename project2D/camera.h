@@ -5,7 +5,7 @@ class Game;
 class Camera
 {
 public:
-	Camera(Game* game);
+	explicit Camera(Game* game);
 
 	void update(float delta);
 

@@ -10,6 +10,9 @@ unsigned int Tile::m_zoneTintColours[ZONETYPE_COUNT];
 Tile::Tile(Game* game, aie::Texture* tex) :
 	m_game(game), m_texture(tex)
 {
+	m_xIndex = -1;
+	m_yIndex = -1;
+
 	m_building = nullptr;
 	m_zoneType = ZONETYPE_NONE;
 	m_hasPower = false;

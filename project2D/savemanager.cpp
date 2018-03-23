@@ -176,7 +176,7 @@ void SaveManager::readBuildings(std::fstream* openFile, int buildingCount)
 	// randomly choose the direction to drop buildings in
 	bool horz = (rand() % 100) < 50;
 
-	for (int i = 0; i < buildingCount; i++)
+	for (int i = 0; i < buildingCount; ++i)
 	{
 		// building info we stored
 		short buildingType;
@@ -226,7 +226,7 @@ void SaveManager::writeBuildings(std::fstream* openFile)
 	int buildingCount = buildings->getCount();
 
 	// 2 bytes for type, 8 bytes for position
-	for (int i = 0; i < buildingCount; i++)
+	for (int i = 0; i < buildingCount; ++i)
 	{
 		Building* thisBuilding = (*buildings)[i];
 		short buildingType = thisBuilding->getType();

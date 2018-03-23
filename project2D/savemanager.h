@@ -9,7 +9,7 @@ class Game;
 class SaveManager
 {
 public:
-	SaveManager(Game* game);
+	explicit SaveManager(Game* game);
 
 	bool loadData();
 	bool saveData();

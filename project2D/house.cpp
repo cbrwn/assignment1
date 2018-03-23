@@ -26,10 +26,4 @@ void House::draw(aie::Renderer2D* renderer)
 	const float yOrigin = 0.0f;
 	renderer->drawSprite(m_texture, m_worldPos.getX(),
 		m_worldPos.getY() + m_altitude - 3, 0, 0, 0, 0, xOrigin, yOrigin);
-	return;
-	// eyeballs
-	drawEyeball(renderer, Vector2(m_worldPos.getX() - 44,
-		m_worldPos.getY() + m_altitude + 48.0f), 12.0f);
-	drawEyeball(renderer, Vector2(m_worldPos.getX() - 18,
-		m_worldPos.getY() + m_altitude + 34.0f), 12.0f);
 }
