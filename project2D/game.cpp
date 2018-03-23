@@ -238,6 +238,8 @@ void Game::draw()
 	// only show zone tint when it's relevant
 	bool tintTiles = getPlaceMode() == PLACEMODE_ZONE
 		|| isViewModeEnabled(VIEWMODE_ZONE);
+
+	// draw all our tiles
 	for (int y = 0; y < WORLD_HEIGHT; ++y)
 	{
 		for (int x = 0; x < WORLD_WIDTH; ++x)
@@ -416,7 +418,6 @@ Vector2 Game::getMousePosition()
 	aie::Input::getInstance()->getMouseXY(&mx, &my);
 	return Vector2((float)mx, (float)my);
 }
-
 
 // whether or not the mouse should interact with the game
 bool Game::isMouseInGame()
