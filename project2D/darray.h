@@ -94,7 +94,7 @@ public:
 	// use subscript operator to get array elements, not this!
 	inline T* _getArray() { return m_items; }
 private:
-	T * m_items;
+	T*		m_items;
 	int		m_size;
 	int		m_itemCount;
 }; // exactly 100 lines looks nice
