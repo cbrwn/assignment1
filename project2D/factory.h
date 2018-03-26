@@ -2,6 +2,7 @@
 
 #include "building.h"
 
+// how much pollution a factory gives to nearby tiles
 #define FACTORY_POLLUTION_AMT 10
 
 class Factory : public Building
@@ -15,5 +16,6 @@ public:
 	void affectTile(Tile* t) override;
 	void unaffectTile(Tile* t) override;
 private:
+	// how long it has been since producing a puff to indicate pollution
 	float m_smokePuffTime;
 };

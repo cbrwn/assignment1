@@ -4,15 +4,14 @@
 */
 #pragma once
 
-#define DARRAY_DEFAULT_SIZE 8
-
 template <class T>
 class DArray
 {
 public:
 	DArray()
 	{
-		m_size = DARRAY_DEFAULT_SIZE;
+		// arbitrarily start at 8 items
+		m_size = 8;
 		m_itemCount = 0;
 
 		m_items = new T[m_size];
@@ -25,7 +24,6 @@ public:
 		for (int i = 0; i < da.getCount(); ++i)
 			this->add(da[i]);
 	}
-
 	DArray& operator=(DArray& da)
 	{
 		for (int i = 0; i < da.getCount(); ++i)
@@ -113,4 +111,4 @@ private:
 	T*		m_items;
 	int		m_size;
 	int		m_itemCount;
-}; // exactly 100 lines looks nice
+};

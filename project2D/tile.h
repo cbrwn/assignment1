@@ -3,9 +3,11 @@
 #include "Texture.h"
 #include "Renderer2D.h"
 
+// Forward declares
 class Building;
 class Game;
 
+// Enum for which zone a tile is
 enum ZoneType
 {
 	ZONETYPE_NONE = 0,

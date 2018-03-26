@@ -12,5 +12,6 @@ public:
 	void update(float delta) override;
 	void draw(aie::Renderer2D* renderer) override;
 private:
+	// text to show
 	std::string m_text;
 };

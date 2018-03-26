@@ -9,5 +9,6 @@ public:
 
 	void update(float delta) override;
 private:
-	float m_rotateDirection;
+	// the speed at which this rotates
+	float m_rotateVelocity;
 };

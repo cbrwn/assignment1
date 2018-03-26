@@ -4,9 +4,7 @@
 
 #include "vector2.h"
 
-// when adding a new building type, don't forget to
-//  add it to the factory in buildingmanager.cpp
-//  and the building UI in uimanager.cpp
+// Enum used to indicate which building the object is when searching/creating
 enum BuildingType
 {
 	BUILDINGTYPE_NONE = 0,
@@ -20,63 +18,187 @@ enum BuildingType
 	BUILDINGTYPE_COUNT
 };
 
-// enum to describe building styles
-// whether a building is created individually,
-//    in a line (click & drag) or in a rectangle (click & drag)
+// Enum describing how buildings should be created by the player
 enum BuildStyle
 {
-	BUILDSTYLE_SINGLE = 0,
-	BUILDSTYLE_LINE,
-	BUILDSTYLE_RECT,
-	BUILDSTYLE_FORBIDDEN // can't build!
+	BUILDSTYLE_SINGLE = 0, // individually, one click = one building
+	BUILDSTYLE_LINE, // click & drag to create a line of buildings
+	BUILDSTYLE_RECT, // click & drag to create a rectangle of buildings
+	BUILDSTYLE_FORBIDDEN // can't build! things like houses which are only
+	                     // made automatically
 };
 
+// Forward declares
 class Game;
 class Tile;
 
 class Building
 {
 public:
+	//------------------------------------------------------------------------
+	// Param:
+	//			game: pointer to our Game so we can access everything we need
+	//			x:    tile-based x position of the building
+	//			y:    tile-based y position of the building
+	//------------------------------------------------------------------------
 	Building(Game* game, int x, int y);
 
+	//------------------------------------------------------------------------
+	// Called every frame to deal with everything non-drawing related
+	//
+	// Param: 
+	//			delta: time in seconds since the last frame
+	//------------------------------------------------------------------------
 	virtual void update(float delta);
+	//------------------------------------------------------------------------
+	// Also called every frame, dealing with everything drawing related
+	//
+	// Param: 
+	//			renderer: a pointer to the Renderer2D we're using
+	//------------------------------------------------------------------------
 	virtual void draw(aie::Renderer2D* renderer) = 0;
 
-	// these will be called after the contructor/destructor 
-	//   when added to the world
+	//------------------------------------------------------------------------
+	// Called after the constructor happens, used to spread pollution and
+	// other tile statuses
+	//------------------------------------------------------------------------
 	virtual void created();
+	//------------------------------------------------------------------------
+	// Called after the destructor, used to undo everything done in created()
+	//------------------------------------------------------------------------
 	virtual void destroyed();
 
+	//------------------------------------------------------------------------
+	// Draws an eyeball which looks towards the mouse
+	//
+	// Param: 
+	//			renderer: a pointer to the Renderer2D we're using
+	//			pos:      center point of the eye
+	//			rad:      radius of the eye
+	//------------------------------------------------------------------------
 	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad);
 
+	//------------------------------------------------------------------------
+	// Sets the position of the building, represented as the index of the tile
+	// it's on in the 2D Tile array
+	//
+	// Param: 
+	//			x: x index of the tile
+	//			y: y index of the tile
+	//------------------------------------------------------------------------
+
 	void setPosition(int x, int y);
+	//------------------------------------------------------------------------
+	// Grabs the position, represented as the index of the tile
+	// it's on in the 2D Tile array
+	//
+	// Param: 
+	//			x: pointer to where the x position will be stored
+	//			y: pointer to where the y position will be stored
+	//------------------------------------------------------------------------
 	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
-	// getCenter is used for depth sorting
+	//------------------------------------------------------------------------
+	// Grabs the indices of the center of the building
+	// This is used in depth sorting, where we compare the center of the
+	// building instead of the stored position (the bottom-right)
+	//
+	// Param: 
+	//			x: pointer to where the x position of the center will be stored
+	//			y: pointer to where the y position of the center will be stored
+	//------------------------------------------------------------------------
 	void getCenter(int* x, int* y);
+	//------------------------------------------------------------------------
+	// Gets the size (in tiles) of the building
+	//
+	// Param: 
+	//			w: pointer to where the width will be stored
+	//			h: pointer to where the height will be stored
+	//------------------------------------------------------------------------
 	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
+	//------------------------------------------------------------------------
+	// Changes the texture which is used when drawing the building
+	//
+	// Param: 
+	//			tex: the new texture
+	//------------------------------------------------------------------------
 	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
+	//------------------------------------------------------------------------
+	// Gets the world position of the building, as opposed to the tile-based
+	// positions stored in m_posX and m_posY
+	//
+	// Return: 
+	//			Vector2 containing the world-based position of the building
+	//------------------------------------------------------------------------
 	inline Vector2 getWorldPosition() { return m_worldPos; }
 
-	// silly dropping stuff
+	//------------------------------------------------------------------------
+	// Sets how far above the ground the building is
+	// Used for dropping buildings into the world on creation
+	//
+	// Param: 
+	//			alt: the desired altitude
+	//------------------------------------------------------------------------
 	inline void setAltitude(float alt) { m_altitude = alt; }
+	//------------------------------------------------------------------------
+	// Sets how quickly the building falls to the ground
+	// Used for dropping buildings into the world on creation
+	//
+	// Param: 
+	//			spd: the desired speed
+	//------------------------------------------------------------------------
 	inline void setFallSpeed(float spd) { m_fallSpeed = spd; }
 
+	//------------------------------------------------------------------------
+	// Powers this building if available, and spreads power if power is found
+	//------------------------------------------------------------------------
 	bool updatePower();
-	inline int getPowerSpread() { return m_powerSpreadRange; }
+	//------------------------------------------------------------------------
+	// Gets how many tiles to search when looking for power
+	//
+	// Return: 
+	//			number of tiles from each side to search
+	//------------------------------------------------------------------------
 	inline int getPowerSearch() { return m_powerSearchRange; }
+	//------------------------------------------------------------------------
+	// Gets how many tiles this building spreads power to if powered
+	//
+	// Return: 
+	//			number of tiles from each side to spread
+	//------------------------------------------------------------------------
+	inline int getPowerSpread() { return m_powerSpreadRange; }
 
+	//------------------------------------------------------------------------
+	// Gets the kind of building this is
+	// Useful for checking a generic Building object for a specific type
+	//
+	// Return: 
+	//			BuildingType enum of the building
+	//------------------------------------------------------------------------
 	inline BuildingType getType() { return m_type; }
+	//------------------------------------------------------------------------
+	// Gets the method of placing the building in build mode
+	//
+	// Return: 
+	//			BuildStyle enum of the building
+	//------------------------------------------------------------------------
 	inline BuildStyle getBuildStyle() { return m_buildStyle; }
 
+	//------------------------------------------------------------------------
+	// Gets how much the building costs to build
+	//
+	// Return: 
+	//			price of the building
+	//------------------------------------------------------------------------
 	inline int getPrice() { return m_price; }
 
+	// a static array of names to show in the UI
 	static char* buildingNames[BUILDINGTYPE_COUNT];
 protected:
 	Game*			m_game;
 
+	// positioning information
 	int				m_posX, m_posY;
 	int				m_sizeX, m_sizeY;
-	// world position of the bulding from the tile number
 	Vector2			m_worldPos;
 
 	// used for dropping it into the world
@@ -84,18 +206,26 @@ protected:
 	float			m_fallSpeed;
 	bool			m_shakesCamera;
 
-	int				m_powerSpreadRange; // how far this building shares power
-	int				m_powerSearchRange; // how far this building looks for power
+	// how far this building shares power
+	int				m_powerSpreadRange;
+	// how far this building looks for power
+	int				m_powerSearchRange;
+	// whether or not this building creates power
 	bool			m_producesPower;
+	// whether or not this building is powered
 	bool			m_hasPower;
 
 	// how long of a reach does affectTile have
 	int				m_tileAffectRange;
 
+	// how much this building costs
 	int				m_price;
 
+	// which kind of building this is
 	BuildingType	m_type;
+	// how the player places this building
 	BuildStyle		m_buildStyle;
+	// the texture to draw
 	aie::Texture*	m_texture;
 
 	// these are used to more efficiently affect surrounding tiles' values

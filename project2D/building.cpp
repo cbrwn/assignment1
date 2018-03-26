@@ -16,6 +16,7 @@ char* Building::buildingNames[BUILDINGTYPE_COUNT] = {
 	"Factory"
 };
 
+/**/
 Building::Building(Game* game, int x, int y)
 	: m_game(game), m_posX(x), m_posY(y)
 {
@@ -30,6 +31,8 @@ Building::Building(Game* game, int x, int y)
 	m_powerSearchRange = 1;
 	m_producesPower = false;
 	m_shakesCamera = true;
+	m_altitude = 10000.0f;
+	m_fallSpeed = 20000.0f;
 
 	m_tileAffectRange = 0;
 
@@ -39,9 +42,6 @@ Building::Building(Game* game, int x, int y)
 	// grab the world position
 	m_worldPos =
 		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);
-
-	m_altitude = 10000.0f;
-	m_fallSpeed = 20000.0f;
 }
 
 void Building::update(float delta)
