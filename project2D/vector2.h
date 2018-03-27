@@ -5,6 +5,7 @@ class Vector2
 public:
 	Vector2();
 	Vector2(float x, float y);
+	~Vector2() = default;
 
 	Vector2(const Vector2& vec);
 
@@ -12,17 +13,17 @@ public:
 	Vector2(Vector2&& vec) = default;
 	Vector2& operator=(Vector2&& vec) = default;
 
-	inline void setX(float x) { m_x = x; }
-	inline void setY(float y) { m_y = y; }
+	void setX(float x) { m_x = x; }
+	void setY(float y) { m_y = y; }
 	inline void setPos(float x, float y);
 
-	inline float getX() const { return m_x; }
-	inline float getY() const { return m_y; }
+	float getX() const { return m_x; }
+	float getY() const { return m_y; }
 
-	inline void addX(float amt) { m_x += amt; }
-	inline void addY(float amt) { m_y += amt; }
-	inline void subX(float amt) { m_x -= amt; }
-	inline void subY(float amt) { m_y -= amt; }
+	void addX(float amt) { m_x += amt; }
+	void addY(float amt) { m_y += amt; }
+	void subX(float amt) { m_x -= amt; }
+	void subY(float amt) { m_y -= amt; }
 
 	float magnitude();
 	float magnitudeSquared();

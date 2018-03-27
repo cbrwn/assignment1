@@ -92,10 +92,6 @@ UiManager::UiManager(Game* game)
 	m_zoneSelectorIcon = img->getTexture("icons/zone");
 }
 
-UiManager::~UiManager()
-{
-}
-
 void UiManager::update(float delta)
 {
 	const float smoothSpeed = 10.0f;

@@ -18,7 +18,7 @@ SmokeParticle::SmokeParticle(Game* game, Vector2& pos)
 	m_opacity += randBetween(0.0f, 0.8f);
 
 	// and random rotation
-	m_rotateDirection = randBetween(-3.0f, 3.0f);
+	m_rotateVelocity = randBetween(-3.0f, 3.0f);
 }
 
 void SmokeParticle::update(float delta)
@@ -27,7 +27,7 @@ void SmokeParticle::update(float delta)
 	m_opacity -= delta * 1.5f;
 
 	// update transform stuff
-	m_rotation += m_rotateDirection * delta;
+	m_rotation += m_rotateVelocity * delta;
 
 	m_vel -= (m_vel * delta);
 	m_pos += (m_vel * delta);

@@ -6,8 +6,8 @@
 Shop::Shop(Game* game, int x, int y)
 	: Building(game, x, y)
 {
-	m_type = BuildingType::BUILDINGTYPE_SHOP;
-	m_buildStyle = BuildStyle::BUILDSTYLE_FORBIDDEN;
+	m_type = BUILDINGTYPE_SHOP;
+	m_buildStyle = BUILDSTYLE_FORBIDDEN;
 	m_sizeX = 1;
 	m_sizeY = 1;
 	m_powerSearchRange = 1;

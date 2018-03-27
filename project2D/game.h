@@ -73,13 +73,13 @@ public:
 	aie::Font* m_uiFont;
 	aie::Font* m_uiFontLarge;
 
-	virtual bool startup();
-	virtual void shutdown();
+	bool startup() override;
+	void shutdown() override;
 
-	virtual void update(float deltaTime);
-	virtual void draw();
+	void update(float deltaTime) override;
+	void draw() override;
 
-	inline Vector2& getMapStart() { return m_mapStart; }
+	Vector2& getMapStart() { return m_mapStart; }
 
 	// mouse-related functions
 	Vector2 getMouseWorldPosition();
@@ -89,18 +89,18 @@ public:
 	void drawTileRect(int left, int top, int right, int bottom);
 
 	// money-related functions
-	inline int  getMoney() { return m_money; }
-	inline void setMoney(int money) { m_money = money; }
-	inline void addMoney(int money) { m_money += money; }
+	int  getMoney() { return m_money; }
+	void setMoney(int money) { m_money = money; }
+	void addMoney(int money) { m_money += money; }
 
 	// place mode related functions
-	inline PlaceMode getPlaceMode() { return m_placeMode; }
+	PlaceMode getPlaceMode() { return m_placeMode; }
 	void setPlaceMode(PlaceMode mode);
 
 	// view mode related functions
-	inline ViewMode getViewMode() { return m_viewMode; }
-	inline void setViewMode(ViewMode mode) { m_viewMode = mode; }
-	inline bool isViewModeEnabled(ViewMode mode) { return (m_viewMode & mode); };
+	ViewMode getViewMode() { return m_viewMode; }
+	void setViewMode(ViewMode mode) { m_viewMode = mode; }
+	bool isViewModeEnabled(ViewMode mode) { return (m_viewMode & mode); };
 	void toggleViewMode(ViewMode mode);
 
 	// particle stuff
@@ -110,12 +110,12 @@ public:
 	void doScreenShake(float amt);
 
 	// getters for all of the managers
-	inline ImageManager*	getImageManager() { return m_imageManager; }
-	inline UiManager*		getUiManager() { return m_uiManager; }
-	inline BuildingManager* getBuildingManager() { return m_buildingManager; }
-	inline RoadManager*		getRoadManager() { return m_roadManager; }
-	inline SaveManager*		getSaveManager() { return m_saveManager; }
-	inline TileManager*		getTileManager() { return m_tileManager; }
+	ImageManager*		getImageManager() { return m_imageManager; }
+	UiManager*			getUiManager() { return m_uiManager; }
+	BuildingManager*	getBuildingManager() { return m_buildingManager; }
+	RoadManager*		getRoadManager() { return m_roadManager; }
+	SaveManager*		getSaveManager() { return m_saveManager; }
+	TileManager*		getTileManager() { return m_tileManager; }
 
 protected:
 	aie::Renderer2D*	m_2dRenderer;

@@ -36,18 +36,22 @@ BuildingManager::BuildingManager(Game* game, BuildingList* buildings)
 	m_factoryCount = 0;
 
 	m_dragging = false;
+	m_isDragHorizontal = false;
+	m_dragStartX = 0;
+	m_dragStartY = 0;
+	m_dragPosX = 0;
+	m_dragPosY = 0;
 }
 
 BuildingManager::~BuildingManager()
 {
-	if (m_ghostBuilding)
-		delete m_ghostBuilding;
+	delete m_ghostBuilding;
 }
 
 void BuildingManager::buildingMode()
 {
 	// double check to make sure we're in building mode
-	if (m_game->getPlaceMode() != PlaceMode::PLACEMODE_BUILDING)
+	if (m_game->getPlaceMode() != PLACEMODE_BUILDING)
 		return;
 
 	aie::Input* input = aie::Input::getInstance();
@@ -55,7 +59,7 @@ void BuildingManager::buildingMode()
 	// B to toggle building mode
 	if (input->wasKeyPressed(aie::INPUT_KEY_B))
 	{
-		m_game->setPlaceMode(PlaceMode::PLACEMODE_NONE);
+		m_game->setPlaceMode(PLACEMODE_NONE);
 		return;
 	}
 
@@ -82,8 +86,7 @@ void BuildingManager::buildingMode()
 	if (m_ghostBuilding == nullptr
 		|| (int)m_ghostBuilding->getType() != m_selectedBuilding)
 	{
-		if (m_ghostBuilding)
-			delete m_ghostBuilding;
+		delete m_ghostBuilding;
 		m_ghostBuilding = makeBuilding((BuildingType)m_selectedBuilding,
 			tileX, tileY, true);
 	}
@@ -107,7 +110,7 @@ void BuildingManager::buildingMode()
 
 	// line style lets you click and drag
 	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT)
-		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_LINE)
+		&& m_ghostBuilding->getBuildStyle() == BUILDSTYLE_LINE)
 	{
 		if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
 			&& m_game->isMouseInGame() && tileX > -1 && tileY > -1)
@@ -126,8 +129,8 @@ void BuildingManager::buildingMode()
 
 			// check if the line we're drawing is horizontal or vertical
 			// based on the direction we're dragging
-			int horizontalDist = (int)fabsf((float)m_dragStartX - m_dragPosX);
-			int verticalDist = (int)fabsf((float)m_dragStartY - m_dragPosY);
+			auto horizontalDist = (int)fabsf((float)m_dragStartX - m_dragPosX);
+			auto verticalDist = (int)fabsf((float)m_dragStartY - m_dragPosY);
 			m_isDragHorizontal = horizontalDist > verticalDist;
 
 			if (m_isDragHorizontal)
@@ -182,7 +185,7 @@ void BuildingManager::buildingMode()
 		return;
 
 	if (input->wasMouseButtonPressed(aie::INPUT_MOUSE_BUTTON_LEFT)
-		&& m_ghostBuilding->getBuildStyle() == BuildStyle::BUILDSTYLE_SINGLE)
+		&& m_ghostBuilding->getBuildStyle() == BUILDSTYLE_SINGLE)
 	{
 		// place building!
 		placeBuilding(makeBuilding((BuildingType)m_selectedBuilding,
@@ -193,7 +196,7 @@ void BuildingManager::buildingMode()
 // draws everything while in building mode
 // basically just the translucent ghost building to show the player
 //   what they're building
-void BuildingManager::drawPlacement(aie::Renderer2D* renderer)
+void BuildingManager::drawPlacement(aie::Renderer2D* renderer) const
 {
 	if (m_ghostBuilding)
 	{
@@ -291,7 +294,7 @@ void BuildingManager::updateBuildings(float delta)
 			zonedTiles[i] = t;
 		}
 
-		int tileAmt = (int)zonedTiles.size();
+		auto tileAmt = (int)zonedTiles.size();
 
 
 		int processed = 0;
@@ -311,7 +314,7 @@ void BuildingManager::updateBuildings(float delta)
 			if (!t->isLiveable())
 				continue;
 
-			Building* newBuilding = nullptr;
+			Building* newBuilding;
 
 			float resDemand = getResidentialDemand();
 			float comDemand = getCommercialDemand();
@@ -339,6 +342,10 @@ void BuildingManager::updateBuildings(float delta)
 				newBuilding = makeBuilding(BUILDINGTYPE_FACTORY,
 					xIndex, yIndex);
 				break;
+			case ZONETYPE_NONE:
+			case ZONETYPE_COUNT:
+			default:
+				continue;
 			}
 
 			if (newBuilding)
@@ -369,7 +376,7 @@ void BuildingManager::updateBuildings(float delta)
 			Tile* underHouse = m_game->getTileManager()->getTile(ix, iy);
 
 			// check if the zone type matches the building
-			bool zoneMatches = false;
+			bool zoneMatches;
 			switch (b->getType())
 			{
 			case BUILDINGTYPE_HOUSE:
@@ -381,6 +388,8 @@ void BuildingManager::updateBuildings(float delta)
 			case BUILDINGTYPE_FACTORY:
 				zoneMatches = underHouse->getZoneType() == ZONETYPE_INDUSTRIAL;
 				break;
+			default: 
+				zoneMatches = false;
 			}
 
 			if (underHouse->isLiveable() && zoneMatches)
@@ -405,7 +414,7 @@ void BuildingManager::updateBuildings(float delta)
 	}
 }
 
-void BuildingManager::drawBuildings(aie::Renderer2D* renderer)
+void BuildingManager::drawBuildings(aie::Renderer2D* renderer) const
 {
 	for (int i = 0; i < m_buildings->getCount(); ++i)
 	{
@@ -508,7 +517,7 @@ void BuildingManager::removeBuilding(Building* toRemove)
 	// make smokey particles on each tile it occupied
 	for (int x = ix - iw; x <= ix; ++x)
 	{
-		for (int y = iy - ih; y <= iy; ++x)
+		for (int y = iy - ih; y <= iy; ++y)
 		{
 			// grab the world position
 			Vector2 tPos =
@@ -557,7 +566,7 @@ void BuildingManager::removeBuilding(Building* toRemove)
 	m_buildings->remove(toRemove);
 }
 
-void BuildingManager::sortBuildings()
+void BuildingManager::sortBuildings() const
 {
 	TileManager* tm = m_game->getTileManager();
 
@@ -577,9 +586,9 @@ void BuildingManager::sortBuildings()
 	});
 }
 
-float BuildingManager::getDemand(ZoneType zone)
+float BuildingManager::getDemand(const ZoneType zone) const
 {
-	float result = 0.0f;
+	float result;
 
 	switch (zone)
 	{
@@ -594,7 +603,6 @@ float BuildingManager::getDemand(ZoneType zone)
 		break;
 	default:
 		return -1.0f;
-		break;
 	}
 
 	// raise the result to a silly power
@@ -614,7 +622,7 @@ float BuildingManager::getDemand(ZoneType zone)
 const float factorySpace = 2.0f;
 const float shopSpace = 3.0f;
 
-float BuildingManager::getResidentialDemand()
+float BuildingManager::getResidentialDemand() const
 {
 	/*
 	residents will not want to move in if:
@@ -631,7 +639,7 @@ float BuildingManager::getResidentialDemand()
 
 	return (shopsPerResident + jobsPerResident) / 2.0f;
 }
-float BuildingManager::getCommercialDemand()
+float BuildingManager::getCommercialDemand() const
 {
 	/*
 	shops will not want to build if:
@@ -643,7 +651,7 @@ float BuildingManager::getCommercialDemand()
 	float residentsPerShop = m_houseCount / (m_shopCount * shopSpace);
 	return residentsPerShop;
 }
-float BuildingManager::getIndustrialDemand()
+float BuildingManager::getIndustrialDemand() const
 {
 	/*
 	factories will not want to build if:
@@ -656,7 +664,7 @@ float BuildingManager::getIndustrialDemand()
 	return residentsPerJob;
 }
 
-int BuildingManager::getBuildingCount(BuildingType type)
+int BuildingManager::getBuildingCount(const BuildingType type) const
 {
 	int result = 0;
 	for (int i = 0; i < m_buildings->getCount(); ++i)
@@ -670,7 +678,7 @@ int BuildingManager::getBuildingCount(BuildingType type)
 
 // returns whether or not the currently selected building can be placed at 
 //   its position
-bool BuildingManager::canPlaceBuilding()
+bool BuildingManager::canPlaceBuilding() const
 {
 	if (!m_ghostBuilding)
 		return false;
@@ -716,7 +724,7 @@ bool BuildingManager::canPlaceBuilding()
 	return true;
 }
 
-Building* BuildingManager::getBuildingAtIndex(int ix, int iy)
+Building* BuildingManager::getBuildingAtIndex(int ix, int iy) const
 {
 	if (ix < 0 || iy < 0 || ix >= WORLD_WIDTH || iy >= WORLD_HEIGHT)
 		return nullptr;
@@ -745,8 +753,8 @@ void BuildingManager::clearBuildings()
 // creates a building with type type
 // similar to a "factory"
 // https://en.wikipedia.org/wiki/Factory_method_pattern
-Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
-	int yTile, bool ghost)
+Building* BuildingManager::makeBuilding(const BuildingType type, 
+	const int xTile, const int yTile, const bool ghost) const
 {
 	// in case we want to use the building we made for something else,
 	// such as storing power poles in their vector
@@ -756,7 +764,6 @@ Building* BuildingManager::makeBuilding(BuildingType type, int xTile,
 	{
 	case BUILDINGTYPE_NONE:
 		return nullptr;
-		break;
 	case BUILDINGTYPE_POWERPLANT:
 		b = new PowerPlant(m_game, xTile, yTile);
 		break;

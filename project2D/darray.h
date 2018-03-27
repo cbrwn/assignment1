@@ -37,6 +37,12 @@ public:
 
 	T& operator[](int index) { return m_items[index]; }
 
+	//------------------------------------------------------------------------
+	// Adds an element to the array
+	//
+	// Param: 
+	//			item: item to add to the end of the array
+	//------------------------------------------------------------------------
 	void add(const T& item)
 	{
 		// just stick it on the end of the array
@@ -64,6 +70,12 @@ public:
 		}
 	}
 
+	//------------------------------------------------------------------------
+	// Removes an item from the array
+	//
+	// Param: 
+	//			index: the index of the item to remove from the array
+	//------------------------------------------------------------------------
 	void remove(int index)
 	{
 		// removing the last item is just popping off the top
@@ -83,7 +95,13 @@ public:
 		m_itemCount--;
 	}
 
-	// searches for item in the array and removes it if found
+	//
+	//------------------------------------------------------------------------
+	// Removes an item from the array by searching for it and calling remove
+	//
+	// Param: 
+	//			item: item to remove
+	//------------------------------------------------------------------------
 	void remove(const T& item)
 	{
 		for (int i = 0; i < m_itemCount; ++i)
@@ -96,17 +114,29 @@ public:
 		}
 	}
 
+	//------------------------------------------------------------------------
+	// Gets the current actual size of the array
+	//
+	// Return: 
+	//			the size of the array
+	//------------------------------------------------------------------------
+	int getCurrentSize() const { return m_size; }
+	//------------------------------------------------------------------------
+	// Gets the number of items in the array
+	//
+	// Return: 
+	//			the number of items in the array
+	//------------------------------------------------------------------------
+	int getCount() const { return m_itemCount; }
+
 	// pop and clear don't actually do much
 	// they just change the item count so that unwanted items aren't
 	//   accessed and will be overwritten
 	void pop() { m_itemCount--; }
 	void clear() { m_itemCount = 0; }
 
-	inline int getCurrentSize() { return m_size; }
-	inline int getCount() { return m_itemCount; }
-
 	// use subscript operator to get array elements, not this!
-	inline T* _getArray() { return m_items; }
+	T* _getArray() { return m_items; }
 private:
 	T*		m_items;
 	int		m_size;

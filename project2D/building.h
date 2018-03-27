@@ -43,6 +43,8 @@ public:
 	//------------------------------------------------------------------------
 	Building(Game* game, int x, int y);
 
+	virtual ~Building() = default;
+
 	//------------------------------------------------------------------------
 	// Called every frame to deal with everything non-drawing related
 	//
@@ -76,7 +78,7 @@ public:
 	//			pos:      center point of the eye
 	//			rad:      radius of the eye
 	//------------------------------------------------------------------------
-	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad);
+	void drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad) const;
 
 	//------------------------------------------------------------------------
 	// Sets the position of the building, represented as the index of the tile
@@ -96,7 +98,7 @@ public:
 	//			x: pointer to where the x position will be stored
 	//			y: pointer to where the y position will be stored
 	//------------------------------------------------------------------------
-	inline void getPosition(int* x, int* y) { *x = m_posX; *y = m_posY; }
+	void getPosition(int* x, int* y) const { *x = m_posX; *y = m_posY; }
 	//------------------------------------------------------------------------
 	// Grabs the indices of the center of the building
 	// This is used in depth sorting, where we compare the center of the
@@ -106,7 +108,7 @@ public:
 	//			x: pointer to where the x position of the center will be stored
 	//			y: pointer to where the y position of the center will be stored
 	//------------------------------------------------------------------------
-	void getCenter(int* x, int* y);
+	void getCenter(int* x, int* y) const;
 	//------------------------------------------------------------------------
 	// Gets the size (in tiles) of the building
 	//
@@ -114,14 +116,14 @@ public:
 	//			w: pointer to where the width will be stored
 	//			h: pointer to where the height will be stored
 	//------------------------------------------------------------------------
-	inline void getSize(int* w, int* h) { *w = m_sizeX; *h = m_sizeY; }
+	void getSize(int* w, int* h) const { *w = m_sizeX; *h = m_sizeY; }
 	//------------------------------------------------------------------------
 	// Changes the texture which is used when drawing the building
 	//
 	// Param: 
 	//			tex: the new texture
 	//------------------------------------------------------------------------
-	inline void setTexture(aie::Texture* tex) { m_texture = tex; }
+	void setTexture(aie::Texture* tex) { m_texture = tex; }
 	//------------------------------------------------------------------------
 	// Gets the world position of the building, as opposed to the tile-based
 	// positions stored in m_posX and m_posY
@@ -129,7 +131,7 @@ public:
 	// Return: 
 	//			Vector2 containing the world-based position of the building
 	//------------------------------------------------------------------------
-	inline Vector2 getWorldPosition() { return m_worldPos; }
+	Vector2 getWorldPosition() const { return m_worldPos; }
 
 	//------------------------------------------------------------------------
 	// Sets how far above the ground the building is
@@ -138,7 +140,7 @@ public:
 	// Param: 
 	//			alt: the desired altitude
 	//------------------------------------------------------------------------
-	inline void setAltitude(float alt) { m_altitude = alt; }
+	void setAltitude(const float alt) { m_altitude = alt; }
 	//------------------------------------------------------------------------
 	// Sets how quickly the building falls to the ground
 	// Used for dropping buildings into the world on creation
@@ -146,7 +148,7 @@ public:
 	// Param: 
 	//			spd: the desired speed
 	//------------------------------------------------------------------------
-	inline void setFallSpeed(float spd) { m_fallSpeed = spd; }
+	void setFallSpeed(const float spd) { m_fallSpeed = spd; }
 
 	//------------------------------------------------------------------------
 	// Powers this building if available, and spreads power if power is found
@@ -158,14 +160,14 @@ public:
 	// Return: 
 	//			number of tiles from each side to search
 	//------------------------------------------------------------------------
-	inline int getPowerSearch() { return m_powerSearchRange; }
+	int getPowerSearch() const { return m_powerSearchRange; }
 	//------------------------------------------------------------------------
 	// Gets how many tiles this building spreads power to if powered
 	//
 	// Return: 
 	//			number of tiles from each side to spread
 	//------------------------------------------------------------------------
-	inline int getPowerSpread() { return m_powerSpreadRange; }
+	int getPowerSpread() const { return m_powerSpreadRange; }
 
 	//------------------------------------------------------------------------
 	// Gets the kind of building this is
@@ -174,14 +176,14 @@ public:
 	// Return: 
 	//			BuildingType enum of the building
 	//------------------------------------------------------------------------
-	inline BuildingType getType() { return m_type; }
+	BuildingType getType() const { return m_type; }
 	//------------------------------------------------------------------------
 	// Gets the method of placing the building in build mode
 	//
 	// Return: 
 	//			BuildStyle enum of the building
 	//------------------------------------------------------------------------
-	inline BuildStyle getBuildStyle() { return m_buildStyle; }
+	BuildStyle getBuildStyle() const { return m_buildStyle; }
 
 	//------------------------------------------------------------------------
 	// Gets how much the building costs to build
@@ -189,7 +191,7 @@ public:
 	// Return: 
 	//			price of the building
 	//------------------------------------------------------------------------
-	inline int getPrice() { return m_price; }
+	int getPrice() const { return m_price; }
 
 	// a static array of names to show in the UI
 	static char* buildingNames[BUILDINGTYPE_COUNT];

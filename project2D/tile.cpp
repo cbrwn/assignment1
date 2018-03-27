@@ -25,14 +25,13 @@ Tile::Tile(Game* game, aie::Texture* tex) :
 	m_zoneTintColours[ZONETYPE_INDUSTRIAL] = 0xffbb00ff;
 }
 
-void Tile::draw(aie::Renderer2D* renderer, float dx, float dy, bool zoneTint)
+void Tile::draw(aie::Renderer2D* renderer, const float dx, 
+	const float dy, const bool zoneTint)
 {
 	if (zoneTint)
 		renderer->setRenderColour(m_zoneTintColours[getZoneType()]);
 	renderer->drawSprite(m_texture, dx, dy, 0, 0, 0, 0, 0, 0.5f);
 }
-
-void Tile::update() {}
 
 void Tile::setIndices(int x, int y)
 {
@@ -40,29 +39,14 @@ void Tile::setIndices(int x, int y)
 	m_yIndex = y;
 }
 
-void Tile::getIndices(int* x, int* y)
+void Tile::getIndices(int* x, int* y) const
 {
 	*x = m_xIndex;
 	*y = m_yIndex;
 }
 
-aie::Texture* Tile::getTexture()
-{
-	return m_texture;
-}
-
-void Tile::setTexture(aie::Texture* tex)
-{
-	m_texture = tex;
-}
-
-void Tile::setZoneType(ZoneType type)
-{
-	m_zoneType = type;
-}
-
 // returns whether or not the tile is suitable for living
-bool Tile::isLiveable()
+bool Tile::isLiveable() const
 {
 	if (!m_hasPower)
 		return false;

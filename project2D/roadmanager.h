@@ -47,7 +47,7 @@ public:
 	//------------------------------------------------------------------------
 	// Clears the list of roads
 	//------------------------------------------------------------------------
-	void clearRoads();
+	void clearRoads() const;
 
 	//------------------------------------------------------------------------
 	// Sorts the list of roads and updates their textures
@@ -65,7 +65,7 @@ public:
 	// Return: 
 	//			pointer to the road found at the position
 	//------------------------------------------------------------------------
-	Road* getRoadAtPosition(int x, int y);
+	Road* getRoadAtPosition(int x, int y) const;
 	//------------------------------------------------------------------------
 	// Gets the road closest to a position and outputs the distance to it
 	//
@@ -76,16 +76,16 @@ public:
 	// Return: 
 	//			pointer to the road closest to the position
 	//------------------------------------------------------------------------
-	Road* getClosestRoad(int x, int y, int* distOut);
+	Road* getClosestRoad(int x, int y, int* distOut) const;
 private:
 	Game* m_game;
 
 	RoadList* m_roads;
 
 	// function which changes the roads' textures based on their neighbours
-	void updateRoadTextures();
+	void updateRoadTextures() const;
 
 	// sorting functions
-	void quickSortRoads(int min, int max);
-	int partitionRoads(int min, int max);
+	void quickSortRoads(int min, int max) const;
+	int partitionRoads(int min, int max) const;
 };

@@ -14,7 +14,7 @@ PollutionParticle::PollutionParticle(Game* game, Vector2& pos)
 	m_vel.setY(randBetween(40.0f, 100.0f));
 
 	// and random rotation
-	m_rotateDirection = randBetween(-3.0f, 3.0f);
+	m_rotateVelocity = randBetween(-3.0f, 3.0f);
 }
 
 void PollutionParticle::update(float delta)
@@ -23,7 +23,7 @@ void PollutionParticle::update(float delta)
 	m_opacity -= delta * 0.8f;
 
 	// update transform stuff
-	m_rotation += m_rotateDirection * delta;
+	m_rotation += m_rotateVelocity * delta;
 
 	m_pos += (m_vel * delta);
 }

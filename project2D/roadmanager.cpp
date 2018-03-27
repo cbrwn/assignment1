@@ -62,22 +62,22 @@ void RoadManager::removeRoad(Building* road)
 	updateRoadTextures();
 }
 
-void RoadManager::clearRoads()
+void RoadManager::clearRoads() const
 {
 	m_roads->clear();
 }
 
 // binary search for road at the given position
-Road* RoadManager::getRoadAtPosition(int x, int y)
+Road* RoadManager::getRoadAtPosition(const int x, const int y) const
 {
 	// make sure index is within bounds of world
 	if (x >= WORLD_WIDTH || y >= WORLD_HEIGHT
 		|| x < 0 || y < 0)
-		return false;
+		return nullptr;
 
 	// no roads to search for!
 	if (m_roads->getCount() < 1)
-		return false;
+		return nullptr;
 
 	// roads are sorted by (y*width)+x, like how they would be laid out in
 	//   a 1d array, so we get that as our target
@@ -119,7 +119,8 @@ Road* RoadManager::getRoadAtPosition(int x, int y)
 	return nullptr;
 }
 
-Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
+Road* RoadManager::getClosestRoad(const int x, const int y, 
+	int* distOut) const
 {
 	Road* closest = nullptr;
 	int closestDist = INT_MAX;
@@ -129,8 +130,8 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 		Road* r = (*m_roads)[i];
 		int rx, ry;
 		r->getPosition(&rx, &ry);
-		int xDist = (int)fabsf((float)x - rx);
-		int yDist = (int)fabsf((float)y - ry);
+		auto xDist = (int)fabsf((float)x - rx);
+		auto yDist = (int)fabsf((float)y - ry);
 		int totalDist = xDist + yDist;
 		if (totalDist < closestDist)
 		{
@@ -143,7 +144,7 @@ Road* RoadManager::getClosestRoad(int x, int y, int* distOut)
 	return closest;
 }
 
-void RoadManager::updateRoadTextures()
+void RoadManager::updateRoadTextures() const
 {
 	// update road textures based on neighbouring roads
 	for (int i = 0; i < m_roads->getCount(); ++i)
@@ -202,7 +203,7 @@ void RoadManager::updateRoadTextures()
 	}
 }
 
-void RoadManager::quickSortRoads(int min, int max)
+void RoadManager::quickSortRoads(const int min, const int max) const
 {
 	if (min < max)
 	{
@@ -215,7 +216,7 @@ void RoadManager::quickSortRoads(int min, int max)
 
 // based on pseudocode from the Lomuto partition scheme:
 // https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
-int RoadManager::partitionRoads(int min, int max)
+int RoadManager::partitionRoads(const int min, const int max) const
 {
 	// use last road as the pivot
 	Road* pivot = (*m_roads)[max];

@@ -41,7 +41,7 @@ public:
 	// Return: 
 	//			the opacity of the particle
 	//------------------------------------------------------------------------
-	inline float getOpacity() { return m_opacity; }
+	float getOpacity() { return m_opacity; }
 protected:
 	Game* m_game;
 

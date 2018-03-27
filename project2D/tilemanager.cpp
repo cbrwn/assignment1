@@ -24,7 +24,7 @@ void TileManager::updateZoneEditing()
 	// Z to toggle mode
 	if (input->wasKeyPressed(aie::INPUT_KEY_Z))
 	{
-		m_game->setPlaceMode(PlaceMode::PLACEMODE_NONE);
+		m_game->setPlaceMode(PLACEMODE_NONE);
 		return;
 	}
 
@@ -85,7 +85,7 @@ void TileManager::updateZoneEditing()
 	}
 }
 
-void TileManager::drawZoneSelection(aie::Renderer2D* renderer)
+void TileManager::drawZoneSelection(aie::Renderer2D* renderer) const
 {
 	// draw current selection
 	if (m_dragging)
@@ -96,7 +96,7 @@ void TileManager::drawZoneSelection(aie::Renderer2D* renderer)
 	}
 }
 
-void TileManager::getTileAtMousePosition(int* ix, int* iy)
+void TileManager::getTileAtMousePosition(int* ix, int* iy) const
 {
 	// first get the mouse's world position
 	Vector2 mousePos = m_game->getMouseWorldPosition();
@@ -105,7 +105,7 @@ void TileManager::getTileAtMousePosition(int* ix, int* iy)
 	getTileAtPosition(mousePos, ix, iy);
 }
 
-Tile* TileManager::getTileAtPosition(Vector2& pos)
+Tile* TileManager::getTileAtPosition(Vector2& pos) const
 {
 	int ix, iy;
 	getTileAtPosition(pos, &ix, &iy);
@@ -115,7 +115,7 @@ Tile* TileManager::getTileAtPosition(Vector2& pos)
 	return (*m_tiles)[iy][ix];
 }
 
-void TileManager::getTileAtPosition(Vector2& pos, int* ix, int* iy)
+void TileManager::getTileAtPosition(Vector2& pos, int* ix, int* iy) const
 {
 	// get shorter names for the measurements we use to offset the tiles
 	const float tw = TILE_WIDTH / 2.0f;
@@ -138,8 +138,8 @@ void TileManager::getTileAtPosition(Vector2& pos, int* ix, int* iy)
 	py += th;
 
 	// the inverse of the calculations in getTileWorldPosition
-	int resultX = (int)((px / tw + py / th) / 2);
-	int resultY = (int)((py / th - px / tw) / 2);
+	auto resultX = (int)((px / tw + py / th) / 2);
+	auto resultY = (int)((py / th - px / tw) / 2);
 
 	if (resultX < 0 || resultX >= WORLD_WIDTH)
 		resultX = -1;
@@ -150,15 +150,16 @@ void TileManager::getTileAtPosition(Vector2& pos, int* ix, int* iy)
 	*iy = resultY;
 }
 
-Vector2 TileManager::getTileWorldPosition(int ix, int iy)
+Vector2 TileManager::getTileWorldPosition(const int ix, const int iy) const
 {
 	Vector2 mapStart = m_game->getMapStart();
 	float xpos = (ix - iy) * TILE_WIDTH / 2.0f + mapStart.getX();
 	float ypos = (ix + iy) * TILE_HEIGHT / 3.0f - mapStart.getY();
-	return Vector2(xpos, -ypos);
+	// (apparently this is more modern than return Vector2(x,y) ??
+	return { xpos, -ypos };
 }
 
-bool TileManager::isIndexInBounds(int x, int y)
+bool TileManager::isIndexInBounds(const int x, const int y) const
 {
 	return x >= 0 && y >= 0 && x < WORLD_WIDTH && y < WORLD_HEIGHT;
 }

@@ -16,7 +16,6 @@ char* Building::buildingNames[BUILDINGTYPE_COUNT] = {
 	"Factory"
 };
 
-/**/
 Building::Building(Game* game, int x, int y)
 	: m_game(game), m_posX(x), m_posY(y)
 {
@@ -25,7 +24,7 @@ Building::Building(Game* game, int x, int y)
 	m_type = BUILDINGTYPE_NONE;
 	m_sizeX = 1;
 	m_sizeY = 1;
-	m_buildStyle = BuildStyle::BUILDSTYLE_SINGLE;
+	m_buildStyle = BUILDSTYLE_SINGLE;
 	m_hasPower = false;
 	m_powerSpreadRange = 2;
 	m_powerSearchRange = 1;
@@ -62,7 +61,7 @@ void Building::update(float delta)
 			// smokey particles on the front-left side
 			for (int i = m_posX + 1; i > m_posX - m_sizeX; --i)
 			{
-				int y = m_posY + 1;
+				const int y = m_posY + 1;
 				Vector2 v =
 					m_game->getTileManager()->getTileWorldPosition(i, y);
 				m_game->spawnSmokeParticle(v);
@@ -70,7 +69,7 @@ void Building::update(float delta)
 			// and front-right side
 			for (int i = m_posY + 1; i >= m_posY - m_sizeY; --i)
 			{
-				int x = m_posX + 1;
+				const int x = m_posX + 1;
 				Vector2 v =
 					m_game->getTileManager()->getTileWorldPosition(x, i);
 				m_game->spawnSmokeParticle(v);
@@ -122,7 +121,8 @@ void Building::affectOrUnaffectTiles(bool affect)
 void Building::affectTile(Tile* t) {}
 void Building::unaffectTile(Tile* t) {}
 
-void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos, float rad)
+void Building::drawEyeball(aie::Renderer2D* renderer, Vector2& pos,
+	const float rad) const
 {
 	// get mouse position
 	Vector2 mousePos = m_game->getMouseWorldPosition();
@@ -159,7 +159,7 @@ void Building::setPosition(int x, int y)
 		m_game->getTileManager()->getTileWorldPosition(m_posX + 1, m_posY);
 }
 
-void Building::getCenter(int* x, int* y)
+void Building::getCenter(int* x, int* y) const
 {
 	*x = m_posX - (m_sizeX - 1) / 2;
 	*y = m_posY - (m_sizeY - 1) / 2;

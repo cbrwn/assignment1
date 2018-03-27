@@ -29,7 +29,6 @@ public:
 	//			game: pointer to our Game so we can access everything we need
 	//------------------------------------------------------------------------
 	explicit UiManager(Game* game);
-	~UiManager();
 
 	//------------------------------------------------------------------------
 	// Called every frame to deal with everything non-drawing related

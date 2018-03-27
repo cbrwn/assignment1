@@ -31,7 +31,7 @@ public:
 	// Param: 
 	//			renderer: pointer to the renderer used to draw everything
 	//------------------------------------------------------------------------
-	void drawZoneSelection(aie::Renderer2D* renderer);
+	void drawZoneSelection(aie::Renderer2D* renderer) const;
 
 	//------------------------------------------------------------------------
 	// Gets a pointer to the tile at a specified index in the 2D array
@@ -44,7 +44,7 @@ public:
 	// Return: 
 	//			the tile at that location
 	//------------------------------------------------------------------------
-	inline Tile* getTile(int x, int y) { return (*m_tiles)[y][x]; }
+	Tile* getTile(int x, int y) const { return (*m_tiles)[y][x]; }
 	//------------------------------------------------------------------------
 	// Grabs the tile index which is under the mouse's world position
 	// Indices will be -1 if no tile is found
@@ -53,7 +53,7 @@ public:
 	//			ix: pointer to where the resulting x index should be stored 
 	//			iy: pointer to where the resulting y index should be stored 
 	//------------------------------------------------------------------------
-	void	getTileAtMousePosition(int *ix, int *iy);
+	void	getTileAtMousePosition(int *ix, int *iy) const;
 	//------------------------------------------------------------------------
 	// Gets a pointer to the tile at a specified world position
 	//
@@ -62,7 +62,7 @@ public:
 	// Return: 
 	//			the tile at the position OR nullptr if no tile exists there
 	//------------------------------------------------------------------------
-	Tile*	getTileAtPosition(Vector2& pos);
+	Tile*	getTileAtPosition(Vector2& pos) const;
 	//------------------------------------------------------------------------
 	// Gets the index to the tile at a specified world position
 	//
@@ -71,7 +71,7 @@ public:
 	//			ix:  pointer to where the resulting x index should be stored 
 	//			iy:  pointer to where the resulting y index should be stored 
 	//------------------------------------------------------------------------
-	void	getTileAtPosition(Vector2& pos, int* ix, int* iy);
+	void	getTileAtPosition(Vector2& pos, int* ix, int* iy) const;
 	//------------------------------------------------------------------------
 	// Gets the world position of the tile at the specified index
 	//
@@ -81,7 +81,7 @@ public:
 	// Return: 
 	//			Vector2 representing the position of the tile at the index
 	//------------------------------------------------------------------------
-	Vector2 getTileWorldPosition(int ix, int iy);
+	Vector2 getTileWorldPosition(int ix, int iy) const;
 	//------------------------------------------------------------------------
 	// Checks if an index is within the world bounds
 	// Useful for checking the indices before using getTile
@@ -92,7 +92,7 @@ public:
 	// Return: 
 	//			whether or not the indices are within the bounds of the world
 	//------------------------------------------------------------------------
-	bool	isIndexInBounds(int x, int y);
+	bool	isIndexInBounds(int x, int y) const;
 	//------------------------------------------------------------------------
 	// Sets all tiles to have no power
 	// Used when updating tile power
@@ -114,7 +114,7 @@ public:
 	// Param: 
 	//			type: zone type selected by the player
 	//------------------------------------------------------------------------
-	inline void setSelectedType(ZoneType type) { m_selectedType = type; }
+	void setSelectedType(ZoneType type) { m_selectedType = type; }
 	//------------------------------------------------------------------------
 	// boopydoopy
 	//
@@ -123,7 +123,7 @@ public:
 	// Return: 
 	//			a boop that doops
 	//------------------------------------------------------------------------
-	inline ZoneType getSelectedType() { return m_selectedType; }
+	ZoneType getSelectedType() const { return m_selectedType; }
 private:
 	Game* m_game;
 	// a pointer to the 2D array of Tile pointers

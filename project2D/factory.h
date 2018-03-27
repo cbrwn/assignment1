@@ -11,7 +11,7 @@ public:
 	Factory(Game* game, int x, int y);
 
 	void update(float delta) override;
-	virtual void draw(aie::Renderer2D* renderer) override;
+	void draw(aie::Renderer2D* renderer) override;
 
 	void affectTile(Tile* t) override;
 	void unaffectTile(Tile* t) override;

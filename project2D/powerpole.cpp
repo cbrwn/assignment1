@@ -6,8 +6,8 @@
 PowerPole::PowerPole(Game* game, int x, int y)
 	: Building(game, x, y)
 {
-	m_type = BuildingType::BUILDINGTYPE_POWERPOLE;
-	m_buildStyle = BuildStyle::BUILDSTYLE_LINE;
+	m_type = BUILDINGTYPE_POWERPOLE;
+	m_buildStyle = BUILDSTYLE_LINE;
 	m_sizeX = 1;
 	m_sizeY = 1;
 	m_powerSearchRange = 3;

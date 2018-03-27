@@ -44,11 +44,11 @@ public:
 	// Param: 
 	//			renderer: pointer to the renderer used to draw everything
 	//------------------------------------------------------------------------
-	void drawPlacement(aie::Renderer2D* renderer);
+	void drawPlacement(aie::Renderer2D* renderer) const;
 	//------------------------------------------------------------------------
 	// Whether or not the ghost building is in a valid position to be placed
 	//------------------------------------------------------------------------
-	bool canPlaceBuilding();
+	bool canPlaceBuilding() const;
 
 	//------------------------------------------------------------------------
 	// Gets the building on the tile at an index
@@ -60,14 +60,14 @@ public:
 	// Return: 
 	//			pointer to the building at the position
 	//------------------------------------------------------------------------
-	Building* getBuildingAtIndex(int ix, int iy);
+	Building* getBuildingAtIndex(int ix, int iy) const;
 	//------------------------------------------------------------------------
 	// Gets a pointer to the list of all buildings
 	//
 	// Return: 
 	//			pointer to the dynamic array of buildings
 	//------------------------------------------------------------------------
-	BuildingList* getBuildings() { return m_buildings; }
+	BuildingList* getBuildings() const { return m_buildings; }
 	//------------------------------------------------------------------------
 	// Deletes all buildings and clears the dynamic array
 	//------------------------------------------------------------------------
@@ -87,7 +87,7 @@ public:
 	// Param: 
 	//			renderer: pointer to the renderer used to draw everything
 	//------------------------------------------------------------------------
-	void drawBuildings(aie::Renderer2D* renderer);
+	void drawBuildings(aie::Renderer2D* renderer) const;
 	//------------------------------------------------------------------------
 	// Adds a building to the dynamic array
 	// Should be the ONLY way buildings are added to the world
@@ -118,7 +118,7 @@ public:
 	// Sorts the array of buildings based on their depth from the camera
 	// so they are drawn as expected in an isometric view
 	//------------------------------------------------------------------------
-	void sortBuildings();
+	void sortBuildings() const;
 
 	//------------------------------------------------------------------------
 	// Gets the demand for the specified zone to be created
@@ -129,7 +129,7 @@ public:
 	//			a number representing demand of the zone
 	//			anything under 1 means there is no demand for it
 	//------------------------------------------------------------------------
-	float getDemand(ZoneType zone);
+	float getDemand(ZoneType zone) const;
 	//------------------------------------------------------------------------
 	// Gets how many buildings of a specific type exist in the world
 	// Used in determining the demand for each zone
@@ -139,7 +139,7 @@ public:
 	// Return: 
 	//			how many buildings of the type exist
 	//------------------------------------------------------------------------
-	int getBuildingCount(BuildingType type);
+	int getBuildingCount(BuildingType type) const;
 
 	//------------------------------------------------------------------------
 	// Gets the BuildingType the player has selected to build as an integer
@@ -147,14 +147,14 @@ public:
 	// Return: 
 	//			which BuildingType is selected
 	//------------------------------------------------------------------------
-	inline int getSelectedBuilding() { return m_selectedBuilding; }
+	int getSelectedBuilding() const { return m_selectedBuilding; }
 	//------------------------------------------------------------------------
 	// Sets the BuildingType the player has selected
 	//
 	// Param: 
 	//			id: BuildingType of the building to build
 	//------------------------------------------------------------------------
-	inline void setSelectedBuilding(int id) { m_selectedBuilding = id; }
+	void setSelectedBuilding(int id) { m_selectedBuilding = id; }
 
 	//------------------------------------------------------------------------
 	// Creates a pointer to a new building
@@ -168,7 +168,7 @@ public:
 	//                 a preview of where the building will be placed
 	//------------------------------------------------------------------------
 	Building* makeBuilding(BuildingType type, int xTile, int yTile,
-		bool ghost = false);
+		bool ghost = false) const;
 private:
 	Game*			m_game;
 	BuildingList*	m_buildings;
@@ -191,7 +191,7 @@ private:
 	// variables to keep track of the number of buildings used in demand calcs
 	int m_houseCount, m_shopCount, m_factoryCount;
 	// functions called by getDemand for individual zone demands
-	float getResidentialDemand();
-	float getCommercialDemand();
-	float getIndustrialDemand();
+	float getResidentialDemand() const;
+	float getCommercialDemand() const;
+	float getIndustrialDemand() const;
 };

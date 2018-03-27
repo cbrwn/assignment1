@@ -8,8 +8,8 @@ ImageManager::~ImageManager()
 	for (auto t : m_textures)
 	{
 		aie::Texture* tex = t.second;
-		if (tex != nullptr)
-			delete tex;
+
+		delete tex;
 	}
 }
 

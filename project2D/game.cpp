@@ -71,7 +71,7 @@ bool Game::startup()
 		}
 	}
 
-	m_placeMode = PlaceMode::PLACEMODE_NONE;
+	m_placeMode = PLACEMODE_NONE;
 	// default view mode shows zones, buildings and roads
 	setViewMode((ViewMode)(VIEWMODE_ZONE |
 		VIEWMODE_BUILDINGS |

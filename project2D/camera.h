@@ -34,8 +34,8 @@ public:
 	void  setZoomSpeed(float spd);
 	float getZoomSpeed();
 
-	inline void setShakeAmount(float amt) { m_shakeAmount = amt; }
-	inline float getShakeAmount() { return m_shakeAmount; }
+	void setShakeAmount(float amt) { m_shakeAmount = amt; }
+	float getShakeAmount() { return m_shakeAmount; }
 private:
 	Game * m_game;
 

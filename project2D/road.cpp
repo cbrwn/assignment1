@@ -28,7 +28,7 @@ void Road::draw(aie::Renderer2D* renderer)
 // used for sorting
 // turns the indices used in a 2 dimensional array (x, y)
 //   into a single index as if it was in a 1D array
-int Road::getOneDimensionalIndex()
+int Road::getOneDimensionalIndex() const
 {
 	return (m_posY * WORLD_WIDTH) + m_posX;
 }
