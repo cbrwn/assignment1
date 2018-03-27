@@ -51,23 +51,7 @@ public:
 
 		// resize if we get close to max size
 		if (m_itemCount >= m_size - 1)
-		{
-			m_size *= 2;
-
-			// make a whole new array with the new size
-			T* resized = new T[m_size];
-			// and copy all the stuff over
-			for (int i = 0; i < m_itemCount; ++i)
-				resized[i] = m_items[i];
-
-			// get rid of the old array
-			delete[] m_items;
-			// and make it point to the new one
-			m_items = resized;
-
-			// apparently realloc doesn't like to work :(
-			//m_items = (T*)realloc(m_items, m_size);
-		}
+			resize(m_size * 2);
 	}
 
 	//------------------------------------------------------------------------
@@ -82,20 +66,24 @@ public:
 		if (index == m_itemCount - 1)
 		{
 			pop();
-			return;
+		}
+		else
+		{
+			// make sure we're in the bounds of the array
+			if (index < 0 || index >= m_itemCount)
+				return;
+
+			// shift all elements left, overwriting the element at index
+			for (int i = index + 1; i < m_itemCount; ++i)
+				m_items[i - 1] = m_items[i];
+			m_itemCount--;
 		}
 
-		// make sure we're in the bounds of the array
-		if (index < 0 || index >= m_itemCount)
-			return;
-
-		// shift all elements left, overwriting the element at index
-		for (int i = index + 1; i < m_itemCount; ++i)
-			m_items[i - 1] = m_items[i];
-		m_itemCount--;
+		// resize if it gets below half the max size
+		if (m_itemCount <= (m_size / 2) - 1)
+			resize(m_size / 2);
 	}
 
-	//
 	//------------------------------------------------------------------------
 	// Removes an item from the array by searching for it and calling remove
 	//
@@ -138,7 +126,32 @@ public:
 	// use subscript operator to get array elements, not this!
 	T* _getArray() { return m_items; }
 private:
-	T*		m_items;
+	T* m_items;
 	int		m_size;
 	int		m_itemCount;
+
+	void resize(int newSize)
+	{
+		m_size = newSize;
+
+		// make a whole new array with the new size
+		T* resized = new T[newSize];
+
+		// make sure we're not trying to copy more than the size
+		int amountToCopy = m_itemCount;
+		if (newSize < amountToCopy)
+			amountToCopy = newSize;
+
+		// copy all the stuff over
+		for (int i = 0; i < amountToCopy; ++i)
+			resized[i] = m_items[i];
+
+		// get rid of the old array
+		delete[] m_items;
+		// and make it point to the new one
+		m_items = resized;
+
+		// apparently realloc doesn't like to work :(
+		//m_items = (T*)realloc(m_items, m_size);
+	}
 };
